@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class UserTokenImp implements UserToken
 {
 	String tokenIssuer;

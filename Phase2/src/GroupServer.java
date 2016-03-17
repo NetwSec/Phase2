@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class GroupServer
 {
 	List<UserTokenImp> users;

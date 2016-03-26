@@ -61,12 +61,12 @@ public class GroupThread extends Thread {
                 
                 //Add user to the group
                 else if (sent.getMessage().equals("addUserToGroup")){
-                    
+                    // If group = /ADMIN, set admin in user token to true
                 }
                 
                 //Delete a user from the group
                 else if (sent.getMessage().equals("deleteUserFromGroup")){
-                    
+                    // If group = /ADMIN, set admin in user token to false
                 }
                 
                 //List Members of the Group

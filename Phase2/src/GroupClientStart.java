@@ -141,7 +141,8 @@ public class GroupClientStart {
             {
                 menuChoice = -1;
             }
-
+            
+           
             switch (menuChoice)
             {
                 case 1:
@@ -275,14 +276,19 @@ public class GroupClientStart {
                             case 0:
                                 System.out.println("Disconnecting from Group Server...");
                                 gc.disconnect();
-                                exitKey = true;
-                                System.exit(0);
+                                eKey = true;
                                 break;
                             default:
                                 System.out.println("Unknown command. Please try again.");
                                 break;
                         }
                     }
+                    
+                    //Logout
+                    case 2:
+                        gc.disconnect();
+                        hasToken = false;
+                        
 		}
             }
         }

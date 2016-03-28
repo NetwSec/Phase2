@@ -1,5 +1,3 @@
-
-
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,25 +12,22 @@ import java.util.Scanner;
  * @author reticent
  */
 public class GroupClientStart {
+        
+        private static GroupClient gc;
     
     public static void main (String args[]){
         
-        GroupClient client = new GroupClient();
+        gc = new GroupClient();
         Scanner console = new Scanner(System.in); // Scanner object for input
 
         //Declared Variables
-        String inputString;
-        int menuChoice;
         boolean exitKey = false;
-        boolean hasToken = false;
-        String userName = new String();
-        UserToken userToken = null;
         
         if (args.length == 2){
            
-            client.connect(args[0], Integer.parseInt(args[1]));
+            gc.connect(args[0], Integer.parseInt(args[1]));
             
-            if (client.isConnect()){
+            if (gc.isConnect()){
                 System.out.println("Client is connected...\n"); //not really neccessary 
                 while(!exitKey){
                     run();
@@ -42,9 +37,9 @@ public class GroupClientStart {
         
         else if (args.length == 0){
             
-             client.connect("localhost", 8765);
+             gc.connect("localhost", 8765);
              
-             if (client.isConnect()){
+             if (gc.isConnect()){
                 System.out.println("Client is connected...\n");
                 
                 while(!exitKey){
@@ -61,9 +56,8 @@ public class GroupClientStart {
         }
     }
     
-    //Designed as an interface where the user can navigate between client and server
+    //Designed as an interface where the user can navigate between gc and server
     private static void run(){
-        GroupClient gc = new GroupClient();
         Scanner console = new Scanner(System.in); // Scanner object for input
 
         String inputString;
@@ -106,6 +100,7 @@ public class GroupClientStart {
                     else // has a valid token, can disconnect from gc
                     {
                         hasToken = true;
+                        exitKey = true;
                         gc.disconnect();
                     }
                 }
@@ -141,8 +136,7 @@ public class GroupClientStart {
             {
                 menuChoice = -1;
             }
-            
-           
+
             switch (menuChoice)
             {
                 case 1:
@@ -150,10 +144,7 @@ public class GroupClientStart {
                     // may want to prompt user here for server name, port
                     hasToken = false;
 
-                    String uName = userToken.getSubject();
                     String aUserName, aGroupName;
-                    String iString;
-                    int clientChoice;
                     boolean eKey = false;
                     List<String> aList;
                     final int MAXUSERLENGTH = 32;
@@ -276,19 +267,14 @@ public class GroupClientStart {
                             case 0:
                                 System.out.println("Disconnecting from Group Server...");
                                 gc.disconnect();
-                                eKey = true;
+                                exitKey = true;
+                                System.exit(0);
                                 break;
                             default:
                                 System.out.println("Unknown command. Please try again.");
                                 break;
                         }
                     }
-                    
-                    //Logout
-                    case 2:
-                        gc.disconnect();
-                        hasToken = false;
-                        
 		}
             }
         }

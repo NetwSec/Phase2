@@ -21,10 +21,12 @@ public abstract class Server {
         this.serverPort = serverPort;
     }
     
+    //return server name
     public String getServerName(){
         return serverName;
     }
     
+    //return server port number
     public int getServerPort(){
         return serverPort;
     }

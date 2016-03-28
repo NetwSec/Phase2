@@ -5,9 +5,6 @@
  */
 
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,23 +12,18 @@ import java.util.List;
  *
  * 
  */
-public class GroupClient extends Client{
-    
-    //Declared Variables
-    protected Socket s;
-    protected ObjectOutputStream output;
-    protected ObjectInputStream input;
+public class GroupClient extends Client {
     
     //Communicates back and forth with server to get ACK for token
-    public UserTokenImp getToken(String username){
-        
-        //Local Varibles
-        UserTokenImp token= null;   //Holds token object
-        Message sendM = null;    //Holds message sent to server
-        Message receiveM = null; //Receives the response from the server
+    public UserToken getToken(String username){
         
         try {
            
+             //Local Varibles
+            UserToken token= null;   //Holds token object
+            Message sendM = null;    //Holds message sent to server
+            Message receiveM = null; //Receives the response from the server
+            
             //Reads, sends, and receives the message
             sendM =  new Message("getToken");
             sendM.addObject(username);   //adds username
@@ -47,23 +39,22 @@ public class GroupClient extends Client{
                 
                 if (temp.size() ==1){
                     
-                    token = (UserTokenImp)temp.get(0);
+                    token = (UserToken)temp.get(0);
                     return token;
                 }
                 
             }
-            
+            return null;
         }
         catch (Exception e){
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace(System.err);
             return null;
         }
-        return null;
     }
     
     //Communicates back and forth with server to get ACK for creating a user
-    public boolean createUser(String username, UserTokenImp token){
+    public boolean createUser(String username, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -77,15 +68,16 @@ public class GroupClient extends Client{
             sendM.addObject(token);  //adds token
             output.writeObject(sendM);   //writes to the server
             
-            
+            //System.out.println("Testing #1 prior to response from server(before object read)"); //Testing Purpose
             receiveM = (Message)input.readObject();  //receives from the server
+            //System.out.println("Testing #1 prior to response from server(after read)");   //Testing Purpose
             
             //Successful Response from server
             if(receiveM.getMessage().equals("OK"))
             {
                 return true;
+                
             }
-            else
                 return false;
             
         }
@@ -97,7 +89,7 @@ public class GroupClient extends Client{
     }
     
     //Communicates back and forth with server to get ACK to create a group
-    public boolean createGroup(String groupname, UserTokenImp token){
+    public boolean createGroup(String groupname, UserToken token){
      
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -118,7 +110,7 @@ public class GroupClient extends Client{
             {
                 return true;
             }
-            else
+            
                 return false;
             
         }
@@ -130,7 +122,7 @@ public class GroupClient extends Client{
     }
     
     //Communicates back and forth with server to get ACK to add user to group
-    public boolean addUserToGroup(String user, String group, UserTokenImp token){
+    public boolean addUserToGroup(String user, String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -153,7 +145,7 @@ public class GroupClient extends Client{
             {
                 return true;
             }
-            else
+            
                 return false;
             
         }
@@ -165,7 +157,7 @@ public class GroupClient extends Client{
     }
     
     //Communicates back and forth with server to get ACK to delete user from group
-    public boolean deleterUserFromGroup(String user, String group, UserTokenImp token){
+    public boolean deleterUserFromGroup(String user, String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -188,7 +180,7 @@ public class GroupClient extends Client{
             {
                 return true;
             }
-            else
+            
                 return false;
             
         }
@@ -200,7 +192,7 @@ public class GroupClient extends Client{
     }
     
     //Communicates back and forth with server to get ACK to receive list of members
-    public List<String> listMembers(String user, UserTokenImp token){
+    public List<String> listMembers(String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -209,7 +201,7 @@ public class GroupClient extends Client{
         try {
             //Reads, sends, and receives the message
             sendM =  new Message("listMembers");
-            sendM.addObject(user);  //ads user
+            sendM.addObject(group);  //adds user
             sendM.addObject(token);  //adds token
 
             output.writeObject(sendM);  //writes to the server
@@ -219,12 +211,12 @@ public class GroupClient extends Client{
             //Successful Response from server
             if(receiveM.getMessage().equals("OK"))
             {
-                List<Object> temp = null;
+                ArrayList<Object> temp = null;
                 temp = receiveM.getObjCont();
                 
-                return (List<String>)temp.get(0);
+                return (ArrayList<String>)temp.get(0);
             }
-            else
+            
                 return null;
             
         }

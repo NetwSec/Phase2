@@ -14,8 +14,9 @@ public class GroupServerStart {
         //User passing server name and port
         if(args.length == 2){
             try{
-            GroupServer server = new GroupServer(args[0], Integer.parseInt(args[1]));
-            server.start();
+                System.out.println("Server connecting...");
+                GroupServer server = new GroupServer(args[0], Integer.parseInt(args[1]));
+                server.start();
             
             }
             
@@ -28,9 +29,12 @@ public class GroupServerStart {
         
         //User passing 0 arguments( By Default server: localhost, and port: 8765
         else if(args.length == 0){
-            
+            System.out.println("Server connecting...");
             GroupServer server = new GroupServer();
             server.start();
+        }
+        else{
+            System.out.println("Error");
         }
         
         

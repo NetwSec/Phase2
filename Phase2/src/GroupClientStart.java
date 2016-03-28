@@ -267,8 +267,7 @@ public class GroupClientStart {
                             case 0:
                                 System.out.println("Disconnecting from Group Server...");
                                 gc.disconnect();
-                                exitKey = true;
-                                System.exit(0);
+                                eKey = true;
                                 break;
                             default:
                                 System.out.println("Unknown command. Please try again.");

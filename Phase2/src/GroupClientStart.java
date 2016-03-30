@@ -8,7 +8,7 @@ import java.util.Scanner;
  */
 
 /**
- *
+ * GroupClient.java now implements this functionality.
  * @author reticent
  */
 public class GroupClientStart {
@@ -17,7 +17,7 @@ public class GroupClientStart {
     
     public static void main (String args[]){
         
-        gc = new GroupClient();
+//        gc = new GroupClient();
         Scanner console = new Scanner(System.in); // Scanner object for input
 
         //Declared Variables
@@ -69,9 +69,14 @@ public class GroupClientStart {
         
         while (!exitKey)
         {
-            System.out.print("Enter 1 to login,\nenter 2 to exit...\n> ");
+            System.out.print("Welcome to the Group Client! Please enter:\n" +
+                    "1: Login\n" + 
+                    "2: Exit\n> ");
+            
+            // Get the choice
             inputString = console.nextLine();
 
+            // Parse it
             try
             {
                 menuChoice = Integer.parseInt(inputString);
@@ -81,50 +86,51 @@ public class GroupClientStart {
                 menuChoice = -1;
             }
 
-            if (menuChoice == 1)
+            switch (menuChoice) 
             {
-                System.out.print("Enter your username to login...\n> ");
-                userName = console.nextLine();
-
-                // connect to group server and get token
-                // may want to prompt user here for server name, port?
-                gc.connect("localhost", 8765);
-                if (gc.isConnect()) // check that server is running
-                {
-                    userToken = gc.getToken(userName);
-                    if (userToken == null) // no login for that name
+                case 1:
+                    System.out.print("Enter your username to login...\n> ");
+                    // Get username
+                    userName = console.nextLine();
+                    // TODO: should already be connected to server
+                    // connect to group server and get token
+                    // may want to prompt user here for server name, port?
+                    gc.connect("localhost", 8765);
+                    if (gc.isConnect()) // check that server is running
                     {
-                        System.out.println("Username not recognized. Contact Admin.");
-                        gc.disconnect();
+                        userToken = gc.getToken(userName);
+                        if (userToken == null) // no login for that name
+                        {
+                            System.out.println("Username not recognized. Contact Admin.");
+                            gc.disconnect();
+                        }
+                        else // has a valid token, can disconnect from gc
+                        {
+                            hasToken = true;
+                            exitKey = true;
+                            // TODO: should not 
+                            gc.disconnect();
+                        }
                     }
-                    else // has a valid token, can disconnect from gc
+                    else
                     {
-                        hasToken = true;
-                        exitKey = true;
-                        gc.disconnect();
-                    }
-                }
-                else
-                {
-                    System.out.println("Error - Group Server not running. Contact Admin.");
-                }
-            }
-            else if (menuChoice == 2)
-            {
-                System.out.println("Exiting...");
-                exitKey = true;
-            }
-            else
-            {
-                System.out.println("Unknown command. Please try again.");
+                        System.out.println("Error - Group Server not running. Contact Admin.");
+                    }   break;
+                case 2:
+                    System.out.println("Exiting...");
+                    exitKey = true;
+                    break;
+                default:
+                    System.out.println("Unknown command. Please try again.");
+                    break;
             }
         }
         
         while (hasToken)
         {
-            System.out.print("Main menu:\n" +
-                             "enter 1 to connect to the Group Server,\n" +
-                             "enter 2 to logout...\n" +
+            System.out.print("Welcome to the Group Client main menu! Please enter:\n" +
+                             "1: Connect to the Group Server\n" +
+                             "2: Logout\n" +
                              userName + "> ");
             inputString = console.nextLine();
 
@@ -137,11 +143,11 @@ public class GroupClientStart {
                 menuChoice = -1;
             }
 
+            // MAIN MENU
             switch (menuChoice)
             {
                 case 1:
                     System.out.println("Connecting to Group Server...");
-                    // may want to prompt user here for server name, port
                     hasToken = false;
 
                     String aUserName, aGroupName;
@@ -150,20 +156,24 @@ public class GroupClientStart {
                     final int MAXUSERLENGTH = 32;
                     final int MAXGROUPLENGTH = 32;
 
+                    // TODO: should not have to connect again
                     gc.connect("localhost", 8765);
 
                     while (!eKey)
                     {
-                        System.out.print("Enter 1 to create a user,\n" +
-                                         "enter 2 to delete a user from a group,\n" +
-                                         "enter 3 to create a group,\n" +
-                                         "enter 4 to list the members of a group,\n" +
-                                         "enter 5 to add a user to a group,\n" +
-                                         "enter 0 to disconnect from Group Server:\n" +
+                        System.out.print("Welcome to the Group Client! Please enter:\n" + 
+                                         "1: Create a new user,\n" +
+                                         "2: Delete a user from a group,\n" +
+                                         "3: Create a new group,\n" +
+                                         "4: List the members of a group,\n" +
+                                         "5: Add a user to a group,\n" +
+                                         "0: Disconnect from Group Server:\n" +
                                          userName + "> ");
                         
+                        // Get the response
                         inputString = console.nextLine();
 
+                        // Parse it
                         try
                         {
                             menuChoice = Integer.parseInt(inputString);
@@ -173,7 +183,7 @@ public class GroupClientStart {
                             menuChoice = -1;
                         }
                         
-                        
+                        // METHODS MENU
                         switch (menuChoice)
                         {
                             //Create a user
@@ -248,7 +258,7 @@ public class GroupClientStart {
                                                                            aGroupName + ".");
                                 }
                                 break;
-                            
+
                             //Add user to group
                             case 5:
                                 aUserName = getNonEmptyString("Enter the username: ", MAXUSERLENGTH);
@@ -274,6 +284,14 @@ public class GroupClientStart {
                                 break;
                         }
                     }
+                case 2:
+                    // TODO: Log out
+                    System.out.println("Logging out from Group Client.");
+                    gc.disconnect();
+                    break;
+                default:
+                    System.out.println("Unknown command. Please try again.");
+                    break;
 		}
             }
         }

@@ -80,9 +80,11 @@ public class FileClient
             }
 
             // Get UserToken
+            /*
             List<String> Group = new ArrayList<>();
             Group.add("group");
             Token = new UserTokenImp("localhost", "admin", Group);
+            */
 
             System.out.println("Connected.");
         }

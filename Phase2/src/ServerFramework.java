@@ -107,6 +107,8 @@ public class ServerFramework implements Runnable
                     // Process the Message and invoke ServerCallback
                     Message Request = (Message)Input.readObject();
                     ServerCallback Callback = Server.MessageDispatcher.get(Request.getMessage());
+                    // Ignore unknown message
+                    if (Callback == null) continue;
                     ArrayList<Object> Content = Request.getObjCont();
                     Message Response = Callback.CallbackProc(Client, Content);
                     Output.writeObject(Response);

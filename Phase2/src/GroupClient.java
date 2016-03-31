@@ -118,6 +118,7 @@ public class GroupClient extends Client {
                                          "3: Add a user to a group,\n" +
                                          "4: Delete a user from a group,\n" +
                                          "5: List the members of a group,\n" +
+                                         "6: Log into File Server,\n" +
                                          "0: Disconnect from Group Server:\n" +
                                          userName + "> ");
                         
@@ -224,6 +225,13 @@ public class GroupClient extends Client {
                                 }
                                 break;
                                 
+                            // 6: file server
+                            case 6:
+                            {
+                                FileClient FC =new FileClient(userToken);
+                                FC.main(null);
+                                break;
+                            }
                             // 0: Disconnect from server
                             case 0:
                                 System.out.println("Disconnecting from Group Server...");

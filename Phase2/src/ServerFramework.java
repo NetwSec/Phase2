@@ -8,15 +8,23 @@ import java.util.Hashtable;
 
 /**
  * A general message driven server class
+ * 
+ * ServerFramework class provide the basic functionality of a message
+ * driver server. Developer should create an instance of this class, create
+ * instances of ServerCallback for each message, RegisterMessage(), and run().
+ * 
+ * 
  * @author Yuntian Zhang
  */
 public class ServerFramework implements Runnable
 {
+    // Since in Java we don't have function pointer, using interface instead
     public abstract interface ServerCallback
     {
         public Message CallbackProc(Socket Client, ArrayList<Object> Content);
     }
     
+    // Using hashtable to hold callbacks
     private Hashtable<String,ServerCallback> MessageDispatcher;
     short Port;
     
@@ -26,6 +34,7 @@ public class ServerFramework implements Runnable
         Port = ServerPort;
     }
     
+    //  Add callback into hashtable
     public boolean RegisterMessage(String Msg,ServerCallback Callback)
     {
         if (MessageDispatcher.containsKey(Msg))
@@ -39,7 +48,7 @@ public class ServerFramework implements Runnable
         }
     }
     
-    // Listening thread
+    // Listening thread main proc
     @Override
     public void run()
     {
@@ -50,10 +59,11 @@ public class ServerFramework implements Runnable
         }
         catch (Exception e)
         {
-            // Cannot start Listen thread
             System.out.println("Failed to create the listen thread, halt");
             return;
         }
+        
+        // Main loop, create socket for each income connection
         while (true)
         {
             try
@@ -63,7 +73,6 @@ public class ServerFramework implements Runnable
             }
             catch (Exception e)
             {
-                // Failed to establish connection, ignore it
                 System.out.println("Failed to create a service thread, continue");
             }
         }
@@ -76,6 +85,9 @@ public class ServerFramework implements Runnable
         ServerFramework Server;
         ObjectInputStream Input;
         ObjectOutputStream Output;
+        
+        // Do not catch exception and keep running
+        // Instead, let main thread knows we failed
         ServerDispatcher(Socket Connection, ServerFramework Base) throws Exception
         {
             Client = Connection;
@@ -84,7 +96,7 @@ public class ServerFramework implements Runnable
             Input = new ObjectInputStream(Client.getInputStream());
         }
         
-        // The service thread
+        // The service thread main proc
         @Override
         public void run()
         {
@@ -92,6 +104,7 @@ public class ServerFramework implements Runnable
             {
                 try
                 {
+                    // Process the Message and invoke ServerCallback
                     Message Request = (Message)Input.readObject();
                     ServerCallback Callback = Server.MessageDispatcher.get(Request.getMessage());
                     ArrayList<Object> Content = Request.getObjCont();

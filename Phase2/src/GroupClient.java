@@ -15,6 +15,7 @@ public class GroupClient {
     static Socket sock;
     static ObjectOutputStream output;
     static ObjectInputStream input;
+    static UserToken userToken = null;
 
     public static void main(String[] args) {
         run();
@@ -71,7 +72,6 @@ public class GroupClient {
         String inputString;
         int menuChoice;
         String userName = new String();
-        UserToken userToken = null;
 
         System.out.print("Please enter your username:\n> ");
         // Get username
@@ -254,6 +254,7 @@ public class GroupClient {
                 if (temp.size() == 1) {
 
                     token = (UserToken) temp.get(0);
+                    System.out.println("[dbg]Group number:" + token.getGroups().size());
                     return token;
                 }
 
@@ -318,6 +319,8 @@ public class GroupClient {
 
             //Successful Response from server
             if (receiveM.getMessage().equals("OK")) {
+                // Update user token
+                userToken = getToken(userToken.getSubject());
                 return true;
             }
 

@@ -76,28 +76,6 @@ public class GroupClient{
         String userName = new String();
         UserToken userToken = null;
         
-        while (!exitKey)
-        {
-            System.out.print("Welcome to the Group Client! Please enter:\n" +
-                    "1: Login\n" + 
-                    "2: Exit\n> ");
-            
-            // Get the choice
-            inputString = console.nextLine();
-
-            // Parse it
-            try
-            {
-                menuChoice = Integer.parseInt(inputString);
-            }
-            catch(Exception e)
-            {
-                menuChoice = -1;
-            }
-
-            switch (menuChoice) 
-            {
-                case 1:
                     System.out.print("Please enter your username:\n> ");
                     // Get username
                     userName = console.nextLine();
@@ -123,40 +101,9 @@ public class GroupClient{
                     else
                     {
                         System.out.println("Error - Group Server not running. Contact Admin.");
-                    }   break;
-                case 2:
-                    System.out.println("Exiting...");
-                    exitKey = true;
-                    break;
-                default:
-                    System.out.println("Unknown command. Please try again.");
-                    break;
-            }
-        }
-        
-        while (hasToken)
-        {
-            System.out.print("Welcome to the Group Client main menu! Please enter:\n" +
-                             "1: Access the Group Server\n" +
-                             "2: Logout\n" +
-                             userName + "> ");
-            inputString = console.nextLine();
-
-            try
-            {
-                menuChoice = Integer.parseInt(inputString);
-            }
-            catch(Exception e)
-            {
-                menuChoice = -1;
-            }
-
-            // MAIN MENU
-            switch (menuChoice)
-            {
-                case 1:
-//                    System.out.println("Connecting to Group Server...");
-                    hasToken = false;
+                        return;
+                    }
+ 
 
                     String aUserName, aGroupName;
                     boolean eKey = false;
@@ -301,17 +248,8 @@ public class GroupClient{
                                 System.out.println("Unknown command. Please try again.");
                                 break;
                         }
-                    }
-                case 2:
-                    System.out.println("Logging out from Group Client.");
-                    disconnect();
-                    break;
-                default:
-                    System.out.println("Unknown command. Please try again.");
-                    break;
-		}
-            }
         }
+    }
     
     public static String getNonEmptyString(String prompt, int maxLength)
 	{

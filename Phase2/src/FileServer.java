@@ -73,9 +73,7 @@ public class FileServer
             {
                 //  Return error message
                 System.out.println("Failed to send the file, continue");
-                Response = new Message("error");
-                Response.addObject((String) Content.get(FS_LIST_GROUP_NAME));
-                Response.addObject(e);
+                Response = GenerateErrorMessage(Content,e);
             }
             
             return Response;
@@ -119,9 +117,7 @@ public class FileServer
             {
                 //  Return error message
                 System.out.println("Failed to send the file, continue");
-                Response = new Message("error");
-                Response.addObject((String) Content.get(FS_LIST_GROUP_NAME));
-                Response.addObject(e);
+                Response = GenerateErrorMessage(Content,e);
             }
             
             return Response;
@@ -164,14 +160,21 @@ public class FileServer
             {
                 // Return error message
                 System.out.println("Failed to save the file, continue");
-                Response = new Message("error");
-                Response.addObject((String) Content.get(FS_UPLOAD_GROUP_NAME));
-                Response.addObject(e);
+                Response = GenerateErrorMessage(Content,e);
             }
             
             return Response;
         }
         
+    }
+    
+    static public Message GenerateErrorMessage(ArrayList<Object> Content, Exception e)
+    {
+        Message Response = new Message("error");
+        Response.addObject((UserToken) Content.get(FS_GENERAL_USER_TOKEN));
+        Response.addObject((String) Content.get(FS_GENERAL_GROUP_NAME));
+        Response.addObject(e);
+        return Response;
     }
 
     public static int FS_PORT = 8766;
@@ -202,7 +205,6 @@ public class FileServer
         Server.RegisterMessage("download", download);
         Server.RegisterMessage("upload", upload);
         Server.RegisterMessage("list", list);
-
         
         // Start listener
         System.out.println("Start the listener");

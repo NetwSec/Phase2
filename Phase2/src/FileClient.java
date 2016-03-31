@@ -2,35 +2,27 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 
 /**
- *
+ * File client
+ * 
  * @author saber
  */
 public class FileClient
 {
     static String FS_ADDRESS = "localhost";
-    static short FS_PORT = 8766;
+    static int FS_PORT = 8766;
     
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws IOException
+    public static void main(String[] args)
     {
         //  Check arguments
         if (args.length == 2)
         {
             FS_ADDRESS = args[0];
-            FS_PORT = (short) Integer.parseInt(args[1]);
+            FS_PORT = Integer.parseInt(args[1]);
         }
         else if (args.length != 0)
         {

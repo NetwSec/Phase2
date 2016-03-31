@@ -26,9 +26,9 @@ public class ServerFramework implements Runnable
     
     // Using hashtable to hold callbacks
     private Hashtable<String,ServerCallback> MessageDispatcher;
-    short Port;
+    int Port;
     
-    public ServerFramework(short ServerPort)
+    public ServerFramework(int ServerPort)
     {
         MessageDispatcher = new Hashtable<String, ServerCallback>();
         Port = ServerPort;

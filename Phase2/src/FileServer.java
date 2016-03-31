@@ -7,26 +7,26 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * FileServer
+ * File server
  * 
  * @author Yuntian Zhang
  */
 public class FileServer
 {
     //  Define the index of each object in the Content
-    public final static short FS_DOWNLOAD_USER_TOKEN = 0;   //UserToken Token
-    public final static short FS_DOWNLOAD_GROUP_NAME = 1;   //String    Group
-    public final static short FS_DOWNLOAD_FILE_NAME = 2;    //String    FileName
+    public final static int FS_DOWNLOAD_USER_TOKEN = 0; //UserToken Token
+    public final static int FS_DOWNLOAD_GROUP_NAME = 1; //String    Group
+    public final static int FS_DOWNLOAD_FILE_NAME = 2;  //String    FileName
     
-    public final static short FS_UPLOAD_USER_TOKEN = 0;     //UserToken Token
-    public final static short FS_UPLOAD_GROUP_NAME = 1;     //String    Group
-    public final static short FS_UPLOAD_FILE_NAME = 2;      //String    FileName
-    public final static short FS_UPLOAD_FILE_CONTENT = 3;   //byte[]    Content
+    public final static int FS_UPLOAD_USER_TOKEN = 0;   //UserToken Token
+    public final static int FS_UPLOAD_GROUP_NAME = 1;   //String    Group
+    public final static int FS_UPLOAD_FILE_NAME = 2;    //String    FileName
+    public final static int FS_UPLOAD_FILE_CONTENT = 3; //byte[]    Content
     
-    public final static short FS_SUCCESS_USER_TOKEN = 0;    //UserToken Token
+    public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
     
-    public final static short FS_ERROR_USER_TOKEN = 0;      //UserToken Token
-    public final static short FS_ERROR_EXCEPTION = 1;       //Exception e
+    public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
+    public final static int FS_ERROR_EXCEPTION = 1;     //Exception e
     
     static class downloadCallback implements ServerFramework.ServerCallback
     {
@@ -107,9 +107,9 @@ public class FileServer
         
     }
 
-    public static short FS_PORT = 8766;
+    public static int FS_PORT = 8766;
     
-    FileServer(short Port)
+    FileServer(int Port)
     {
         FS_PORT = Port;
     }

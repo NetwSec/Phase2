@@ -108,7 +108,7 @@ public class FileClient
             return false;
         }
         
-        return (Response.getMessage() == "success");
+        return ("success".equals(Response.getMessage()));
     }
 
     static boolean download(UserToken token, String group, String remoteFile, String localFile)
@@ -137,7 +137,7 @@ public class FileClient
         }
         
         // Check response
-        if (Response.getMessage() != "upload")
+        if (!"upload".equals(Response.getMessage()))
         {
             return false;
         }
@@ -198,12 +198,19 @@ public class FileClient
         UserToken Token = new UserTokenImp("localhost", "admin", null);
         
         //  Create an upload message
+        String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
         System.out.println("Create an upload message");
-        upload(Token,"group","test_remote.txt","test_local");
+        if (!upload(Token,"group","test_remote.txt",localFile + "test_local.txt"))
+        {
+            System.out.println("Upload failed");
+        }
         
         //  Create an download message
         System.out.println("Create a download message");
-        download(Token,"group","test_remote.txt","test_local");
+        if(!download(Token,"group","test_remote.txt",localFile + "test_local_new.txt"))
+        {
+            System.out.println("Download failed");
+        }
         
         //  Disconnect
         System.out.println("Disconnect");

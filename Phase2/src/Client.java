@@ -15,36 +15,10 @@ public abstract class Client {
     ObjectInputStream input;
     
     public static void main(String[] args) {
-        // Scanner for input
-        Scanner console = new Scanner(System.in);
-        
-        // Output the menu
-        System.out.println("Welcome! Please enter: ");
-        System.out.println("g: Connect to Group Server");
-        System.out.println("f: Connect to File Server");
-        System.out.println("e: Exit");
-        
-        // Get the first character of the input
-        char choice = console.nextLine().charAt(0);
-        
-        switch(choice)
-        {
-            case 'g':
-                // Create a GroupClient
-                GroupClient groupClient = new GroupClient();
-                // Run it to interface with user
-                groupClient.run();
-                break;
-            case 'f':
-                // Run the file server/client
-                break;
-            case 'e':
-                break;
-            default:
-                System.out.println("Unknown command. Please try again.");
-                break;
-                
-        }
+        // Create a GroupClient
+        GroupClient groupClient = new GroupClient();
+        // Run it to interface with user
+        groupClient.run();
     }
     
     //Atempt to connect client with server

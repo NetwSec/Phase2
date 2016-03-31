@@ -88,16 +88,15 @@ public class GroupThread extends Thread {
                     } else {
                         response = new Message("FAIL");
 
-                        if (sent.getObjCont().get(0) != null) {
-                            if (sent.getObjCont().get(1) != null) {
+                        if ((sent.getObjCont().get(0) != null)
+                                && (sent.getObjCont().get(1) != null)) {
 
-                                String groupname = (String) sent.getObjCont().get(0);
-                                UserToken token = (UserToken) sent.getObjCont().get(1);
+                            String groupname = (String) sent.getObjCont().get(0);
+                            UserToken token = (UserToken) sent.getObjCont().get(1);
 
-                                if (createGroup(groupname, token)) {
-                                    System.out.println("Creating Group");
-                                    response = new Message("OK");
-                                }
+                            if (createGroup(groupname, token)) {
+                                System.out.println("Creating Group");
+                                response = new Message("OK");
                             }
                         }
                     }
@@ -111,18 +110,13 @@ public class GroupThread extends Thread {
                     } else {
                         response = new Message("FAIL");
 
-                        if (sent.getObjCont().get(0) != null) {
-                            if (sent.getObjCont().get(1) != null) {
-                                if (sent.getObjCont().get(2) != null) {
+                        if ((sent.getObjCont().get(0) != null) && (sent.getObjCont().get(1) != null) && (sent.getObjCont().get(2) != null)) {
+                            String username = (String) sent.getObjCont().get(0);
+                            String groupname = (String) sent.getObjCont().get(1);
+                            UserToken token = (UserToken) sent.getObjCont().get(2);
 
-                                    String username = (String) sent.getObjCont().get(0);
-                                    String groupname = (String) sent.getObjCont().get(1);
-                                    UserToken token = (UserToken) sent.getObjCont().get(2);
-
-                                    if (addUserToGroup(username, groupname, token)) {
-                                        response = new Message("OK");
-                                    }
-                                }
+                            if (addUserToGroup(username, groupname, token)) {
+                                response = new Message("OK");
                             }
                         }
                     }
@@ -135,19 +129,16 @@ public class GroupThread extends Thread {
                     } else {
                         response = new Message("FAIL");
 
-                        if (sent.getObjCont().get(0) != null) {
-                            if (sent.getObjCont().get(1) != null) {
-                                if (sent.getObjCont().get(2) != null) {
+                        if ((sent.getObjCont().get(0) != null) && (sent.getObjCont().get(1) != null) && (sent.getObjCont().get(2) != null)) {
 
-                                    String username = (String) sent.getObjCont().get(0);
-                                    String groupname = (String) sent.getObjCont().get(1);
-                                    UserToken token = (UserToken) sent.getObjCont().get(2);
+                            String username = (String) sent.getObjCont().get(0);
+                            String groupname = (String) sent.getObjCont().get(1);
+                            UserToken token = (UserToken) sent.getObjCont().get(2);
 
-                                    if (deleteUserFromGroup(username, groupname, token)) {
-                                        response = new Message("OK");
-                                    }
-                                }
+                            if (deleteUserFromGroup(username, groupname, token)) {
+                                response = new Message("OK");
                             }
+
                         }
                     }
                     output.writeObject(response);

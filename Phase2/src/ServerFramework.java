@@ -122,7 +122,7 @@ public class ServerFramework implements Runnable
                     String ClientName = Token.getSubject();
                     String RequestedGroup = (String) Content.get(1);
                     List<String> AvailableGroups = Token.getGroups();
-                    if ((AvailableGroups == null) || (!AvailableGroups.contains(RequestedGroup)))
+                    if (!Command.equals("login") && ((AvailableGroups == null) || (!AvailableGroups.contains(RequestedGroup))))
                     {
                         System.out.println(ClientName + " is requesting [" + Command + "] in group " + RequestedGroup + ", denied");
                         Message Response = new Message("error");

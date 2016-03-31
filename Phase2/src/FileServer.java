@@ -117,6 +117,6 @@ public class FileServer
         Server.RegisterMessage("upload", upload);
         
         System.out.println("Start the listener");
-        Server.Start();
+        Server.run();
     }
 }

@@ -10,7 +10,7 @@ import java.util.Hashtable;
  * A general message driven server class
  * @author Yuntian Zhang
  */
-public class ServerFramework
+public class ServerFramework implements Runnable
 {
     public abstract interface ServerCallback
     {
@@ -40,7 +40,8 @@ public class ServerFramework
     }
     
     // Listening thread
-    public void Start()
+    @Override
+    public void run()
     {
         ServerSocket Listen;
         try

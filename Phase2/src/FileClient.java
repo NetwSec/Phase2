@@ -147,7 +147,9 @@ public class FileClient
         {
             ArrayList<Object> Content = Response.getObjCont();
             byte[] FileContent = (byte[]) Content.get(3);
-            FileOutputStream FileStream = new FileOutputStream(localFile);
+            File FileHandle = new File(localFile);
+            FileHandle.getParentFile().mkdirs();
+            FileOutputStream FileStream = new FileOutputStream(FileHandle);
             BufferedOutputStream FileBuff = new BufferedOutputStream(FileStream);
             FileBuff.write(FileContent, 0, FileContent.length);
             FileBuff.flush();

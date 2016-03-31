@@ -40,7 +40,11 @@ public class FileServer
             try
             {
                 //  Read file content
-                File FileHandle = new File((String) Content.get(FS_DOWNLOAD_FILE_NAME));
+                File FileHandle = new File((String)
+                        FS_STORAGE + File.separator +
+                        Content.get(FS_DOWNLOAD_GROUP_NAME) + File.separator + 
+                        Content.get(FS_DOWNLOAD_FILE_NAME));
+                FileHandle.getParentFile().mkdirs();
                 byte[] FileContent = new byte[(int) FileHandle.length()];
                 FileInputStream FileStream = new FileInputStream(FileHandle);
                 BufferedInputStream FileBuff = new BufferedInputStream(FileStream);
@@ -82,7 +86,12 @@ public class FileServer
             {
                 // Save file content
                 byte[] FileContent = (byte[]) Content.get(FS_UPLOAD_FILE_CONTENT);
-                FileOutputStream FileStream = new FileOutputStream((String) Content.get(FS_UPLOAD_FILE_NAME));
+                File FileHandle = new File((String)
+                        FS_STORAGE + File.separator + 
+                        Content.get(FS_UPLOAD_GROUP_NAME) + File.separator + 
+                        Content.get(FS_UPLOAD_FILE_NAME));
+                FileHandle.getParentFile().mkdirs();
+                FileOutputStream FileStream = new FileOutputStream(FileHandle);
                 BufferedOutputStream FileBuff = new BufferedOutputStream(FileStream);
                 FileBuff.write(FileContent, 0, FileContent.length);
                 FileBuff.flush();
@@ -108,10 +117,12 @@ public class FileServer
     }
 
     public static int FS_PORT = 8766;
+    public static String FS_STORAGE = System.getProperty("user.dir") + File.separator + "FileServer";
     
-    FileServer(int Port)
+    FileServer(int Port, String Storage)
     {
         FS_PORT = Port;
+        FS_STORAGE = Storage;
     }
     
     public static void main(String args[])

@@ -249,8 +249,7 @@ public class GroupClient {
             //Successful Response from server
             if (receiveM.getMessage().equals("OK")) {
                 //Return token if available in the message
-                ArrayList<Object> temp = null;
-                temp = receiveM.getObjCont();
+                ArrayList<Object> temp =  receiveM.getObjCont();
 
                 if (temp.size() == 1) {
 

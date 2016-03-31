@@ -64,7 +64,6 @@ public class GroupThread extends Thread {
                         String username = (String) sent.getObjCont().get(0);
                         UserToken token = (UserToken) sent.getObjCont().get(1);
                         if ((username != null) && (token != null) && createGroup(username, token)) {
-                            System.out.println("Creating Group");
                             response = new Message("OK");
                         }
                     }

@@ -30,31 +30,40 @@ public class FileClient
         Token = token;
     }
     
-    static boolean connect(String server, int port) throws IOException
+    static boolean connect(String server, int port)
     {
+        try
+        {
         Server = new Socket(server,port);
-
         Output = new ObjectOutputStream(Server.getOutputStream());
         Input = new ObjectInputStream(Server.getInputStream());
         return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
     
     static void disconnect()
     {
         try {
             Input.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
         }
+        Input = null;
         
         try {
             Output.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
         }
+        Output = null;
         
         try {
             Server.close();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
         }
+        Server = null;
     }
     
     static List<String> listFile(UserToken token, String group)
@@ -69,7 +78,7 @@ public class FileClient
         try {
             Output.writeObject(Upload);
             Output.flush();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return null;
         }
         
@@ -77,7 +86,7 @@ public class FileClient
         Message Response;
         try {
             Response = (Message) Input.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (Exception ex) {
             return null;
         }
         
@@ -125,7 +134,7 @@ public class FileClient
         try {
             Output.writeObject(Upload);
             Output.flush();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return false;
         }
         
@@ -133,7 +142,7 @@ public class FileClient
         Message Response;
         try {
             Response = (Message) Input.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (Exception ex) {
             return false;
         }
         
@@ -153,7 +162,7 @@ public class FileClient
         try {            
             Output.writeObject(Download);
             Output.flush();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             return false;
         }
         
@@ -161,7 +170,7 @@ public class FileClient
         Message Response;
         try {
             Response = (Message) Input.readObject();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (Exception ex) {
             return false;
         }
         

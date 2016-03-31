@@ -5,12 +5,14 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * FileServer
+ * 
+ * @author Yuntian Zhang
+ */
 public class FileServer
 {
-    public final static short FS_PORT = 8766;
-    
     //  Define the index of each object in the Content
     public final static short FS_DOWNLOAD_USER_TOKEN = 0;   //UserToken Token
     public final static short FS_DOWNLOAD_GROUP_NAME = 1;   //String    Group
@@ -78,23 +80,23 @@ public class FileServer
             
             try
             {
-                //  Save file content
+                // Save file content
                 byte[] FileContent = (byte[]) Content.get(FS_UPLOAD_FILE_CONTENT);
                 FileOutputStream FileStream = new FileOutputStream((String) Content.get(FS_UPLOAD_FILE_NAME));
                 BufferedOutputStream FileBuff = new BufferedOutputStream(FileStream);
                 FileBuff.write(FileContent, 0, FileContent.length);
                 FileBuff.flush();
                 
-                //  Create Message
+                // Create Message
                 Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
                 
-                //  Free resources
+                // Free resources
                 FileBuff.close();
                 FileStream.close();
             }
             catch (Exception e)
             {
-                //  Return error message
+                // Return error message
                 System.out.println("Failed to save the file, continue");
                 Response = new Message("error");
                 Response.addObject(e);
@@ -104,18 +106,33 @@ public class FileServer
         }
         
     }
+
+    public static short FS_PORT = 8766;
+    
+    FileServer(short Port)
+    {
+        FS_PORT = Port;
+    }
     
     public static void main(String args[])
     {
+        run();
+    }
+    
+    public static void run()
+    {
+        // Create instances
         System.out.println("Initalize file server");
         ServerFramework Server = new ServerFramework(FS_PORT);
         downloadCallback download = new downloadCallback();
         uploadCallback upload = new uploadCallback();
         
+        // Register callbacks
         System.out.println("Register messages");
         Server.RegisterMessage("download", download);
         Server.RegisterMessage("upload", upload);
         
+        // Start listener
         System.out.println("Start the listener");
         Server.run();
     }

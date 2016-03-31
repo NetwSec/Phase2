@@ -96,6 +96,18 @@ public class GroupServer extends Server{
             // Give ownership of ADMIN to current user
             userL.addOwnerships(username, "ADMIN");
             
+            ObjectOutputStream outStream;
+            try
+            {
+                    outStream = new ObjectOutputStream(new FileOutputStream("UserList.bin"));
+                    outStream.writeObject(userL);
+            }
+            catch(Exception ex)
+            {
+                    System.err.println("Error: " + e.getMessage());
+                    e.printStackTrace(System.err);
+            }
+            
             System.out.println("You have been added to the user list. Please run the Client.");
         }
         catch(IOException | ClassNotFoundException e)

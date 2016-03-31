@@ -88,24 +88,32 @@ public class GroupThread extends Thread {
                 }
                 
                 //Create Group
-                else if (sent.getMessage().equals("createGroup")){
+                else if (sent.getMessage().equals("createGroup"))
+                {
                     
-                    if(sent.getObjCont().size() <2){
+                    if(sent.getObjCont().size() <2)
+                    {
                         response = new Message("FAIL");
                     }
-                    else{
+                    else
+                    {
                         response = new Message("FAIL");
                         
                         if(sent.getObjCont().get(0) != null)
-                            if (sent.getObjCont().get(1) != null){
+                        {
+                            if (sent.getObjCont().get(1) != null)
+                            {
                                 
                                 String groupname = (String)sent.getObjCont().get(0);
                                 UserToken token = (UserToken)sent.getObjCont().get(1);
                                 
                                 if(createGroup(groupname, token))
+                                {
                                     System.out.println("Creating Group");
                                     response = new Message("OK");
+                                }
                             }
+                        }
                     }
                     
                     output.writeObject(response);

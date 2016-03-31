@@ -15,6 +15,9 @@ import java.util.List;
 public class FileServer
 {
     //  Define the index of each object in the Content
+    public final static int FS_GENERAL_USER_TOKEN = 0;  //UserToken Token
+    public final static int FS_GENERAL_GROUP_NAME = 1;  //String    Group
+    
     public final static int FS_DOWNLOAD_USER_TOKEN = 0; //UserToken Token
     public final static int FS_DOWNLOAD_GROUP_NAME = 1; //String    Group
     public final static int FS_DOWNLOAD_FILE_NAME = 2;  //String    FileName

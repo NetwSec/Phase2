@@ -23,12 +23,11 @@ public class FileClient
     static Socket Server;
     static ObjectInputStream Input;
     static ObjectOutputStream Output;
+    static UserToken Token;
     
-    FileClient(String server, int port) throws IOException
+    FileClient(UserToken token)
     {
-        FS_ADDRESS = server;
-        FS_PORT = port;
-        connect(FS_ADDRESS,FS_PORT);
+        Token = token;
     }
     
     static boolean connect(String server, int port) throws IOException

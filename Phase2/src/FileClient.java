@@ -58,7 +58,7 @@ public class FileClient
         }
     }
     
-    static String [] listFile(UserToken token, String group)
+    static List<String> listFile(UserToken token, String group)
     {
          Message Upload = new Message("list");
         

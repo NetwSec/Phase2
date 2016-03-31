@@ -70,8 +70,6 @@ public class GroupClient {
 
         String inputString;
         int menuChoice;
-        boolean exitKey = false;
-        boolean hasToken = false;
         String userName = new String();
         UserToken userToken = null;
 
@@ -88,12 +86,6 @@ public class GroupClient {
                 System.out.println("Username not recognized. Contact Admin.");
                 // Disconnect from GS
                 disconnect();
-            } else // has a valid token, can disconnect from gc
-            {
-                hasToken = true;
-                exitKey = true;
-                // TODO: should not 
-//                            gc.disconnect();
             }
         } else {
             System.out.println("Error - Group Server not running. Contact Admin.");

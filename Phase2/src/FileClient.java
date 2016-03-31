@@ -26,11 +26,6 @@ public class FileClient
     static ObjectOutputStream Output;
     static UserToken Token;
     
-    FileClient(UserToken token)
-    {
-        Token = token;
-    }
-    
     static boolean connect(String server, int port)
     {
         try
@@ -338,10 +333,17 @@ public class FileClient
         }
     };
     
-    /**
-     * @param args the command line arguments
-     */
+    FileClient(UserToken token)
+    {
+        Token = token;
+    }
+    
     public static void main(String[] args)
+    {
+        run();
+    }
+    
+    public static void run()
     {
         ClientFramework MainMenu = new ClientFramework("Main Menu");
 

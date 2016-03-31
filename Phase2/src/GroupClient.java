@@ -191,7 +191,7 @@ public class GroupClient {
                 // 6: file server
                 case 6: {
                     FileClient FC = new FileClient(userToken);
-                    FC.main(null);
+                    FC.run();
                     break;
                 }
                 // 0: Disconnect from server

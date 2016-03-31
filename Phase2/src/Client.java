@@ -30,11 +30,6 @@ public abstract class Client {
         switch(choice)
         {
             case 'g':
-//                System.out.println("got into the switch!");
-                // Create a GroupServer
-//                GroupServer groupServer = new GroupServer();
-//                // Get it running so it listens for connections
-//                groupServer.start();
                 // Create a GroupClient
                 GroupClient groupClient = new GroupClient();
                 // Run it to interface with user

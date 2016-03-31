@@ -57,17 +57,17 @@ public class FileServer
                         FS_STORAGE + File.separator +
                         Content.get(FS_LIST_GROUP_NAME));
                 File[] FileList = FolderHandle.listFiles();
-                String[] FileNameList = new String[FileList.length];
+                ArrayList<String> FileNameList = new ArrayList<String>();
                 
                 for (int i=0; i<FileList.length; i++)
                 {
-                    FileNameList[i] = FileList[i].getName();
+                    FileNameList.add(FileList[i].getName());
                 }
                 
                 //  Create Message
                 Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
                 Response.addObject((String) Content.get(FS_DOWNLOAD_GROUP_NAME));
-                Response.addObject((String[]) FileNameList);
+                Response.addObject((ArrayList<String>) FileNameList);
             }
             catch (Exception e)
             {

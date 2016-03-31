@@ -89,7 +89,7 @@ public class FileClient
         else
         {
             ArrayList<Object> Content = Response.getObjCont();
-            return (String [])Content.get(2);
+            return (List<String>)Content.get(2);
         }
     }
     
@@ -229,7 +229,7 @@ public class FileClient
         
         // Create a list message
         System.out.println("Create a list message (1st)");
-        String[] FileList = listFile(Token,"group");
+        List<String> FileList = listFile(Token,"group");
         if (FileList == null)
         {
             System.out.println("List failed");
@@ -237,9 +237,9 @@ public class FileClient
         else
         {
             System.out.println("List:");
-            for (int i=0; i<FileList.length; i++)
+            for (int i=0; i<FileList.toArray().length; i++)
             {
-                System.out.println(FileList[i]);
+                System.out.println(FileList.toArray()[i]);
             }
             System.out.println("-------");
             FileList = null;
@@ -263,9 +263,9 @@ public class FileClient
         else
         {
             System.out.println("List:");
-            for (int i=0; i<FileList.length; i++)
+            for (int i=0; i<FileList.toArray().length; i++)
             {
-                System.out.println(FileList[i]);
+                System.out.println(FileList.toArray()[i]);
             }
             System.out.println("-------");
         }

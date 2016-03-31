@@ -1,3 +1,6 @@
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -6,9 +9,63 @@ import java.util.Scanner;
  *
  * 
  */
-public class GroupClient extends Client {
+public class GroupClient{
     
-    public void run()
+    static Socket sock;   
+    static ObjectOutputStream output;
+    static ObjectInputStream input;
+    
+    public static void main(String[] args) {
+        run();
+    }
+    
+    //Atempt to connect client with server
+    static public boolean connect(final String server, final int port) {
+        System.out.println("Connecting to server...");
+        
+        try{
+            //Connected to the specified server
+            sock = new Socket(server,port);
+            System.out.println("Connected to " + server +" on port " + port);
+            
+            // Set up I/O streams with server
+            output = new ObjectOutputStream(sock.getOutputStream());
+            input = new ObjectInputStream(sock.getInputStream());
+            
+            return true;
+        }
+        catch(Exception e){
+            System.err.println("Error " + e.getMessage());
+            e.printStackTrace(System.err);
+            return false;
+        }
+    }
+    
+    //Returns true is client is connect to server, else returns false is not connected
+    static public boolean isConnect(){
+        if (sock == null || !sock.isConnected())
+            return false;
+        else
+            return true;
+        
+    }
+    
+    //Disconnects client from server
+    static public void disconnect(){
+        if (isConnect()){
+            try{
+                // TODO: may need to change message to "disconnect"
+                Message msg = new Message("disconnect");
+                output.writeObject(msg);
+            }
+            catch(Exception e){
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(System.err);
+            }
+        }
+    }
+    
+    static public void run()
     {   
         Scanner console = new Scanner(System.in); // Scanner object for input
 
@@ -283,7 +340,7 @@ public class GroupClient extends Client {
 	}
     
     //Communicates back and forth with server to get ACK for token
-    public UserToken getToken(String username){
+    public static UserToken getToken(String username){
         
         try {
            
@@ -322,7 +379,7 @@ public class GroupClient extends Client {
     }
     
     //Communicates back and forth with server to get ACK for creating a user
-    public boolean createUser(String username, UserToken token){
+    public static boolean createUser(String username, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -357,7 +414,7 @@ public class GroupClient extends Client {
     }
     
     //Communicates back and forth with server to get ACK to create a group
-    public boolean createGroup(String groupname, UserToken token){
+    public static boolean createGroup(String groupname, UserToken token){
      
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -390,7 +447,7 @@ public class GroupClient extends Client {
     }
     
     //Communicates back and forth with server to get ACK to add user to group
-    public boolean addUserToGroup(String user, String group, UserToken token){
+    public static boolean addUserToGroup(String user, String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -425,7 +482,7 @@ public class GroupClient extends Client {
     }
     
     //Communicates back and forth with server to get ACK to delete user from group
-    public boolean deleterUserFromGroup(String user, String group, UserToken token){
+    public static boolean deleterUserFromGroup(String user, String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server
@@ -460,7 +517,7 @@ public class GroupClient extends Client {
     }
     
     //Communicates back and forth with server to get ACK to receive list of members
-    public List<String> listMembers(String group, UserToken token){
+    public static List<String> listMembers(String group, UserToken token){
         
         //Local Variables
         Message sendM = null;    //Holds message sent to server

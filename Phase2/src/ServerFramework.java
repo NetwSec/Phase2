@@ -60,6 +60,7 @@ public class ServerFramework implements Runnable
         catch (Exception e)
         {
             System.out.println("Failed to create the listen thread, halt");
+            System.out.println("Reason: " + e.toString());
             return;
         }
         

@@ -225,7 +225,9 @@ public class FileClient
         
         // Get UserToken
         System.out.println("Get UserToken");
-        UserToken Token = new UserTokenImp("localhost", "admin", null);
+        List<String> Group = new ArrayList<String>();
+        Group.add("group");
+        UserToken Token = new UserTokenImp("localhost", "admin", Group);
         
         // Create a list message
         System.out.println("Create a list message (1st)");

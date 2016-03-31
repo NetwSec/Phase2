@@ -5,6 +5,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 
 /**
  * A general message driven server class
@@ -105,17 +106,51 @@ public class ServerFramework implements Runnable
             {
                 try
                 {
-                    // Process the Message and invoke ServerCallback
+                    // Process the Message
                     Message Request = (Message)Input.readObject();
-                    ServerCallback Callback = Server.MessageDispatcher.get(Request.getMessage());
+                    if (Request == null)
+                    {
+                        System.out.println("Invalid message, close connection");
+                        throw new UnsupportedOperationException("Invalid message.");
+                    }
+                    
+                    String Command = Request.getMessage();
+                    ArrayList<Object> Content = Request.getObjCont();
+                    
+                    // Check permission
+                    UserToken Token = (UserToken) Content.get(0);
+                    String ClientName = Token.getSubject();
+                    String RequestedGroup = (String) Content.get(1);
+                    List<String> AvailableGroups = Token.getGroups();
+                    if ((AvailableGroups == null) || (!AvailableGroups.contains(RequestedGroup)))
+                    {
+                        System.out.println(ClientName + " is requesting [" + Command + "] in group " + RequestedGroup + ", denied");
+                        Message Response = new Message("error");
+                        Response.addObject((UserToken) Token);
+                        Response.addObject((String) RequestedGroup);
+                        Response.addObject(new Exception("Access denied"));
+                        Output.writeObject(Response);
+                        continue;
+                    }
+                    
+                    // Check callback
+                    ServerCallback Callback = Server.MessageDispatcher.get(Command);
                     // Ignore unknown message
                     if (Callback == null)
                     {
-                        System.out.println("Unknown message [" + Request.getMessage() + "], continue");
+                        System.out.println("Unknown message [" + Command + "], continue");
+                        Message Response = new Message("error");
+                        Response.addObject((UserToken) Token);
+                        Response.addObject((String) RequestedGroup);
+                        Response.addObject(new Exception("Unknown message"));
+                        Output.writeObject(Response);
                         continue;
                     }
-                    ArrayList<Object> Content = Request.getObjCont();
+                    
+                    // Invoke callback
                     Message Response = Callback.CallbackProc(Client, Content);
+                    
+                    // Send response
                     Output.writeObject(Response);
                 }
                 catch (IOException | ClassNotFoundException e)

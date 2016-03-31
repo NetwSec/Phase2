@@ -32,9 +32,11 @@ public class FileServer
     public final static int FS_VIEW_FILE_LIST = 2;      //String[]  List
     
     public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
+    public final static int FS_SUCCESS_GROUP_NAME = 1;  //String    Group
     
     public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
-    public final static int FS_ERROR_EXCEPTION = 1;     //Exception e
+    public final static int FS_ERROR_GROUP_NAME = 1;    //String    Group
+    public final static int FS_ERROR_EXCEPTION = 2;     //Exception e
     
     static class listCallback implements ServerFramework.ServerCallback
     {
@@ -69,6 +71,7 @@ public class FileServer
                 //  Return error message
                 System.out.println("Failed to send the file, continue");
                 Response = new Message("error");
+                Response.addObject((String) Content.get(FS_LIST_GROUP_NAME));
                 Response.addObject(e);
             }
             
@@ -114,6 +117,7 @@ public class FileServer
                 //  Return error message
                 System.out.println("Failed to send the file, continue");
                 Response = new Message("error");
+                Response.addObject((String) Content.get(FS_LIST_GROUP_NAME));
                 Response.addObject(e);
             }
             
@@ -146,7 +150,8 @@ public class FileServer
                 FileBuff.flush();
                 
                 // Create Message
-                Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
+                Response.addObject((UserToken) Content.get(FS_UPLOAD_USER_TOKEN));
+                Response.addObject((String) Content.get(FS_UPLOAD_GROUP_NAME));
                 
                 // Free resources
                 FileBuff.close();
@@ -157,6 +162,7 @@ public class FileServer
                 // Return error message
                 System.out.println("Failed to save the file, continue");
                 Response = new Message("error");
+                Response.addObject((String) Content.get(FS_UPLOAD_GROUP_NAME));
                 Response.addObject(e);
             }
             

@@ -72,7 +72,7 @@ public class FileServer
             catch (Exception e)
             {
                 //  Return error message
-                System.out.println("Failed to send the file, continue");
+                System.out.println("Failed to list the file, continue");
                 Response = GenerateErrorMessage(Content,e);
             }
             
@@ -159,7 +159,7 @@ public class FileServer
             catch (Exception e)
             {
                 // Return error message
-                System.out.println("Failed to save the file, continue");
+                System.out.println("Failed to receive the file, continue");
                 Response = GenerateErrorMessage(Content,e);
             }
             

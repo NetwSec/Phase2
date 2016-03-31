@@ -43,7 +43,7 @@ public class GroupThread extends Thread {
                 //Get Token
                 if (sent.getMessage().equals("getToken")) {
                     String username = (String) sent.getObjCont().get(0);
-                    //if there is no username
+
                     if (username != null) {
                         UserToken userToken = createToken(username); //Create Token
                         response = new Message("OK");

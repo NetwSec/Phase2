@@ -110,6 +110,7 @@ public class ServerFramework implements Runnable
                     // Ignore unknown message
                     if (Callback == null)
                     {
+                        System.out.println("Unknown message [" + Request.getMessage() + "], continue");
                         continue;
                     }
                     ArrayList<Object> Content = Request.getObjCont();

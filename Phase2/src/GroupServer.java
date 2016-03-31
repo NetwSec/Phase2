@@ -11,7 +11,20 @@ import java.util.Scanner;
 /**
  *
  */
-public class GroupServer extends Server{
+public class GroupServer{
+    
+    private String serverName;  //Stores server name
+    private int serverPort; //Stores port number
+    
+    //return server name
+    public String getServerName(){
+        return serverName;
+    }
+    
+    //return server port number
+    public int getServerPort(){
+        return serverPort;
+    }
     
     // Port to listen to client connections
     private static final int S_PORT = 8765;
@@ -21,16 +34,16 @@ public class GroupServer extends Server{
     // Default Constructor
     public GroupServer()
     {
-        super("localhost", S_PORT);
+        this.serverName = "localhost";
+        this.serverPort = S_PORT;
     }
 
     // Constructor with 2 parameters
-    public GroupServer(String serverName, int serverPort) 
-    {
-        super(serverName, serverPort);
+    public GroupServer(String serverName, int serverPort){
+        this.serverName = serverName;
+        this.serverPort = serverPort;
     }
         
-    @Override
     // Start-up method
     void start()
     {   

@@ -34,142 +34,81 @@ public class GroupThread extends Thread {
             final ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
             final ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
 
-            boolean loop = true;    //Used for the disconnect
-
-            do {
+            while (true) {
                 //read and print message
                 Message sent = (Message) input.readObject();
-                Message response;
+                Message response = new Message("FAIL");
                 System.out.println("[" + socket.getInetAddress() + ":" + socket.getPort() + "] " + sent.getMessage());
 
                 //Get Token
                 if (sent.getMessage().equals("getToken")) {
-
                     String username = (String) sent.getObjCont().get(0);
-
                     //if there is no username
-                    if (username == null) {
-                        response = new Message("FAIL");
-                        response.addObject(null);
-                        output.writeObject(response);
-                    } else {
+                    if (username != null) {
                         UserToken userToken = createToken(username); //Create Token
                         response = new Message("OK");
                         response.addObject(userToken);
-                        output.writeObject(response);
                     }
                 } //Create User
                 else if (sent.getMessage().equals("createUser")) {
-
-                    if (sent.getObjCont().size() < 2) {
-                        response = new Message("FAIL");
-                    } else {
-                        response = new Message("FAIL");
-
-                        if (sent.getObjCont().get(0) != null) {
-                            if (sent.getObjCont().get(1) != null) {
-
-                                String username = (String) sent.getObjCont().get(0);
-                                UserToken token = (UserToken) sent.getObjCont().get(1);
-
-                                if (createUser(username, token)) {
-                                    response = new Message("OK");
-                                }
-
-                            }
+                    if (sent.getObjCont().size() >= 2) {
+                        String username = (String) sent.getObjCont().get(0);
+                        UserToken token = (UserToken) sent.getObjCont().get(1);
+                        if ((username != null) && (token != null) && createUser(username, token)) {
+                            response = new Message("OK");
                         }
                     }
-                    output.writeObject(response);
                 } //Create Group
                 else if (sent.getMessage().equals("createGroup")) {
-
-                    if (sent.getObjCont().size() < 2) {
-                        response = new Message("FAIL");
-                    } else {
-                        response = new Message("FAIL");
-
-                        if ((sent.getObjCont().get(0) != null)
-                                && (sent.getObjCont().get(1) != null)) {
-
-                            String groupname = (String) sent.getObjCont().get(0);
-                            UserToken token = (UserToken) sent.getObjCont().get(1);
-
-                            if (createGroup(groupname, token)) {
-                                System.out.println("Creating Group");
-                                response = new Message("OK");
-                            }
+                    if (sent.getObjCont().size() >= 2) {
+                        String username = (String) sent.getObjCont().get(0);
+                        UserToken token = (UserToken) sent.getObjCont().get(1);
+                        if ((username != null) && (token != null) && createGroup(username, token)) {
+                            System.out.println("Creating Group");
+                            response = new Message("OK");
                         }
                     }
-
-                    output.writeObject(response);
                 } //Add user to the group
                 else if (sent.getMessage().equals("addUserToGroup")) {
-
-                    if (sent.getObjCont().size() < 3) {
-                        response = new Message("FAIL");
-                    } else {
-                        response = new Message("FAIL");
-
-                        if ((sent.getObjCont().get(0) != null) && (sent.getObjCont().get(1) != null) && (sent.getObjCont().get(2) != null)) {
-                            String username = (String) sent.getObjCont().get(0);
-                            String groupname = (String) sent.getObjCont().get(1);
-                            UserToken token = (UserToken) sent.getObjCont().get(2);
-
-                            if (addUserToGroup(username, groupname, token)) {
-                                response = new Message("OK");
-                            }
+                    if (sent.getObjCont().size() >= 3) {
+                        String username = (String) sent.getObjCont().get(0);
+                        String groupname = (String) sent.getObjCont().get(1);
+                        UserToken token = (UserToken) sent.getObjCont().get(2);
+                        if ((username != null) && (groupname != null) && (token != null) && addUserToGroup(username, groupname, token)) {
+                            response = new Message("OK");
                         }
                     }
-                    output.writeObject(response);
                 } //Delete a user from the group
                 else if (sent.getMessage().equals("deleteUserFromGroup")) {
-
-                    if (sent.getObjCont().size() < 2) {
-                        response = new Message("FAIL");
-                    } else {
-                        response = new Message("FAIL");
-
-                        if ((sent.getObjCont().get(0) != null) && (sent.getObjCont().get(1) != null) && (sent.getObjCont().get(2) != null)) {
-
-                            String username = (String) sent.getObjCont().get(0);
-                            String groupname = (String) sent.getObjCont().get(1);
-                            UserToken token = (UserToken) sent.getObjCont().get(2);
-
-                            if (deleteUserFromGroup(username, groupname, token)) {
-                                response = new Message("OK");
-                            }
-
+                    if (sent.getObjCont().size() >= 3) {
+                        String username = (String) sent.getObjCont().get(0);
+                        String groupname = (String) sent.getObjCont().get(1);
+                        UserToken token = (UserToken) sent.getObjCont().get(2);
+                        if ((username != null) && (groupname != null) && (token != null) && deleteUserFromGroup(username, groupname, token)) {
+                            response = new Message("OK");
                         }
                     }
-                    output.writeObject(response);
                 } //List Members of the Group
                 else if (sent.getMessage().equals("listMembers")) {
-
-                    String groupName = (String) sent.getObjCont().get(0);
-                    UserToken token = (UserToken) sent.getObjCont().get(1);
-
-                    if (groupName == null) {
-                        response = new Message("FAIL");
-                        response.addObject(null);
-                        output.writeObject(response);
-                    } else {
-                        List<String> members = listMembers(groupName, token);
-                        response = new Message("OK");
-                        response.addObject(members);
-                        output.writeObject(response);
+                    if (sent.getObjCont().size() >= 2) {
+                        String groupName = (String) sent.getObjCont().get(0);
+                        UserToken token = (UserToken) sent.getObjCont().get(1);
+                        if ((groupName != null) && (token != null)) {
+                            List<String> members = listMembers(groupName, token);
+                            response = new Message("OK");
+                            response.addObject(members);
+                        }
                     }
                 } //Disconnect
                 else if (sent.getMessage().equals("disconnect")) {
                     // Close and cleanup
                     System.out.println("** Closing connection with " + socket.getInetAddress() + ":" + socket.getPort() + " **");
-                    loop = false;
                     socket.close();
-                } else {
-                    response = new Message("FAIL"); //Server does not understand client request
-                    output.writeObject(response);
+                    break;
                 }
 
-            } while (loop);
+                output.writeObject(response);
+            }
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             e.printStackTrace(System.err);

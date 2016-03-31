@@ -45,6 +45,48 @@ public class FileClient
             return false;
         }
     }
+    static ClientFramework Connect = new ClientFramework("Connect")
+    {
+        @Override
+        public void run()
+        {
+            // Connect to server
+            Scanner Input = new Scanner(System.in);
+
+            System.out.println("Please enter server address");
+            System.out.print("Default[localhost]:");
+            String FS_ADDRESS = Input.nextLine();
+            if (FS_ADDRESS.equals(""))
+            {
+                FS_ADDRESS = "localhost";
+            }
+            System.out.println("Please enter server port");
+            System.out.print("Default[8766]:");
+            String Port = Input.nextLine();
+            try
+            {
+                FS_PORT = Integer.parseInt(Port);
+            }
+            catch (Exception e)
+            {
+                FS_PORT = 8766;
+            }
+
+            System.out.println("Connect to " + FS_ADDRESS + ":" + FS_PORT);
+            if (!connect(FS_ADDRESS,FS_PORT))
+            {
+                System.out.println("Connection failed");
+                return;
+            }
+
+            // Get UserToken
+            List<String> Group = new ArrayList<>();
+            Group.add("group");
+            Token = new UserTokenImp("localhost", "admin", Group);
+
+            System.out.println("Connected.");
+        }
+    };
     
     static void disconnect()
     {
@@ -66,6 +108,16 @@ public class FileClient
         }
         Server = null;
     }
+    static ClientFramework Disconnect = new ClientFramework("Disconnect")
+    {
+        @Override
+        public void run()
+        {
+            // Disconnect
+            disconnect();
+            System.out.println("Disconnected.");
+        }
+    };
     
     static List<String> listFile(UserToken token, String group)
     {
@@ -101,6 +153,32 @@ public class FileClient
             return (List<String>)Content.get(2);
         }
     }
+    static ClientFramework ListFile = new ClientFramework("List File")
+    {
+        @Override
+        public void run()
+        {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter group name:");
+            String Group = Input.nextLine();
+
+            List<String> FileList = listFile(Token,Group);
+            if (FileList == null)
+            {
+                System.out.println("List failed");
+            }
+            else
+            {
+                System.out.println("List:");
+                for (int i=0; i<FileList.toArray().length; i++)
+                {
+                    System.out.println(FileList.toArray()[i]);
+                }
+                System.out.println("-------");
+            }
+        }
+    };
     
     static boolean upload(UserToken token, String group, String remoteFile, String localFile)
     {
@@ -149,6 +227,33 @@ public class FileClient
         
         return ("success".equals(Response.getMessage()));
     }
+    static ClientFramework Upload = new ClientFramework("Upload")
+    {
+        @Override
+        public void run()
+        {
+            // Create an upload message
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter group name:");
+            String Group = Input.nextLine();
+            System.out.print("Please enter local file name:");
+            String Local = Input.nextLine();
+            System.out.print("Please enter remote file name:");
+            String Remote = Input.nextLine();
+
+            String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
+
+            if (!upload(Token,Group,Remote,localFile + Local))
+            {
+                System.out.println("Upload failed");
+            }
+            else
+            {
+                System.out.println("Upload Succeed");
+            }
+        }
+    };
 
     static boolean download(UserToken token, String group, String remoteFile, String localFile)
     {
@@ -203,6 +308,33 @@ public class FileClient
         }
         return true;
     }
+    static ClientFramework Download = new ClientFramework("Download")
+    {
+        @Override
+        public void run()
+        {
+            // Create an download message
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter group name:");
+            String Group = Input.nextLine();
+            System.out.print("Please enter local file name:");
+            String Local = Input.nextLine();
+            System.out.print("Please enter remote file name:");
+            String Remote = Input.nextLine();
+
+            String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
+
+            if(!download(Token,Group,Remote,localFile + Local))
+            {
+                System.out.println("Download failed");
+            }
+            else
+            {
+                System.out.println("Download Succeed");
+            }
+        }
+    };
     
     /**
      * @param args the command line arguments
@@ -210,144 +342,7 @@ public class FileClient
     public static void main(String[] args)
     {
         ClientFramework MainMenu = new ClientFramework("Main Menu");
-        
-        ClientFramework Connect = new ClientFramework("Connect")
-        {
-            @Override
-            public void run()
-            {
-                // Connect to server
-                Scanner Input = new Scanner(System.in);
-                
-                System.out.println("Please enter server address");
-                System.out.print("Default[localhost]:");
-                String FS_ADDRESS = Input.nextLine();
-                if (FS_ADDRESS.equals(""))
-                {
-                    FS_ADDRESS = "localhost";
-                }
-                System.out.println("Please enter server port");
-                System.out.print("Default[8766]:");
-                String Port = Input.nextLine();
-                try
-                {
-                    FS_PORT = Integer.parseInt(Port);
-                }
-                catch (Exception e)
-                {
-                    FS_PORT = 8766;
-                }
-                
-                System.out.println("Connect to " + FS_ADDRESS + ":" + FS_PORT);
-                if (!connect(FS_ADDRESS,FS_PORT))
-                {
-                    System.out.println("Connection failed");
-                    return;
-                }
 
-                // Get UserToken
-                List<String> Group = new ArrayList<>();
-                Group.add("group");
-                Token = new UserTokenImp("localhost", "admin", Group);
-                
-                System.out.println("Connected.");
-            }
-        };
-        
-        ClientFramework Disconnect = new ClientFramework("Disconnect")
-        {
-            @Override
-            public void run()
-            {
-                // Disconnect
-                disconnect();
-                System.out.println("Disconnected.");
-            }
-        };
-        
-        ClientFramework ListFile = new ClientFramework("List File")
-        {
-            @Override
-            public void run()
-            {
-                Scanner Input = new Scanner(System.in);
-                
-                System.out.print("Please enter group name:");
-                String Group = Input.nextLine();
-                
-                List<String> FileList = listFile(Token,Group);
-                if (FileList == null)
-                {
-                    System.out.println("List failed");
-                }
-                else
-                {
-                    System.out.println("List:");
-                    for (int i=0; i<FileList.toArray().length; i++)
-                    {
-                        System.out.println(FileList.toArray()[i]);
-                    }
-                    System.out.println("-------");
-                }
-            }
-        };
-        
-        ClientFramework Upload = new ClientFramework("Upload")
-        {
-            @Override
-            public void run()
-            {
-                // Create an upload message
-                Scanner Input = new Scanner(System.in);
-                
-                System.out.print("Please enter group name:");
-                String Group = Input.nextLine();
-                System.out.print("Please enter local file name:");
-                String Local = Input.nextLine();
-                System.out.print("Please enter remote file name:");
-                String Remote = Input.nextLine();
-                
-                String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
-                
-                if (!upload(Token,Group,Remote,localFile + Local))
-                {
-                    System.out.println("Upload failed");
-                }
-                else
-                {
-                    System.out.println("Upload Succeed");
-                }
-            }
-        };
-        
-        ClientFramework Download = new ClientFramework("Download")
-        {
-            @Override
-            public void run()
-            {
-                // Create an download message
-                Scanner Input = new Scanner(System.in);
-                
-                System.out.print("Please enter group name:");
-                String Group = Input.nextLine();
-                System.out.print("Please enter local file name:");
-                String Local = Input.nextLine();
-                System.out.print("Please enter remote file name:");
-                String Remote = Input.nextLine();
-                
-                String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
-                
-                if(!download(Token,Group,Remote,localFile + Local))
-                {
-                    System.out.println("Download failed");
-                }
-                else
-                {
-                    System.out.println("Download Succeed");
-                }
-            }
-        };
-        
         MainMenu.RegisterItem(Connect);
         MainMenu.RegisterItem(Disconnect);
         MainMenu.RegisterItem(ListFile);

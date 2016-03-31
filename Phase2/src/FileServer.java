@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * File server
@@ -23,10 +24,58 @@ public class FileServer
     public final static int FS_UPLOAD_FILE_NAME = 2;    //String    FileName
     public final static int FS_UPLOAD_FILE_CONTENT = 3; //byte[]    Content
     
+    public final static int FS_LIST_USER_TOKEN = 0;     //UserToken Token
+    public final static int FS_LIST_GROUP_NAME = 1;     //String    Group
+    
+    public final static int FS_VIEW_USER_TOKEN = 0;     //UserToken Token
+    public final static int FS_VIEW_GROUP_NAME = 1;     //String    Group
+    public final static int FS_VIEW_FILE_LIST = 2;      //String[]  List
+    
     public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
     
     public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
     public final static int FS_ERROR_EXCEPTION = 1;     //Exception e
+    
+    static class listCallback implements ServerFramework.ServerCallback
+    {
+        @Override
+        public Message CallbackProc(Socket Client, ArrayList<Object> Content)
+        {
+            System.out.println("Received a list message");
+            
+            Message Response = new Message("view");
+            
+            try
+            {
+                //  Read file content
+                File FolderHandle = new File((String)
+                        FS_STORAGE + File.separator +
+                        Content.get(FS_LIST_GROUP_NAME));
+                File[] FileList = FolderHandle.listFiles();
+                String[] FileNameList = new String[FileList.length];
+                
+                for (int i=0; i<FileList.length; i++)
+                {
+                    FileNameList[i] = FileList[i].getName();
+                }
+                
+                //  Create Message
+                Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
+                Response.addObject((String) Content.get(FS_DOWNLOAD_GROUP_NAME));
+                Response.addObject((String[]) FileNameList);
+            }
+            catch (Exception e)
+            {
+                //  Return error message
+                System.out.println("Failed to send the file, continue");
+                Response = new Message("error");
+                Response.addObject(e);
+            }
+            
+            return Response;
+        }
+        
+    }
     
     static class downloadCallback implements ServerFramework.ServerCallback
     {
@@ -52,7 +101,7 @@ public class FileServer
                 
                 //  Create Message
                 Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
-                Response.addObject((String) "");
+                Response.addObject((String) Content.get(FS_DOWNLOAD_GROUP_NAME));
                 Response.addObject((String) Content.get(FS_DOWNLOAD_FILE_NAME));
                 Response.addObject(FileContent);
                 
@@ -137,11 +186,14 @@ public class FileServer
         ServerFramework Server = new ServerFramework(FS_PORT);
         downloadCallback download = new downloadCallback();
         uploadCallback upload = new uploadCallback();
+        listCallback list = new listCallback();
         
         // Register callbacks
         System.out.println("Register messages");
         Server.RegisterMessage("download", download);
         Server.RegisterMessage("upload", upload);
+        Server.RegisterMessage("list", list);
+
         
         // Start listener
         System.out.println("Start the listener");

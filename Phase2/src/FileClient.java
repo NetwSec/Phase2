@@ -58,9 +58,39 @@ public class FileClient
         }
     }
     
-    static List<String> listFiles(UserToken token)
+    static String [] listFile(UserToken token, String group)
     {
-        return null;
+         Message Upload = new Message("list");
+        
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) group);
+        
+        //  Send message
+        try {
+            Output.writeObject(Upload);
+            Output.flush();
+        } catch (IOException ex) {
+            return null;
+        }
+        
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) Input.readObject();
+        } catch (IOException | ClassNotFoundException ex) {
+            return null;
+        }
+        
+        if(!"view".equals(Response.getMessage()))
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<Object> Content = Response.getObjCont();
+            return (String [])Content.get(2);
+        }
     }
     
     static boolean upload(UserToken token, String group, String remoteFile, String localFile)
@@ -170,7 +200,7 @@ public class FileClient
      */
     public static void main(String[] args)
     {
-        //  Check arguments
+        // Check arguments
         if (args.length == 2)
         {
             FS_ADDRESS = args[0];
@@ -184,7 +214,7 @@ public class FileClient
             return;
         }
         
-        //  Connect to server
+        // Connect to server
         try {
             System.out.println("Connect to " + FS_ADDRESS + ":" + FS_PORT);
             connect(FS_ADDRESS,FS_PORT);
@@ -193,11 +223,29 @@ public class FileClient
             return;
         }
         
-        //  Get UserToken
+        // Get UserToken
         System.out.println("Get UserToken");
         UserToken Token = new UserTokenImp("localhost", "admin", null);
         
-        //  Create an upload message
+        // Create a list message
+        System.out.println("Create a list message (1st)");
+        String[] FileList = listFile(Token,"group");
+        if (FileList == null)
+        {
+            System.out.println("List failed");
+        }
+        else
+        {
+            System.out.println("List:");
+            for (int i=0; i<FileList.length; i++)
+            {
+                System.out.println(FileList[i]);
+            }
+            System.out.println("-------");
+            FileList = null;
+        }
+        
+        // Create an upload message
         String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
         System.out.println("Create an upload message");
         if (!upload(Token,"group","test_remote.txt",localFile + "test_local.txt"))
@@ -205,14 +253,31 @@ public class FileClient
             System.out.println("Upload failed");
         }
         
-        //  Create an download message
+        // Create a list message
+        System.out.println("Create a list message (2nd)");
+        FileList = listFile(Token,"group");
+        if (FileList == null)
+        {
+            System.out.println("List failed");
+        }
+        else
+        {
+            System.out.println("List:");
+            for (int i=0; i<FileList.length; i++)
+            {
+                System.out.println(FileList[i]);
+            }
+            System.out.println("-------");
+        }
+        
+        // Create an download message
         System.out.println("Create a download message");
         if(!download(Token,"group","test_remote.txt",localFile + "test_local_new.txt"))
         {
             System.out.println("Download failed");
         }
         
-        //  Disconnect
+        // Disconnect
         System.out.println("Disconnect");
         disconnect();
     }

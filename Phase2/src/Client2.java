@@ -345,7 +345,7 @@ public class Client2
             System.out.print("Please enter remote file name:");
             String Remote = Input.nextLine();
 
-            String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
+            String localFile = System.getProperty("user.dir") + File.separator + "Client" + File.separator;
 
             if(!download(Token,Group,Remote,localFile + Local))
             {

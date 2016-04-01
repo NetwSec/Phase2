@@ -182,6 +182,29 @@ public class GroupClient {
 
                 // 6: file server
                 case 6: {
+                    
+                    disconnect();
+                    connect("localhost", 8765);
+                    if (isConnect()) // check that server is running
+                    {
+                        userToken = getToken(userName);
+                        if (userToken == null) // no login for that name
+                        {
+                             System.out.println("Username not recognized. Contact Admin.");
+                            // Disconnect from GS
+                            disconnect();
+                        }              
+                    } else {
+                     System.out.println("Error - Group Server not running. Contact Admin.");
+                     return;
+                    }
+                    
+                    List<String> AvailableGroups = userToken.getGroups();
+            
+                    for (int x = 0; x < AvailableGroups.size();x++){
+                        System.out.println(AvailableGroups.get(x));
+                    }                    
+                    
                     FileClient FC = new FileClient(userToken);
                     FC.run();
                     break;

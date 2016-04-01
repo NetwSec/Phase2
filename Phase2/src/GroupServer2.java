@@ -5,8 +5,27 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 
 /**
- * File server
- *
+ * Group server
+ * 
+ * GroupServer2 is a simple server providing account management.
+ * It is based on ServerFramework and can handle 5 messages: login, adduser, 
+ * addgroup, mgnt, and listgroup. It can return success message when receives
+ * login/adduser/addgroup/mgnt request, view message when receives listgroup
+ * request, and error message when something goes wrong.
+ * 
+ * The class consists of 5 callbacks for each messages, 1 error message generator,
+ * and 1 run() method to register callbacks, populate UserList, and start the server.
+ * 
+ * The default admin account is admin and the default admin group is also admin.
+ * They are defined by GS_ADMIN_GROUP.
+ * 
+ * The default issuer value in UserToken is test_server. This is defined by
+ * GS_IDENTITY.
+ * 
+ * The default UserList file is ./GroupServer/UserList.bin. This is defined by
+ * GS_STORAGE.
+ * 
+ * The default port is 8765. This is defined by GS_PORT.
  * @author Yuntian Zhang
  */
 public class GroupServer2 {
@@ -175,7 +194,7 @@ public class GroupServer2 {
                     && (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))) {
                 //  Create Message
                 if (UserName.equals(Token.getSubject())) {
-                    Token = new UserTokenImp(GS_IDENTITY, Account.getUser(Token.getSubject()));
+                    Token = new UserTokenImp(GS_IDENTITY, Account.getUser(UserName));
                 }
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) GroupName);
@@ -262,7 +281,7 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
 
         // Initalize account information
-        Account = new UserList("UserList.bin", GS_ADMIN_GROUP);
+        Account = new UserList(GS_STORAGE, GS_ADMIN_GROUP);
 
         // Start listener
         System.out.println("Start the listener");

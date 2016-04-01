@@ -12,7 +12,49 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * General client
+ * General client for both servers
+ *
+ * The Client2 is a universal client that connects to one group server and one
+ * file server upon starting. It is based on ClientFramework to display the main
+ * menu, 7 leaf nodes to take extra information from user, and subroutines
+ * defined in the specification:
+ *
+ * connect(): Implemented
+ *
+ * disconnect():Implemented
+ *
+ * getToken(): Implemented
+ *
+ * createUser(): Implemented
+ *
+ * createGroup(): Implemented
+ *
+ * addUserToGroup()/deleteUserFromGroup(): Implemented as manageUser()
+ *
+ * listMembers(): Implemented
+ *
+ * listFiles(): Implemented
+ *
+ * upload(): Implemented
+ *
+ * download(): Implemented
+ *
+ * The Client2 consists 10 standard subroutines, 1 run() method to start the main
+ * ClientFramework class, and other 10 ClientFramework in following topology:
+ * 
+ * [Welcome] - [Log In] - [Main Menu] - [Add User]
+ *           L Exit                   L [Add Group]
+ *                                    L [User Management]
+ *                                    L [List Members]
+ *                                    L [List Files]
+ *                                    L [Upload]
+ *                                    L [Download]
+ *                                    L Exit - [Disconnect]
+ * 
+ * The reason for Main Menu node is Log In is a leaf node, thus has no loop for
+ * user input.
+ * 
+ * The default file saving location is ./Client/. This is defined by LocalFile.
  *
  * @author Yuntian Zhang
  */
@@ -109,6 +151,116 @@ public class Client2 {
         }
     }
 
+    static boolean getToken(String UserName) {
+        Message Login = new Message(GS_LOGIN);
+        // Create Message header
+        Login.addObject((UserToken) null);
+        Login.addObject((String) UserName);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Login);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        // Update token
+        if (Response.getMessage().equals("success")) {
+            UpdateToken((UserToken) Response.getObjCont().get(GS_SUCCESS_USER_TOKEN));
+            return true;
+        }
+        return false;
+    }
+
+    static ClientFramework Login = new ClientFramework("Log in") {
+        @Override
+        public void run() {
+            Scanner Input = new Scanner(System.in);
+
+            // 1. Collect server information
+            System.out.println("Please enter the group server address");
+            System.out.print("Default[localhost]:");
+            GS_ADDRESS = Input.nextLine();
+            if (GS_ADDRESS.equals("")) {
+                GS_ADDRESS = "localhost";
+            }
+
+            System.out.println("Please enter the group server port");
+            System.out.print("Default[8765]:");
+            String GPort = Input.nextLine();
+            try {
+                GS_PORT = Integer.parseInt(GPort);
+            } catch (Exception e) {
+                GS_PORT = 8765;
+            }
+
+            System.out.println("Please enter the file server address");
+            System.out.print("Default[localhost]:");
+            FS_ADDRESS = Input.nextLine();
+            if (FS_ADDRESS.equals("")) {
+                FS_ADDRESS = "localhost";
+            }
+
+            System.out.println("Please enter the file server port");
+            System.out.print("Default[8766]:");
+            String FPort = Input.nextLine();
+            try {
+                FS_PORT = Integer.parseInt(FPort);
+            } catch (Exception e) {
+                FS_PORT = 8766;
+            }
+
+            // 2. Connect to remote servers
+            if (!connect()) {
+                System.out.println("Connection failed");
+                return;
+            } else {
+                System.out.println("Connected.");
+            }
+
+            // 3. Login
+            // Get user token before further action
+            while (true) {
+                System.out.print("Please enter your user name: ");
+                String UserName = Input.nextLine();
+
+                if (getToken(UserName)) {
+                    break;
+                }
+
+                System.out.println("Invalid user name. Please retry");
+                System.out.println();
+            }
+
+            // 4. Start the main menu
+            ClientFramework MainMenu = new ClientFramework("Main Menu");
+
+            // Group server specific
+            MainMenu.RegisterItem(AddUser);
+            MainMenu.RegisterItem(AddGroup);
+            MainMenu.RegisterItem(Management);
+            MainMenu.RegisterItem(ListMembers);
+
+            // File server specific
+            MainMenu.RegisterItem(ListFiles);
+            MainMenu.RegisterItem(Upload);
+            MainMenu.RegisterItem(Download);
+
+            // Set exit handler
+            MainMenu.SetExitHandler(Disconnect);
+            MainMenu.run();
+        }
+    };
+
     static void disconnect() {
         try {
             GInput.close();
@@ -120,9 +272,253 @@ public class Client2 {
         } catch (Exception ex) {
         }
     }
+    static ClientFramework Disconnect = new ClientFramework("Disconnect") {
+        @Override
+        public void Exit() {
+            disconnect();
+            System.out.println("Disconnected.");
+        }
+    };
+
+    // Group server services
+    static boolean createUser(UserToken token, String Username) {
+        Message Upload = new Message(GS_ADDUSER);
+
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Username);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        if (!Response.getMessage().equals(GS_SUCCESS)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+    static ClientFramework AddUser = new ClientFramework("Create new user") {
+        @Override
+        public void run() {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the user name:");
+            String Username = Input.nextLine();
+
+            if (!createUser(Token, Username)) {
+                System.out.println("Operation failed");
+            } else {
+                System.out.println("Operation succeed");
+            }
+        }
+    };
+
+    static boolean createGroup(UserToken token, String Group) {
+        Message Upload = new Message(GS_ADDGROUP);
+
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Group);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        if (!Response.getMessage().equals(GS_SUCCESS)) {
+            return false;
+        } else {
+            // Update token
+            UpdateToken((UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN));
+            return true;
+        }
+    }
+    static ClientFramework AddGroup = new ClientFramework("Create new group") {
+        @Override
+        public void run() {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+
+            if (!createGroup(Token, Group)) {
+                System.out.println("Operation failed");
+            } else {
+                System.out.println("Operation succeed");
+            }
+        }
+    };
+
+    static boolean manageUser(UserToken token, String Group, String UserName, String Operation) {
+        Message Upload = new Message(GS_MGNT);
+
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Group);
+        Upload.addObject((String) UserName);
+        boolean Option;
+        if (Operation.equals("add")) {
+            Option = GS_MGNT_OPTION_ADD;
+        } else if (Operation.equals("remove")) {
+            Option = GS_MGNT_OPTION_REMOVE;
+        } else {
+            return false;
+        }
+        Upload.addObject((boolean) Option);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        if (!Response.getMessage().equals(GS_SUCCESS)) {
+            return false;
+        } else {
+            // Update token
+            if (token.getSubject().equals(UserName)) {
+                UpdateToken((UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN));
+            }
+            return true;
+        }
+    }
+    static ClientFramework Management = new ClientFramework("User management") {
+        @Override
+        public void run() {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+
+            // Code in listmembers
+            List<String> UserList = listMembers(Token, Group);
+            if (UserList == null) {
+                System.out.println("Operation failed");
+                return;
+            } else {
+                System.out.println("The following members are in the group " + Group);
+                for (int i = 0; i < UserList.toArray().length; i++) {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+            // End of copypasta
+
+            System.out.print("Please enter the user name:");
+            String UserName = Input.nextLine();
+
+            System.out.print("Please enter the operation [add|remove]:");
+            String Operation = Input.nextLine();
+
+            if (!manageUser(Token, Group, UserName, Operation)) {
+                System.out.println("Operation failed");
+            } else {
+                System.out.println("Operation succeed");
+            }
+
+            // Code in listmembers
+            UserList = listMembers(Token, Group);
+            if (UserList == null) {
+                System.out.println("Operation failed");
+                return;
+            } else {
+                System.out.println("The following members are in the group " + Group);
+                for (int i = 0; i < UserList.toArray().length; i++) {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+            // End of copypasta
+        }
+    };
+
+    static List<String> listMembers(UserToken token, String group) {
+        Message Upload = new Message(GS_LISTGROUP);
+
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) group);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return null;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return null;
+        }
+
+        if (!Response.getMessage().equals(GS_VIEW)) {
+            return null;
+        } else {
+            ArrayList<Object> Content = Response.getObjCont();
+            return (List<String>) Content.get(GS_VIEW_USER_LIST);
+        }
+    }
+    static ClientFramework ListMembers = new ClientFramework("List members in your group") {
+        @Override
+        public void run() {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+
+            List<String> UserList = listMembers(Token, Group);
+            if (UserList == null) {
+                System.out.println("Operation failed");
+            } else {
+                System.out.println("The following members are in the group " + Group);
+                for (int i = 0; i < UserList.toArray().length; i++) {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+        }
+    };
 
     // File server services
-    static List<String> listFile(UserToken token, String group) {
+    static List<String> listFiles(UserToken token, String group) {
         Message Upload = new Message(FS_LIST);
 
         // Create Message header
@@ -152,7 +548,7 @@ public class Client2 {
             return (List<String>) Content.get(FS_VIEW_FILE_LIST);
         }
     }
-    static ClientFramework ListFile = new ClientFramework("List File") {
+    static ClientFramework ListFiles = new ClientFramework("List Files") {
         @Override
         public void run() {
             Scanner Input = new Scanner(System.in);
@@ -160,7 +556,7 @@ public class Client2 {
             System.out.print("Please enter the group name:");
             String Group = Input.nextLine();
 
-            List<String> FileList = listFile(Token, Group);
+            List<String> FileList = listFiles(Token, Group);
             if (FileList == null) {
                 System.out.println("Operation failed");
             } else {
@@ -308,237 +704,6 @@ public class Client2 {
         }
     };
 
-    // Group server services
-    static boolean createUser(UserToken token, String Username) {
-        Message Upload = new Message(GS_ADDUSER);
-
-        // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) Username);
-
-        //  Send message
-        try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        //  Receive response
-        Message Response;
-        try {
-            Response = (Message) GInput.readObject();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    static ClientFramework AddUser = new ClientFramework("Create new user") {
-        @Override
-        public void run() {
-            Scanner Input = new Scanner(System.in);
-
-            System.out.print("Please enter the user name:");
-            String Username = Input.nextLine();
-
-            if (!createUser(Token, Username)) {
-                System.out.println("Operation failed");
-            } else {
-                System.out.println("Operation succeed");
-            }
-        }
-    };
-
-    static boolean createGroup(UserToken token, String Group) {
-        Message Upload = new Message(GS_ADDGROUP);
-
-        // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) Group);
-
-        //  Send message
-        try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        //  Receive response
-        Message Response;
-        try {
-            Response = (Message) GInput.readObject();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    static ClientFramework AddGroup = new ClientFramework("Create new group") {
-        @Override
-        public void run() {
-            Scanner Input = new Scanner(System.in);
-
-            System.out.print("Please enter the group name:");
-            String Group = Input.nextLine();
-
-            if (!createGroup(Token, Group)) {
-                System.out.println("Operation failed");
-            } else {
-                System.out.println("Operation succeed");
-            }
-        }
-    };
-
-    static boolean manageUser(UserToken token, String Group, String UserName, String Operation) {
-        Message Upload = new Message(GS_MGNT);
-
-        // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) Group);
-        Upload.addObject((String) UserName);
-        boolean Option;
-        if (Operation.equals("add")) {
-            Option = GS_MGNT_OPTION_ADD;
-        } else if (Operation.equals("remove")) {
-            Option = GS_MGNT_OPTION_REMOVE;
-        } else {
-            return false;
-        }
-        Upload.addObject((boolean) Option);
-
-        //  Send message
-        try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        //  Receive response
-        Message Response;
-        try {
-            Response = (Message) GInput.readObject();
-        } catch (Exception ex) {
-            return false;
-        }
-
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-    static ClientFramework Management = new ClientFramework("User management") {
-        @Override
-        public void run() {
-            Scanner Input = new Scanner(System.in);
-
-            System.out.print("Please enter the group name:");
-            String Group = Input.nextLine();
-
-            // Code in listmembers
-            List<String> UserList = listMembers(Token, Group);
-            if (UserList == null) {
-                System.out.println("Operation failed");
-                return;
-            } else {
-                System.out.println("The following members are in the group " + Group);
-                for (int i = 0; i < UserList.toArray().length; i++) {
-                    System.out.println(UserList.toArray()[i]);
-                }
-                System.out.println();
-            }
-            // End of copypasta
-
-            System.out.print("Please enter the user name:");
-            String UserName = Input.nextLine();
-
-            System.out.print("Please enter the operation [add|remove]:");
-            String Operation = Input.nextLine();
-
-            if (!manageUser(Token, Group, UserName, Operation)) {
-                System.out.println("Operation failed");
-            } else {
-                System.out.println("Operation succeed");
-            }
-
-            // Code in listmembers
-            UserList = listMembers(Token, Group);
-            if (UserList == null) {
-                System.out.println("Operation failed");
-                return;
-            } else {
-                System.out.println("The following members are in the group " + Group);
-                for (int i = 0; i < UserList.toArray().length; i++) {
-                    System.out.println(UserList.toArray()[i]);
-                }
-                System.out.println();
-            }
-            // End of copypasta
-        }
-    };
-
-    static List<String> listMembers(UserToken token, String group) {
-        Message Upload = new Message(GS_LISTGROUP);
-
-        // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) group);
-
-        //  Send message
-        try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        //  Receive response
-        Message Response;
-        try {
-            Response = (Message) GInput.readObject();
-        } catch (Exception ex) {
-            return null;
-        }
-
-        if (!Response.getMessage().equals(GS_VIEW)) {
-            return null;
-        } else {
-            ArrayList<Object> Content = Response.getObjCont();
-            return (List<String>) Content.get(GS_VIEW_USER_LIST);
-        }
-    }
-    static ClientFramework ListMembers = new ClientFramework("List members in your group") {
-        @Override
-        public void run() {
-            Scanner Input = new Scanner(System.in);
-
-            System.out.print("Please enter the group name:");
-            String Group = Input.nextLine();
-
-            List<String> UserList = listMembers(Token, Group);
-            if (UserList == null) {
-                System.out.println("Operation failed");
-            } else {
-                System.out.println("The following members are in the group " + Group);
-                for (int i = 0; i < UserList.toArray().length; i++) {
-                    System.out.println(UserList.toArray()[i]);
-                }
-                System.out.println();
-            }
-        }
-    };
-
     static String GS_ADDRESS = "localhost";
     static int GS_PORT = 8765;
 
@@ -557,111 +722,19 @@ public class Client2 {
 
     static String LocalFile = System.getProperty("user.dir") + File.separator + "Client" + File.separator;
 
+    public static void UpdateToken(UserToken newToken) {
+        Token = newToken;
+    }
+
     public static void run() {
-        Scanner Input = new Scanner(System.in);
 
         // Set up the local file folder
         File FileHandle = new File(LocalFile);
         FileHandle.mkdirs();
 
-        // 1. Set up the connection
-        // Get server address
-        System.out.println("Please enter the group server address");
-        System.out.print("Default[localhost]:");
-        GS_ADDRESS = Input.nextLine();
-        if (GS_ADDRESS.equals("")) {
-            GS_ADDRESS = "localhost";
-        }
-        System.out.println("Please enter the group server port");
-        System.out.print("Default[8765]:");
-        String GPort = Input.nextLine();
-        try {
-            GS_PORT = Integer.parseInt(GPort);
-        } catch (Exception e) {
-            GS_PORT = 8765;
-        }
-
-        System.out.println("Please enter the file server address");
-        System.out.print("Default[localhost]:");
-        FS_ADDRESS = Input.nextLine();
-        if (FS_ADDRESS.equals("")) {
-            FS_ADDRESS = "localhost";
-        }
-        System.out.println("Please enter the file server port");
-        System.out.print("Default[8766]:");
-        String FPort = Input.nextLine();
-        try {
-            FS_PORT = Integer.parseInt(FPort);
-        } catch (Exception e) {
-            FS_PORT = 8766;
-        }
-
-        // Connect to remote servers
-        if (!connect()) {
-            System.out.println("Connection failed");
-            return;
-        }
-
-        System.out.println("Connected.");
-
-        // 2. Login
-        // Get user token before further action
-        while (true) {
-            System.out.print("Please enter your user name: ");
-            String Username = Input.nextLine();
-
-            Message Login = new Message(GS_LOGIN);
-            // Create Message header
-            Login.addObject((UserToken) null);
-            Login.addObject((String) Username);
-
-            //  Send message
-            try {
-                GOutput.writeObject(Login);
-                GOutput.flush();
-            } catch (Exception ex) {
-                System.out.println("Unable to send login message. Please retry.");
-                System.out.println();
-                continue;
-            }
-
-            //  Receive response
-            Message Response;
-            try {
-                Response = (Message) GInput.readObject();
-            } catch (Exception ex) {
-                System.out.println("Unable to receive login token. Please retry.");
-                System.out.println();
-                continue;
-            }
-
-            if (Response.getMessage().equals("success")) {
-                Token = (UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN);
-                break;
-            }
-
-            System.out.println("Invalid user name. Please retry");
-            System.out.println();
-        }
-
-        // 3. Start client
-        System.out.println();
-        ClientFramework MainMenu = new ClientFramework("Main Menu");
-
-        // Group server specific
-        MainMenu.RegisterItem(AddUser);
-        MainMenu.RegisterItem(AddGroup);
-        MainMenu.RegisterItem(Management);
-        MainMenu.RegisterItem(ListMembers);
-
-        // File server specific
-        MainMenu.RegisterItem(ListFile);
-        MainMenu.RegisterItem(Upload);
-        MainMenu.RegisterItem(Download);
-        MainMenu.run();
-
-        // Disconnect
-        disconnect();
-        System.out.println("Disconnected.");
+        // Start the log in menu
+        ClientFramework ClientEntry = new ClientFramework("Welcome");
+        ClientEntry.RegisterItem(Login);
+        ClientEntry.run();
     }
 }

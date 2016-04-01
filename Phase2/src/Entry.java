@@ -2,8 +2,9 @@
 import java.util.Scanner;
 
 /**
+ * The entrypoint of the package
  *
- * @author saber
+ * @author Yuntian Zhang
  */
 public class Entry {
 
@@ -26,6 +27,7 @@ public class Entry {
             Server.run();
         }
     };
+    
     static ClientFramework FileServer = new ClientFramework("Start file server") {
         @Override
         public void run() {
@@ -45,6 +47,7 @@ public class Entry {
             Server.run();
         }
     };
+    
     static ClientFramework Client = new ClientFramework("Start client") {
         @Override
         public void run() {
@@ -53,11 +56,9 @@ public class Entry {
         }
     };
 
-    /**
-     * @param args the command line arguments
-     */
+    static ClientFramework Launcher = new ClientFramework("Launcher");
+    
     public static void main(String[] args) {
-        ClientFramework Launcher = new ClientFramework("Launcher");
         Launcher.RegisterItem(GroupServer);
         Launcher.RegisterItem(FileServer);
         Launcher.RegisterItem(Client);

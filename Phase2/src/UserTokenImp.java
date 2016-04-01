@@ -8,13 +8,7 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
     private String subject; //Holds the subject/user requesting the token
     private List<String> group; //Holds list of memberships of the subject
 
-    //Constructor with 3 parameters
-    public UserTokenImp(String issuer, String subject, List<String> group) {
-        this.issuer = issuer;
-        this.subject = subject;
-        this.group = group;
-    }
-
+    //Constructor with 2 parameters
     public UserTokenImp(String issuer, User UserInfo) {
         this.issuer = issuer;
         this.subject = UserInfo.getName();

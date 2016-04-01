@@ -2,8 +2,6 @@
 import java.util.ArrayList;
 
 /**
- * *
- *
  * Message class serves the purpose as the courier who exchanges messages
  * between server and client. It is a means of communication.
  */

@@ -10,6 +10,19 @@ import java.util.ArrayList;
 /**
  * File server
  *
+ * FileServer is a simple server providing file storage service.
+ * It is based on ServerFramework and can handle 3 messages: download, upload,
+ * and list. It can return upload message when receives download request, success
+ * message when receives upload request, view message when receives list
+ * request, and error message when something goes wrong.
+ * 
+ * The class consists of 3 callbacks for each messages, 1 error message generator,
+ * and 1 run() method to register callbacks and start the server.
+ * 
+ * The default file saving location is ./FileServer/<GROUP NAME>/. This is
+ * defined by FS_STORAGE.
+ * 
+ * The default port is 8766. This is defined by FS_PORT.
  * @author Yuntian Zhang
  */
 public class FileServer {
@@ -197,6 +210,7 @@ public class FileServer {
         // Create instances
         System.out.println("Initalize file server");
         ServerFramework Server = new ServerFramework(FS_PORT);
+        
         downloadCallback download = new downloadCallback();
         uploadCallback upload = new uploadCallback();
         listCallback list = new listCallback();

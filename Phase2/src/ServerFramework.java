@@ -12,8 +12,26 @@ import java.util.Hashtable;
  * ServerFramework class provide the basic functionality of a message driver
  * server. Developer should create an instance of this class, create instances
  * of ServerCallback for each message, RegisterMessage(), and run().
- *
- *
+ * 
+ * 
+ * ServerFramework itself is only a listener thread class. It will fire a new 
+ * thread to handle incoming connection. The incoming connection is handled by
+ * ServerDispatcher.
+ * 
+ * ServerDispatcher is a working thread designed specific for Message class.
+ * The communication assumes that both sides will send one Message object each
+ * time and Message class only. After receiving the object, ServerDispatcher will
+ * check the registered message handler in ServerFramework, and invoke the proc
+ * with the content of Message.
+ * 
+ * Since Java doesn't support function pointer, ServerCallback is provided as a
+ * workaround. By implementing a class, create an instance, and register in
+ * ServerFramework, the ServerDispatcher will be able to find the correct function
+ * to handle the specific Message. Since the ServerDispatcher handles the 
+ * commonication between server and the client, a ServerCallback is free from
+ * socket programming and can focus on the specific task. However if non-Message
+ * packet or very large stream is required, ServerCallback can use the client socket
+ * that is passing in the parameter to make the direct communication.
  * @author Yuntian Zhang
  */
 public class ServerFramework implements Runnable {
@@ -46,6 +64,7 @@ public class ServerFramework implements Runnable {
     // Listening thread main proc
     @Override
     public void run() {
+        // Open the port
         ServerSocket Listen;
         try {
             Listen = new ServerSocket(this.Port);
@@ -94,7 +113,6 @@ public class ServerFramework implements Runnable {
                         System.out.println("Invalid message, close connection");
                         throw new UnsupportedOperationException("Invalid message.");
                     }
-
                     String Command = Request.getMessage();
                     ArrayList<Object> Content = Request.getObjCont();
 
@@ -103,6 +121,8 @@ public class ServerFramework implements Runnable {
                     // Ignore unknown message
                     if (Callback == null) {
                         System.out.println("Unknown message [" + Command + "], continue");
+                        
+                        // Send an error packet
                         Message Response = new Message("error");
                         UserToken Token = (UserToken) Content.get(0);
                         String RequestedGroup = (String) Content.get(1);

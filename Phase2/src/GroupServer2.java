@@ -20,34 +20,41 @@ public class GroupServer2
     public final static int GS_GENERAL_GROUP_NAME = 1;  //String    Group
     public final static int GS_GENERAL_USER_NAME = 1;   //String    User
     
+    public final static String GS_LOGIN = "login";      //login
     public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_LOGIN_USER_NAME = 1;     //String    User
     
+    public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
     
+    public final static String GS_ADDGROUP = "addgroup";//addgroup
     public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
     public final static int GS_ADDGROUP_GROUP_NAME = 1; //String    Group
     
+    public final static String GS_MGNT = "mgnt";        //mgnt
     public final static int GS_MGNT_USER_TOKEN = 0;     //UserToken Token
     public final static int GS_MGNT_GROUP_NAME = 1;     //String    Group
     public final static int GS_MGNT_USER_NAME = 2;      //String    User
     public final static int GS_MGNT_OPTION = 3;         //boolean   Option
-    
     public final static boolean GS_MGNT_OPTION_ADD = true;      //boolean   Option
     public final static boolean GS_MGNT_OPTION_REMOVE = false;  //boolean   Option
     
+    public final static String GS_LISTGROUP = "listgroup";//listgroup
     public final static int GS_LISTGROUP_USER_TOKEN = 0; //UserToken Token
     public final static int GS_LISTGROUP_GROUP_NAME = 1; //String    Group
     
+    public final static String GS_VIEW = "view";        //view
     public final static int GS_VIEW_USER_TOKEN = 0;     //UserToken Token
     public final static int GS_VIEW_GROUP_NAME = 1;     //String    Group
     public final static int GS_VIEW_USER_LIST = 2;      //String[]  List
     
+    public final static String GS_SUCCESS = "success";  //success
     public final static int GS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_SUCCESS_GROUP_NAME = 1;  //String    Group
     public final static int GS_SUCCESS_USER_NAME = 1;   //String    User
     
+    public final static String GS_ERROR = "error";      //error
     public final static int GS_ERROR_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_ERROR_GROUP_NAME = 1;    //String    Group
     
@@ -58,7 +65,7 @@ public class GroupServer2
         {
             System.out.println("Received a login message");
             
-            Message Response = new Message("success");
+            Message Response = new Message(GS_SUCCESS);
             
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
@@ -91,7 +98,7 @@ public class GroupServer2
         {
             System.out.println("Received an adduser message");
             
-            Message Response = new Message("success");
+            Message Response = new Message(GS_SUCCESS);
             
             UserToken Token = (UserToken) Content.get(GS_ADDUSER_USER_TOKEN);
             String UserName = (String) Content.get(GS_ADDUSER_USER_NAME);
@@ -126,7 +133,7 @@ public class GroupServer2
         {
             System.out.println("Received an addgroup message");
             
-            Message Response = new Message("success");
+            Message Response = new Message(GS_SUCCESS);
             
             UserToken Token = (UserToken) Content.get(GS_ADDGROUP_USER_TOKEN);
             String GroupName = (String) Content.get(GS_ADDGROUP_GROUP_NAME);
@@ -162,7 +169,7 @@ public class GroupServer2
         {
             System.out.println("Received a mgnt message");
             
-            Message Response = new Message("success");
+            Message Response = new Message(GS_SUCCESS);
             
             UserToken Token = (UserToken) Content.get(GS_MGNT_USER_TOKEN);
             String GroupName = (String) Content.get(GS_MGNT_GROUP_NAME);
@@ -199,7 +206,7 @@ public class GroupServer2
         {
             System.out.println("Received a listgroup message");
             
-            Message Response = new Message("view");
+            Message Response = new Message(GS_VIEW);
             
             UserToken Token = (UserToken) Content.get(GS_LISTGROUP_USER_TOKEN);
             String GroupName = (String) Content.get(GS_LISTGROUP_GROUP_NAME);
@@ -239,7 +246,7 @@ public class GroupServer2
     
     static public Message GenerateErrorMessage(ArrayList<Object> Content)
     {
-        Message Response = new Message("error");
+        Message Response = new Message(GS_ERROR);
         Response.addObject((UserToken) Content.get(GS_GENERAL_USER_TOKEN));
         Response.addObject((String) Content.get(GS_GENERAL_GROUP_NAME));
         return Response;
@@ -275,11 +282,11 @@ public class GroupServer2
         
         // Register callbacks
         System.out.println("Register messages");
-        Server.RegisterMessage("login", login);
-        Server.RegisterMessage("adduser", adduser);
-        Server.RegisterMessage("addgroup", addgroup);
-        Server.RegisterMessage("mgnt", mgnt);
-        Server.RegisterMessage("listgroup", listgroup);
+        Server.RegisterMessage(GS_LOGIN, login);
+        Server.RegisterMessage(GS_ADDUSER, adduser);
+        Server.RegisterMessage(GS_ADDGROUP, addgroup);
+        Server.RegisterMessage(GS_MGNT, mgnt);
+        Server.RegisterMessage(GS_LISTGROUP, listgroup);
         
         // Initalize account information
         Account = new UserList("UserList.bin", GS_ADMIN_GROUP);

@@ -18,25 +18,31 @@ public class FileServer
     public final static int FS_GENERAL_USER_TOKEN = 0;  //UserToken Token
     public final static int FS_GENERAL_GROUP_NAME = 1;  //String    Group
     
+    public final static String FS_DOWNLOAD = "download";//download
     public final static int FS_DOWNLOAD_USER_TOKEN = 0; //UserToken Token
     public final static int FS_DOWNLOAD_GROUP_NAME = 1; //String    Group
     public final static int FS_DOWNLOAD_FILE_NAME = 2;  //String    FileName
     
+    public final static String FS_UPLOAD = "upload";    //upload
     public final static int FS_UPLOAD_USER_TOKEN = 0;   //UserToken Token
     public final static int FS_UPLOAD_GROUP_NAME = 1;   //String    Group
     public final static int FS_UPLOAD_FILE_NAME = 2;    //String    FileName
     public final static int FS_UPLOAD_FILE_CONTENT = 3; //byte[]    Content
     
+    public final static String FS_LIST = "list";        //list
     public final static int FS_LIST_USER_TOKEN = 0;     //UserToken Token
     public final static int FS_LIST_GROUP_NAME = 1;     //String    Group
     
+    public final static String FS_VIEW = "view";        //view
     public final static int FS_VIEW_USER_TOKEN = 0;     //UserToken Token
     public final static int FS_VIEW_GROUP_NAME = 1;     //String    Group
     public final static int FS_VIEW_FILE_LIST = 2;      //String[]  List
     
+    public final static String FS_SUCCESS = "success";  //success
     public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
     public final static int FS_SUCCESS_GROUP_NAME = 1;  //String    Group
     
+    public final static String FS_ERROR = "error";      //error
     public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
     public final static int FS_ERROR_GROUP_NAME = 1;    //String    Group
     public final static int FS_ERROR_EXCEPTION = 2;     //Exception e
@@ -48,7 +54,7 @@ public class FileServer
         {
             System.out.println("Received a list message");
             
-            Message Response = new Message("view");
+            Message Response = new Message(FS_VIEW);
             
             try
             {
@@ -88,7 +94,7 @@ public class FileServer
         {
             System.out.println("Received a download message");
             
-            Message Response = new Message("upload");
+            Message Response = new Message(FS_UPLOAD);
             
             try
             {
@@ -132,7 +138,7 @@ public class FileServer
         {
             System.out.println("Received an upload message");
             
-            Message Response = new Message("success");
+            Message Response = new Message(FS_SUCCESS);
             
             try
             {
@@ -170,7 +176,7 @@ public class FileServer
     
     static public Message GenerateErrorMessage(ArrayList<Object> Content, Exception e)
     {
-        Message Response = new Message("error");
+        Message Response = new Message(FS_ERROR);
         Response.addObject((UserToken) Content.get(FS_GENERAL_USER_TOKEN));
         Response.addObject((String) Content.get(FS_GENERAL_GROUP_NAME));
         Response.addObject(e);
@@ -202,9 +208,9 @@ public class FileServer
         
         // Register callbacks
         System.out.println("Register messages");
-        Server.RegisterMessage("download", download);
-        Server.RegisterMessage("upload", upload);
-        Server.RegisterMessage("list", list);
+        Server.RegisterMessage(FS_DOWNLOAD, download);
+        Server.RegisterMessage(FS_UPLOAD, upload);
+        Server.RegisterMessage(FS_LIST, list);
         
         // Start listener
         System.out.println("Start the listener");

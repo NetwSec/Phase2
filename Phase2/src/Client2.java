@@ -358,6 +358,67 @@ public class Client2
         }
     };
     
+    static List<String> listMembers(UserToken token, String group)
+    {
+         Message Upload = new Message(GS_LISTGROUP);
+        
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) group);
+        
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return null;
+        }
+        
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return null;
+        }
+        
+        if(!Response.getMessage().equals(GS_VIEW))
+        {
+            return null;
+        }
+        else
+        {
+            ArrayList<Object> Content = Response.getObjCont();
+            return (List<String>)Content.get(GS_VIEW_USER_LIST);
+        }
+    }
+    static ClientFramework ListMembers = new ClientFramework("List members in your group")
+    {
+        @Override
+        public void run()
+        {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter group name:");
+            String Group = Input.nextLine();
+            
+            List<String> UserList = listMembers(Token,Group);
+            if (UserList == null)
+            {
+                System.out.println("List failed");
+            }
+            else
+            {
+                System.out.println("The following members are in the group " + Group);
+                for (int i=0; i<UserList.toArray().length; i++)
+                {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+        }
+    };
+    
     Client2(UserToken token)
     {
         Token = token;
@@ -465,6 +526,10 @@ public class Client2
         ClientFramework MainMenu = new ClientFramework("Main Menu");
         
         // Group server specific
+        //MainMenu.RegisterItem(AddUser);
+        //MainMenu.RegisterItem(AddGroup);
+        //MainMenu.RegisterItem(Management);
+        MainMenu.RegisterItem(ListMembers);
         
         // File server specific
         MainMenu.RegisterItem(ListFile);

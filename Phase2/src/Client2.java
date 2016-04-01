@@ -109,6 +109,8 @@ public class Client2
     
     static UserToken Token;
     
+    // Common services
+    
     static boolean connect()
     {
         try
@@ -140,6 +142,8 @@ public class Client2
         } catch (Exception ex) {
         }
     }
+    
+    // File server services
     
     static List<String> listFile(UserToken token, String group)
     {
@@ -358,6 +362,8 @@ public class Client2
         }
     };
     
+    // Group server services
+    
     static boolean createUser(UserToken token, String Username)
     {
          Message Upload = new Message(GS_ADDUSER);
@@ -526,11 +532,6 @@ public class Client2
             }
         }
     };
-    
-    Client2(UserToken token)
-    {
-        Token = token;
-    }
     
     public static void main(String[] args)
     {

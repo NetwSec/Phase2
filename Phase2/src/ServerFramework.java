@@ -116,23 +116,7 @@ public class ServerFramework implements Runnable
                     
                     String Command = Request.getMessage();
                     ArrayList<Object> Content = Request.getObjCont();
-                    
-                    // Check permission
-                    UserToken Token = (UserToken) Content.get(0);
-                    String ClientName = Token.getSubject();
-                    String RequestedGroup = (String) Content.get(1);
-                    List<String> AvailableGroups = Token.getGroups();
-                    if (!Command.equals("login") && ((AvailableGroups == null) || (!AvailableGroups.contains(RequestedGroup))))
-                    {
-                        System.out.println(ClientName + " is requesting [" + Command + "] in group " + RequestedGroup + ", denied");
-                        Message Response = new Message("error");
-                        Response.addObject((UserToken) Token);
-                        Response.addObject((String) RequestedGroup);
-                        Response.addObject(new Exception("Access denied"));
-                        Output.writeObject(Response);
-                        continue;
-                    }
-                    
+
                     // Check callback
                     ServerCallback Callback = Server.MessageDispatcher.get(Command);
                     // Ignore unknown message
@@ -140,6 +124,8 @@ public class ServerFramework implements Runnable
                     {
                         System.out.println("Unknown message [" + Command + "], continue");
                         Message Response = new Message("error");
+                        UserToken Token = (UserToken) Content.get(0);
+                        String RequestedGroup = (String) Content.get(1);
                         Response.addObject((UserToken) Token);
                         Response.addObject((String) RequestedGroup);
                         Response.addObject(new Exception("Unknown message"));

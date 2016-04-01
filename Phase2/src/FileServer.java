@@ -58,6 +58,11 @@ public class FileServer
             
             try
             {
+                // Check permission
+                UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
+                if (!Token.getGroups().contains(Group)) throw new Exception("Access denied.");
+                
                 //  Read file content
                 File FolderHandle = new File((String)
                         FS_STORAGE + File.separator +
@@ -71,8 +76,8 @@ public class FileServer
                 }
                 
                 //  Create Message
-                Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
-                Response.addObject((String) Content.get(FS_DOWNLOAD_GROUP_NAME));
+                Response.addObject((UserToken) Token);
+                Response.addObject((String) Group);
                 Response.addObject((ArrayList<String>) FileNameList);
             }
             catch (Exception e)
@@ -84,7 +89,6 @@ public class FileServer
             
             return Response;
         }
-        
     }
     
     static class downloadCallback implements ServerFramework.ServerCallback
@@ -98,6 +102,11 @@ public class FileServer
             
             try
             {
+                // Check permission
+                UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
+                if (!Token.getGroups().contains(Group)) throw new Exception("Access denied.");
+                
                 //  Read file content
                 File FileHandle = new File((String)
                         FS_STORAGE + File.separator +
@@ -110,8 +119,8 @@ public class FileServer
                 FileBuff.read(FileContent, 0, FileContent.length);
                 
                 //  Create Message
-                Response.addObject((UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN));
-                Response.addObject((String) Content.get(FS_DOWNLOAD_GROUP_NAME));
+                Response.addObject((UserToken) Token);
+                Response.addObject((String) Group);
                 Response.addObject((String) Content.get(FS_DOWNLOAD_FILE_NAME));
                 Response.addObject(FileContent);
                 
@@ -142,6 +151,11 @@ public class FileServer
             
             try
             {
+                // Check permission
+                UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
+                if (!Token.getGroups().contains(Group)) throw new Exception("Access denied.");
+                
                 // Save file content
                 byte[] FileContent = (byte[]) Content.get(FS_UPLOAD_FILE_CONTENT);
                 File FileHandle = new File((String)
@@ -155,8 +169,8 @@ public class FileServer
                 FileBuff.flush();
                 
                 // Create Message
-                Response.addObject((UserToken) Content.get(FS_UPLOAD_USER_TOKEN));
-                Response.addObject((String) Content.get(FS_UPLOAD_GROUP_NAME));
+                Response.addObject((UserToken) Token);
+                Response.addObject((String) Group);
                 
                 // Free resources
                 FileBuff.close();

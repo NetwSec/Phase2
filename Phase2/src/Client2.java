@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * File client
+ * General client
  * 
  * @author Yuntian Zhang
  */
-public class FileClient
+public class Client2
 {
     static String FS_ADDRESS = "localhost";
     static int FS_PORT = 8766;
@@ -333,7 +333,7 @@ public class FileClient
         }
     };
     
-    FileClient(UserToken token)
+    Client2(UserToken token)
     {
         Token = token;
     }

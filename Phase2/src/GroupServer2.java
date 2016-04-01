@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -59,12 +60,15 @@ public class GroupServer2
             
             Message Response = new Message("success");
             
-            // Generate the user token
-            UserToken Token = GetToken((String) Content.get(GS_LOGIN_USER_NAME));
+            // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
+            User UserInfo = Account.getUser(UserName);
             
-            if (Token != null)
+            // Permission: only register user can login
+            if (UserInfo != null)
             {
+                UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+                
                 //  Create Message
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) UserName);
@@ -91,8 +95,14 @@ public class GroupServer2
             
             UserToken Token = (UserToken) Content.get(GS_ADDUSER_USER_TOKEN);
             String UserName = (String) Content.get(GS_ADDUSER_USER_NAME);
+            User UserInfo = Account.getUser(Token.getSubject());
             
-            if (AddUser(Token, UserName))
+            // Permission: admin
+            if (
+                    (UserInfo != null) && 
+                    (UserInfo.getGroups().contains(GS_ADMIN_GROUP)) &&
+                    (Account.addUser(UserName))
+                    )
             {
                 //  Create Message
                 Response.addObject((UserToken) Token);
@@ -120,8 +130,14 @@ public class GroupServer2
             
             UserToken Token = (UserToken) Content.get(GS_ADDGROUP_USER_TOKEN);
             String GroupName = (String) Content.get(GS_ADDGROUP_GROUP_NAME);
+            User UserInfo = Account.getUser(Token.getSubject());
             
-            if (AddGroup(Token, GroupName))
+            // Permission: anyone, against adding into admin
+            if (
+                    (!GroupName.equals(GS_ADMIN_GROUP)) &&
+                    (UserInfo != null) &&
+                    (Account.addOwnerships(Token.getSubject(), GroupName))
+                    )
             {
                 //  Create Message
                 Response.addObject((UserToken) Token);
@@ -152,8 +168,14 @@ public class GroupServer2
             String GroupName = (String) Content.get(GS_MGNT_GROUP_NAME);
             String UserName = (String) Content.get(GS_MGNT_USER_NAME);
             boolean Option = (boolean) Content.get(GS_MGNT_OPTION);
+            User UserInfo = Account.getUser(Token.getSubject());
             
-            if (ManageGroupMember(Token, GroupName, UserName, Option))
+            // Permission: owner
+            if (
+                    (UserInfo != null) && 
+                    (UserInfo.getOwnerships().contains(GroupName)) &&
+                    (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))
+                    )
             {
                 //  Create Message
                 Response.addObject((UserToken) Token);
@@ -181,13 +203,28 @@ public class GroupServer2
             
             UserToken Token = (UserToken) Content.get(GS_LISTGROUP_USER_TOKEN);
             String GroupName = (String) Content.get(GS_LISTGROUP_GROUP_NAME);
-            String [] UserList = ListGroup(Token, GroupName);
-            if (UserList != null)
+            User UserInfo = Account.getUser(Token.getSubject());
+
+            // Permission: owner
+            if (
+                    (UserInfo != null) && 
+                    (UserInfo.getOwnerships().contains(GroupName))
+                    )
             {
+                ArrayList<String> UserList = new ArrayList<String>();
+                for (Enumeration<String> unList = Account.getUsernames(); unList.hasMoreElements();)
+                {
+                    String tUser = unList.nextElement();
+                    if (Account.getUserGroups(tUser).contains(GroupName))
+                    {
+                        UserList.add(tUser);
+                    }
+                }
+                
                 //  Create Message
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) GroupName);
-                Response.addObject((String []) UserList);
+                Response.addObject((ArrayList<String>) UserList);
             }
             else
             {
@@ -210,6 +247,8 @@ public class GroupServer2
 
     public static int GS_PORT = 8765;
     public static String GS_STORAGE = System.getProperty("user.dir") + File.separator + "GroupServer" + File.separator + "UserList.bin";
+    public static String GS_IDENTITY = "test_server";
+    public static String GS_ADMIN_GROUP = "admin";
     public static UserList Account;
     
     GroupServer2(int Port, String Storage)
@@ -226,7 +265,7 @@ public class GroupServer2
     public static void run()
     {
         // Create instances
-        System.out.println("Initalize file server");
+        System.out.println("Initalize group server");
         ServerFramework Server = new ServerFramework(GS_PORT);
         loginCallback login = new loginCallback();
         adduserCallback adduser = new adduserCallback();
@@ -241,15 +280,12 @@ public class GroupServer2
         Server.RegisterMessage("addgroup", addgroup);
         Server.RegisterMessage("mgnt", mgnt);
         Server.RegisterMessage("listgroup", listgroup);
-
+        
+        // Initalize account information
+        Account = new UserList("UserList.bin", GS_ADMIN_GROUP);
         
         // Start listener
         System.out.println("Start the listener");
         Server.run();
-    }
-    
-    public class UserList
-    {
-        
     }
 }

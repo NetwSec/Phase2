@@ -125,15 +125,11 @@ public class GroupClient {
             switch (menuChoice) {
                 //Create a user
                 case 1:
-                    if (userToken.getGroups().contains("ADMIN")) {
-                        aUserName = getNonEmptyString("Enter the username to be added: ", MAXUSERLENGTH);
-                        if (createUser(aUserName, userToken)) {
-                            System.out.println("Added " + aUserName + " to the User List.");
-                        } else {
-                            System.out.println("Error adding user - name already exists.");
-                        }
+                    aUserName = getNonEmptyString("Enter the username to be added: ", MAXUSERLENGTH);
+                    if (createUser(aUserName, userToken)) {
+                        System.out.println("Added " + aUserName + " to the User List.");
                     } else {
-                        System.out.println("Forbidden operation. You must be an ADMIN to create a user.");
+                        System.out.println("Error adding user");
                     }
                     break;
 
@@ -160,17 +156,13 @@ public class GroupClient {
 
                 // 4: Delete user from group
                 case 4:
-                    if (userToken.getGroups().contains("ADMIN")) {
-                        aUserName = getNonEmptyString("Enter the username: ", MAXUSERLENGTH);
-                        aGroupName = getNonEmptyString("Enter the group name: ", MAXUSERLENGTH);
+                    aUserName = getNonEmptyString("Enter the username: ", MAXUSERLENGTH);
+                    aGroupName = getNonEmptyString("Enter the group name: ", MAXUSERLENGTH);
 
-                        if (deleterUserFromGroup(aUserName, aGroupName, userToken)) {
-                            System.out.println("Deleted " + aUserName + " from the group " + aGroupName + ".");
-                        } else {
-                            System.out.println("Error deleting user - unknown username.");
-                        }
+                    if (deleterUserFromGroup(aUserName, aGroupName, userToken)) {
+                        System.out.println("Deleted " + aUserName + " from the group " + aGroupName + ".");
                     } else {
-                        System.out.println("Forbidden operation. You must be an ADMIN to delete a user.");
+                        System.out.println("Error deleting user.");
                     }
                     break;
 

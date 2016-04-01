@@ -192,12 +192,12 @@ public class Client2
             }
             else
             {
-                System.out.println("List:");
+                System.out.println("In group " + Group + "the following files are available to you:");
                 for (int i=0; i<FileList.toArray().length; i++)
                 {
                     System.out.println(FileList.toArray()[i]);
                 }
-                System.out.println("-------");
+                System.out.println();
             }
         }
     };

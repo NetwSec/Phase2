@@ -99,18 +99,27 @@ public class Client2
     static String FS_ADDRESS = "localhost";
     static int FS_PORT = 8766;
     
-    static Socket Server;
-    static ObjectInputStream Input;
-    static ObjectOutputStream Output;
+    static Socket GServer;
+    static ObjectInputStream GInput;
+    static ObjectOutputStream GOutput;
+    
+    static Socket FServer;
+    static ObjectInputStream FInput;
+    static ObjectOutputStream FOutput;
+    
     static UserToken Token;
     
-    static boolean connect(String server, int port)
+    static boolean connect()
     {
         try
         {
-        Server = new Socket(server,port);
-        Output = new ObjectOutputStream(Server.getOutputStream());
-        Input = new ObjectInputStream(Server.getInputStream());
+        GServer = new Socket(GS_ADDRESS,GS_PORT);
+        GOutput = new ObjectOutputStream(GServer.getOutputStream());
+        GInput = new ObjectInputStream(GServer.getInputStream());
+        
+        FServer = new Socket(FS_ADDRESS,FS_PORT);
+        FOutput = new ObjectOutputStream(FServer.getOutputStream());
+        FInput = new ObjectInputStream(FServer.getInputStream());
         return true;
         }
         catch (Exception e)
@@ -118,81 +127,19 @@ public class Client2
             return false;
         }
     }
-    static ClientFramework Connect = new ClientFramework("Connect")
-    {
-        @Override
-        public void run()
-        {
-            // Connect to server
-            Scanner Input = new Scanner(System.in);
-
-            System.out.println("Please enter server address");
-            System.out.print("Default[localhost]:");
-            String FS_ADDRESS = Input.nextLine();
-            if (FS_ADDRESS.equals(""))
-            {
-                FS_ADDRESS = "localhost";
-            }
-            System.out.println("Please enter server port");
-            System.out.print("Default[8766]:");
-            String Port = Input.nextLine();
-            try
-            {
-                FS_PORT = Integer.parseInt(Port);
-            }
-            catch (Exception e)
-            {
-                FS_PORT = 8766;
-            }
-
-            System.out.println("Connect to " + FS_ADDRESS + ":" + FS_PORT);
-            if (!connect(FS_ADDRESS,FS_PORT))
-            {
-                System.out.println("Connection failed");
-                return;
-            }
-
-            // Get UserToken
-            /*
-            List<String> Group = new ArrayList<>();
-            Group.add("group");
-            Token = new UserTokenImp("localhost", "admin", Group);
-            */
-
-            System.out.println("Connected.");
-        }
-    };
     
     static void disconnect()
     {
         try {
-            Input.close();
+            GInput.close();
+            GOutput.close();
+            GServer.close();
+            FInput.close();
+            FOutput.close();
+            FServer.close();
         } catch (Exception ex) {
         }
-        Input = null;
-        
-        try {
-            Output.close();
-        } catch (Exception ex) {
-        }
-        Output = null;
-        
-        try {
-            Server.close();
-        } catch (Exception ex) {
-        }
-        Server = null;
     }
-    static ClientFramework Disconnect = new ClientFramework("Disconnect")
-    {
-        @Override
-        public void run()
-        {
-            // Disconnect
-            disconnect();
-            System.out.println("Disconnected.");
-        }
-    };
     
     static List<String> listFile(UserToken token, String group)
     {
@@ -204,8 +151,8 @@ public class Client2
         
         //  Send message
         try {
-            Output.writeObject(Upload);
-            Output.flush();
+            FOutput.writeObject(Upload);
+            FOutput.flush();
         } catch (Exception ex) {
             return null;
         }
@@ -213,7 +160,7 @@ public class Client2
         //  Receive response
         Message Response;
         try {
-            Response = (Message) Input.readObject();
+            Response = (Message) FInput.readObject();
         } catch (Exception ex) {
             return null;
         }
@@ -286,8 +233,8 @@ public class Client2
         
         //  Send message
         try {
-            Output.writeObject(Upload);
-            Output.flush();
+            FOutput.writeObject(Upload);
+            FOutput.flush();
         } catch (Exception ex) {
             return false;
         }
@@ -295,7 +242,7 @@ public class Client2
         //  Receive response
         Message Response;
         try {
-            Response = (Message) Input.readObject();
+            Response = (Message) FInput.readObject();
         } catch (Exception ex) {
             return false;
         }
@@ -341,8 +288,8 @@ public class Client2
         
         // Send the message
         try {            
-            Output.writeObject(Download);
-            Output.flush();
+            FOutput.writeObject(Download);
+            FOutput.flush();
         } catch (Exception ex) {
             return false;
         }
@@ -350,7 +297,7 @@ public class Client2
         //  Receive response
         Message Response;
         try {
-            Response = (Message) Input.readObject();
+            Response = (Message) FInput.readObject();
         } catch (Exception ex) {
             return false;
         }
@@ -423,13 +370,110 @@ public class Client2
     
     public static void run()
     {
-        ClientFramework MainMenu = new ClientFramework("Main Menu");
+        Scanner Input = new Scanner(System.in);
 
-        MainMenu.RegisterItem(Connect);
-        MainMenu.RegisterItem(Disconnect);
+        // Get server address
+        System.out.println("Please enter group server address");
+        System.out.print("Default[localhost]:");
+        GS_ADDRESS = Input.nextLine();
+        if (GS_ADDRESS.equals(""))
+        {
+            GS_ADDRESS = "localhost";
+        }
+        System.out.println("Please enter group server port");
+        System.out.print("Default[8765]:");
+        String GPort = Input.nextLine();
+        try
+        {
+            GS_PORT = Integer.parseInt(GPort);
+        }
+        catch (Exception e)
+        {
+            GS_PORT = 8765;
+        }
+        
+        System.out.println("Please enter file server address");
+        System.out.print("Default[localhost]:");
+        FS_ADDRESS = Input.nextLine();
+        if (FS_ADDRESS.equals(""))
+        {
+            FS_ADDRESS = "localhost";
+        }
+        System.out.println("Please enter file server port");
+        System.out.print("Default[8766]:");
+        String FPort = Input.nextLine();
+        try
+        {
+            FS_PORT = Integer.parseInt(FPort);
+        }
+        catch (Exception e)
+        {
+            FS_PORT = 8766;
+        }
+
+        // Connect to remote servers
+        if (!connect())
+        {
+            System.out.println("Connection failed");
+            return;
+        }
+
+        System.out.println("Connected.");
+        
+        // Get user token before further action
+        while (true)
+        {
+            System.out.print("Please enter your user name: ");
+            String Username = Input.nextLine();
+            
+            Message Login = new Message(GS_LOGIN);
+            // Create Message header
+            Login.addObject((UserToken) null);
+            Login.addObject((String) Username);
+
+            //  Send message
+            try {
+                GOutput.writeObject(Login);
+                GOutput.flush();
+            } catch (Exception ex) {
+                System.out.println("Unable to send login message. Please retry.");
+                System.out.println();
+                continue;
+            }
+        
+            //  Receive response
+            Message Response;
+            try {
+                Response = (Message) GInput.readObject();
+            } catch (Exception ex) {
+                System.out.println("Unable to receive login token. Please retry.");
+                System.out.println();
+                continue;
+            }
+            
+            if (Response.getMessage().equals("success"))
+            {
+                Token = (UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN);
+                break;
+            }
+            
+            System.out.println("Invalid user name. Please retry");
+            System.out.println();
+        }
+        
+        System.out.println();
+        ClientFramework MainMenu = new ClientFramework("Main Menu");
+        
+        // Group server specific
+        
+        // File server specific
         MainMenu.RegisterItem(ListFile);
         MainMenu.RegisterItem(Upload);
         MainMenu.RegisterItem(Download);
         MainMenu.run();
+        
+        // Disconnect
+        disconnect();
+        System.out.println("Disconnected.");
     }
 }

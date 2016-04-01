@@ -272,15 +272,9 @@ public class GroupServer2
     public static String GS_ADMIN_GROUP = "admin";
     public static UserList Account;
     
-    GroupServer2(int Port, String Storage)
+    GroupServer2(int Port)
     {
         GS_PORT = Port;
-        GS_STORAGE = Storage;
-    }
-    
-    public static void main(String args[])
-    {
-        run();
     }
     
     public static void run()

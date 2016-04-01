@@ -200,15 +200,9 @@ public class FileServer
     public static int FS_PORT = 8766;
     public static String FS_STORAGE = System.getProperty("user.dir") + File.separator + "FileServer";
     
-    FileServer(int Port, String Storage)
+    FileServer(int Port)
     {
         FS_PORT = Port;
-        FS_STORAGE = Storage;
-    }
-    
-    public static void main(String args[])
-    {
-        run();
     }
     
     public static void run()

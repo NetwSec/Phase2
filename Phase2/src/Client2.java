@@ -626,12 +626,7 @@ public class Client2
             }
         }
     };
-    
-    public static void main(String[] args)
-    {
-        run();
-    }
-    
+
     static String GS_ADDRESS = "localhost";
     static int GS_PORT = 8765;
     

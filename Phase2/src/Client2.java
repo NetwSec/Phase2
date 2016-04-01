@@ -472,6 +472,118 @@ public class Client2
         }
     };
     
+    static boolean manageUser(UserToken token, String Group, String UserName, String Operation)
+    {
+         Message Upload = new Message(GS_MGNT);
+        
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Group);
+        Upload.addObject((String) UserName);
+        boolean Option;
+        if (Operation.equals("add"))
+        {
+            Option = GS_MGNT_OPTION_ADD;
+        }
+        else if (Operation.equals("remove"))
+        {
+            Option = GS_MGNT_OPTION_REMOVE;
+        }
+        else
+        {
+            return false;
+        }
+        Upload.addObject((boolean) Option);
+
+        
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        if(!Response.getMessage().equals(GS_SUCCESS))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    static ClientFramework Management = new ClientFramework("User management")
+    {
+        @Override
+        public void run()
+        {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+            
+            // Code in listmembers
+            List<String> UserList = listMembers(Token,Group);
+            if (UserList == null)
+            {
+                System.out.println("Operation failed");
+                return;
+            }
+            else
+            {
+                System.out.println("The following members are in the group " + Group);
+                for (int i=0; i<UserList.toArray().length; i++)
+                {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+            // End of copypasta
+            
+            System.out.print("Please enter the user name:");
+            String UserName = Input.nextLine();
+            
+            System.out.print("Please enter the operation [add|remove]:");
+            String Operation = Input.nextLine();
+            
+            if (!manageUser(Token,Group,UserName,Operation))
+            {
+                System.out.println("Operation failed");
+            }
+            else
+            {
+                System.out.println("Operation succeed");
+            }
+            
+            // Code in listmembers
+            UserList = listMembers(Token,Group);
+            if (UserList == null)
+            {
+                System.out.println("Operation failed");
+                return;
+            }
+            else
+            {
+                System.out.println("The following members are in the group " + Group);
+                for (int i=0; i<UserList.toArray().length; i++)
+                {
+                    System.out.println(UserList.toArray()[i]);
+                }
+                System.out.println();
+            }
+            // End of copypasta
+        }
+    };
+    
     static List<String> listMembers(UserToken token, String group)
     {
          Message Upload = new Message(GS_LISTGROUP);
@@ -631,13 +743,14 @@ public class Client2
             System.out.println();
         }
         
+        // 3. Start client
         System.out.println();
         ClientFramework MainMenu = new ClientFramework("Main Menu");
         
         // Group server specific
         MainMenu.RegisterItem(AddUser);
         MainMenu.RegisterItem(AddGroup);
-        //MainMenu.RegisterItem(Management);
+        MainMenu.RegisterItem(Management);
         MainMenu.RegisterItem(ListMembers);
         
         // File server specific

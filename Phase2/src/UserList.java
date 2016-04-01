@@ -128,7 +128,7 @@ public class UserList implements java.io.Serializable {
     
     public synchronized ArrayList<String> getUserOwnerships(String username){
         
-        return list.get(username).getOwnership();
+        return list.get(username).getOwnerships();
     }
     
     public synchronized boolean addGroup(String user, String groupname){
@@ -181,7 +181,7 @@ class User implements java.io.Serializable{
         return groups;
     }
     
-    public ArrayList<String> getOwnership(){
+    public ArrayList<String> getOwnerships(){
         return ownerships;
     }
     

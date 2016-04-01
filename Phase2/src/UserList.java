@@ -110,6 +110,12 @@ public class UserList implements java.io.Serializable {
             return false;
     }
     
+    public synchronized User getUser(String username)
+    {    
+        return list.get(username);
+    }
+    
+    
     public synchronized Enumeration<String> getUsernames(){
         
         return list.keys();

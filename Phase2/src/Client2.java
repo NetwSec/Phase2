@@ -182,7 +182,7 @@ public class Client2
         {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter group name:");
+            System.out.print("Please enter the group name:");
             String Group = Input.nextLine();
 
             List<String> FileList = listFile(Token,Group);
@@ -257,11 +257,11 @@ public class Client2
             // Create an upload message
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter group name:");
-            String Group = Input.nextLine();
-            System.out.print("Please enter local file name:");
+            System.out.print("Please enter the local file name:");
             String Local = Input.nextLine();
-            System.out.print("Please enter remote file name:");
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+            System.out.print("Please enter the remote file name:");
             String Remote = Input.nextLine();
 
             String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
@@ -338,12 +338,12 @@ public class Client2
             // Create an download message
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter group name:");
+            System.out.print("Please enter the group name:");
             String Group = Input.nextLine();
-            System.out.print("Please enter local file name:");
-            String Local = Input.nextLine();
-            System.out.print("Please enter remote file name:");
+            System.out.print("Please enter the remote file name:");
             String Remote = Input.nextLine();
+            System.out.print("Please enter the local file name:");
+            String Local = Input.nextLine();
 
             String localFile = System.getProperty("user.dir") + File.separator + "Client" + File.separator;
 
@@ -399,7 +399,7 @@ public class Client2
         {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter group name:");
+            System.out.print("Please enter the group name:");
             String Group = Input.nextLine();
             
             List<String> UserList = listMembers(Token,Group);
@@ -434,14 +434,14 @@ public class Client2
         Scanner Input = new Scanner(System.in);
 
         // Get server address
-        System.out.println("Please enter group server address");
+        System.out.println("Please enter the group server address");
         System.out.print("Default[localhost]:");
         GS_ADDRESS = Input.nextLine();
         if (GS_ADDRESS.equals(""))
         {
             GS_ADDRESS = "localhost";
         }
-        System.out.println("Please enter group server port");
+        System.out.println("Please enter the group server port");
         System.out.print("Default[8765]:");
         String GPort = Input.nextLine();
         try
@@ -453,14 +453,14 @@ public class Client2
             GS_PORT = 8765;
         }
         
-        System.out.println("Please enter file server address");
+        System.out.println("Please enter the file server address");
         System.out.print("Default[localhost]:");
         FS_ADDRESS = Input.nextLine();
         if (FS_ADDRESS.equals(""))
         {
             FS_ADDRESS = "localhost";
         }
-        System.out.println("Please enter file server port");
+        System.out.println("Please enter the file server port");
         System.out.print("Default[8766]:");
         String FPort = Input.nextLine();
         try

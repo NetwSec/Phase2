@@ -654,6 +654,7 @@ public class Client2
     {
         Scanner Input = new Scanner(System.in);
 
+        // 1. Set up the connection
         // Get server address
         System.out.println("Please enter the group server address");
         System.out.print("Default[localhost]:");
@@ -702,6 +703,7 @@ public class Client2
 
         System.out.println("Connected.");
         
+        // 2. Login
         // Get user token before further action
         while (true)
         {
@@ -742,6 +744,7 @@ public class Client2
             System.out.println("Invalid user name. Please retry");
             System.out.println();
         }
+        
         
         // 3. Start client
         System.out.println();

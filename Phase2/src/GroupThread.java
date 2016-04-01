@@ -137,7 +137,7 @@ public class GroupThread extends Thread {
             //Get the user's group
             ArrayList<String> tempUG = gs.userL.getUserGroups(request);
 
-            if (tempUG.contains("ADMIN")) {
+            if (tempUG.contains("admin")) {
 
                 //Check if user exist
                 if (gs.userL.checkUser(username)) {
@@ -147,7 +147,7 @@ public class GroupThread extends Thread {
                     return true;
                 }
             } else {
-                return false;   //Returns false if request is not "ADMIN"
+                return false;   //Returns false if request is not "admin"
             }
         } else {
             return false;   //Returns false if no request exist

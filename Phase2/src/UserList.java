@@ -85,17 +85,21 @@ public class UserList implements java.io.Serializable {
         return true;
     }
     
-    public synchronized void addUser(String username){
+    public synchronized boolean addUser(String username){
+        
+        if (checkUser(username)) return false;
         
         User newUser = new User();
         list.put(username, newUser);
         Save();
+        return true;
     }
     
-    public synchronized void deleteUser(String username){
+    public synchronized boolean deleteUser(String username){
         
-        list.remove(username);
+        User result = list.remove(username);
         Save();
+        return (result != null);
     }
     
     public synchronized boolean checkUser(String username){
@@ -121,26 +125,30 @@ public class UserList implements java.io.Serializable {
         return list.get(username).getOwnership();
     }
     
-    public synchronized void addGroup(String user, String groupname){
-        list.get(user).addGroup(groupname);
+    public synchronized boolean addGroup(String user, String groupname){
+        boolean result = list.get(user).addGroup(groupname);
         Save();
+        return result;
     }
     
-    public synchronized void removeGroup(String user, String groupname){
+    public synchronized boolean removeGroup(String user, String groupname){
         removeOwnerships(user, groupname);
-        list.get(user).removeGroup(groupname);
+        boolean result = list.get(user).removeGroup(groupname);
         Save();
+        return result;
     }
     
-    public synchronized void removeOwnerships(String user, String groupname){
-        list.get(user).removeOwnership(groupname);
+    public synchronized boolean removeOwnerships(String user, String groupname){
+        boolean result = list.get(user).removeOwnership(groupname);
         Save();
+        return result;
     }
     
-    public synchronized void addOwnerships(String user, String groupname){
+    public synchronized boolean addOwnerships(String user, String groupname){
         addGroup(user, groupname);
-        list.get(user).addOwnerships(groupname);
+        boolean result = list.get(user).addOwnerships(groupname);
         Save();
+        return result;
     }
     
 }
@@ -165,25 +173,37 @@ class User implements java.io.Serializable{
         return ownerships;
     }
     
-    public void addGroup(String group){
+    public boolean addGroup(String group){
+        if (groups.contains(group)) return false;
         groups.add(group);
+        return true;
     }
     
-    public void removeGroup(String group){
+    public boolean removeGroup(String group){
         if(!groups.isEmpty()){
             if(groups.contains(group)){
                 groups.remove(group.indexOf(group));
+                return true;
             }
         }
+        return false;
     }
     
-    public void addOwnerships(String group){
+    public boolean addOwnerships(String group){
+        if(ownerships.contains(group)) return false;
         ownerships.add(group);
+        return true;
     }
     
-    public void removeOwnership(String group){
+    public boolean removeOwnership(String group){
         if(!ownerships.isEmpty())
+        {
             if(ownerships.contains(group))
+            {
                 ownerships.remove(ownerships.indexOf(group));
+                return true;
+            }
+        }
+        return false;
     }
 }

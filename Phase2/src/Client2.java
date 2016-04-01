@@ -188,7 +188,7 @@ public class Client2
             List<String> FileList = listFile(Token,Group);
             if (FileList == null)
             {
-                System.out.println("List failed");
+                System.out.println("Operation failed");
             }
             else
             {
@@ -268,11 +268,11 @@ public class Client2
 
             if (!upload(Token,Group,Remote,localFile + Local))
             {
-                System.out.println("Upload failed");
+                System.out.println("Operation failed");
             }
             else
             {
-                System.out.println("Upload Succeed");
+                System.out.println("Operation Succeed");
             }
         }
     };
@@ -349,11 +349,11 @@ public class Client2
 
             if(!download(Token,Group,Remote,localFile + Local))
             {
-                System.out.println("Download failed");
+                System.out.println("Operation failed");
             }
             else
             {
-                System.out.println("Download Succeed");
+                System.out.println("Operation Succeed");
             }
         }
     };
@@ -405,7 +405,7 @@ public class Client2
             List<String> UserList = listMembers(Token,Group);
             if (UserList == null)
             {
-                System.out.println("List failed");
+                System.out.println("Operation failed");
             }
             else
             {

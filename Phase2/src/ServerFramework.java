@@ -139,19 +139,19 @@ public class ServerFramework implements Runnable
                     // Send response
                     Output.writeObject(Response);
                 }
-                catch (IOException | ClassNotFoundException e)
+                catch (Exception e)
                 {
                     try {
                         // Connection ended, clean up resource
-                        System.out.println("Client terminated the connection, continue");
+                        System.out.println("Client terminated the connection, exit thread");
                         Input.close();
                         Output.close();
                         Client.close();
                         return;
-                    } catch (IOException ex) {
+                    } catch (Exception ex) {
                         // If we cannot free resources then just let them leak
                         // Better keep server alive
-                        System.out.println("Unable to free all the resource used in last connection, continue");
+                        System.out.println("Unable to free all the resource used in last connection, exit thread");
                         return;
                     }
                 }

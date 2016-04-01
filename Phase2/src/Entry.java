@@ -1,75 +1,58 @@
 
 import java.util.Scanner;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author saber
  */
 public class Entry {
 
-    static ClientFramework GroupServer = new ClientFramework("Start group server")
-    {
+    static ClientFramework GroupServer = new ClientFramework("Start group server") {
         @Override
-        public void run()
-        {
+        public void run() {
             Scanner Input = new Scanner(System.in);
-        
+
             System.out.println("Please enter the group server port");
             System.out.print("Default[8765]:");
             int Port = 8765;
-            try
-            {
+            try {
                 Port = Integer.parseInt(Input.nextLine());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Port = 8765;
             }
             System.out.println("Starting server at port " + Port);
-            
+
             GroupServer2 Server = new GroupServer2(Port);
             Server.run();
         }
     };
-    static ClientFramework FileServer = new ClientFramework("Start file server")
-    {
+    static ClientFramework FileServer = new ClientFramework("Start file server") {
         @Override
-        public void run()
-        {
+        public void run() {
             Scanner Input = new Scanner(System.in);
-        
+
             System.out.println("Please enter the group server port");
             System.out.print("Default[8766]:");
             int Port = 8766;
-            try
-            {
+            try {
                 Port = Integer.parseInt(Input.nextLine());
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Port = 8766;
             }
             System.out.println("Starting server at port " + Port);
-            
+
             FileServer Server = new FileServer(Port);
             Server.run();
         }
     };
-    static ClientFramework Client = new ClientFramework("Start client")
-    {
+    static ClientFramework Client = new ClientFramework("Start client") {
         @Override
-        public void run()
-        {
+        public void run() {
             Client2 Client = new Client2();
             Client.run();
         }
     };
+
     /**
      * @param args the command line arguments
      */
@@ -80,5 +63,5 @@ public class Entry {
         Launcher.RegisterItem(Client);
         Launcher.run();
     }
-    
+
 }

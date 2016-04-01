@@ -412,6 +412,60 @@ public class Client2
         }
     };
     
+    static boolean createGroup(UserToken token, String Group)
+    {
+         Message Upload = new Message(GS_ADDGROUP);
+        
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Group);
+        
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        if(!Response.getMessage().equals(GS_SUCCESS))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    static ClientFramework AddGroup = new ClientFramework("Create new group")
+    {
+        @Override
+        public void run()
+        {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the group name:");
+            String Group = Input.nextLine();
+            
+            if (!createGroup(Token,Group))
+            {
+                System.out.println("Operation failed");
+            }
+            else
+            {
+                System.out.println("Operation succeed");
+            }
+        }
+    };
+    
     static List<String> listMembers(UserToken token, String group)
     {
          Message Upload = new Message(GS_LISTGROUP);
@@ -580,8 +634,8 @@ public class Client2
         ClientFramework MainMenu = new ClientFramework("Main Menu");
         
         // Group server specific
-        //MainMenu.RegisterItem(AddUser);
-        //MainMenu.RegisterItem(AddGroup);
+        MainMenu.RegisterItem(AddUser);
+        MainMenu.RegisterItem(AddGroup);
         //MainMenu.RegisterItem(Management);
         MainMenu.RegisterItem(ListMembers);
         

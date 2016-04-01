@@ -333,9 +333,7 @@ public class Client2
             System.out.print("Please enter the local file name:");
             String Local = Input.nextLine();
 
-            String localFile = System.getProperty("user.dir") + File.separator + "Client" + File.separator;
-
-            if(!download(Token,Group,Remote,localFile + Local))
+            if(!download(Token,Group,Remote,LocalFile + Local))
             {
                 System.out.println("Operation failed");
             }
@@ -650,9 +648,15 @@ public class Client2
     
     static UserToken Token;
     
+    static String LocalFile = System.getProperty("user.dir") + File.separator + "Client" + File.separator;
+    
     public static void run()
     {
         Scanner Input = new Scanner(System.in);
+        
+        // Set up the local file folder
+        File FileHandle = new File(LocalFile);
+        FileHandle.mkdirs();
 
         // 1. Set up the connection
         // Get server address

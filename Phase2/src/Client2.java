@@ -93,22 +93,6 @@ public class Client2
     public final static int FS_ERROR_GROUP_NAME = 1;    //String    Group
     public final static int FS_ERROR_EXCEPTION = 2;     //Exception e
     
-    static String GS_ADDRESS = "localhost";
-    static int GS_PORT = 8765;
-    
-    static String FS_ADDRESS = "localhost";
-    static int FS_PORT = 8766;
-    
-    static Socket GServer;
-    static ObjectInputStream GInput;
-    static ObjectOutputStream GOutput;
-    
-    static Socket FServer;
-    static ObjectInputStream FInput;
-    static ObjectOutputStream FOutput;
-    
-    static UserToken Token;
-    
     // Common services
     
     static boolean connect()
@@ -649,6 +633,22 @@ public class Client2
     {
         run();
     }
+    
+    static String GS_ADDRESS = "localhost";
+    static int GS_PORT = 8765;
+    
+    static String FS_ADDRESS = "localhost";
+    static int FS_PORT = 8766;
+    
+    static Socket GServer;
+    static ObjectInputStream GInput;
+    static ObjectOutputStream GOutput;
+    
+    static Socket FServer;
+    static ObjectInputStream FInput;
+    static ObjectOutputStream FOutput;
+    
+    static UserToken Token;
     
     public static void run()
     {

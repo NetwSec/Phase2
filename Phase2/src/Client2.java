@@ -358,6 +358,60 @@ public class Client2
         }
     };
     
+    static boolean createUser(UserToken token, String Username)
+    {
+         Message Upload = new Message(GS_ADDUSER);
+        
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) Username);
+        
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        if(!Response.getMessage().equals(GS_SUCCESS))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+    static ClientFramework AddUser = new ClientFramework("Create new user")
+    {
+        @Override
+        public void run()
+        {
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the user name:");
+            String Username = Input.nextLine();
+            
+            if (!createUser(Token,Username))
+            {
+                System.out.println("Operation failed");
+            }
+            else
+            {
+                System.out.println("Operation succeed");
+            }
+        }
+    };
+    
     static List<String> listMembers(UserToken token, String group)
     {
          Message Upload = new Message(GS_LISTGROUP);

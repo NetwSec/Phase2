@@ -18,6 +18,84 @@ import java.util.Scanner;
  */
 public class Client2
 {
+    // Can't get import working, just copy the definition
+    public final static int GS_GENERAL_USER_TOKEN = 0;  //UserToken Token
+    public final static int GS_GENERAL_GROUP_NAME = 1;  //String    Group
+    public final static int GS_GENERAL_USER_NAME = 1;   //String    User
+    
+    public final static String GS_LOGIN = "login";      //login
+    public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
+    public final static int GS_LOGIN_USER_NAME = 1;     //String    User
+    
+    public final static String GS_ADDUSER = "adduser";  //adduser
+    public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
+    public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
+    
+    public final static String GS_ADDGROUP = "addgroup";//addgroup
+    public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
+    public final static int GS_ADDGROUP_GROUP_NAME = 1; //String    Group
+    
+    public final static String GS_MGNT = "mgnt";        //mgnt
+    public final static int GS_MGNT_USER_TOKEN = 0;     //UserToken Token
+    public final static int GS_MGNT_GROUP_NAME = 1;     //String    Group
+    public final static int GS_MGNT_USER_NAME = 2;      //String    User
+    public final static int GS_MGNT_OPTION = 3;         //boolean   Option
+    public final static boolean GS_MGNT_OPTION_ADD = true;      //boolean   Option
+    public final static boolean GS_MGNT_OPTION_REMOVE = false;  //boolean   Option
+    
+    public final static String GS_LISTGROUP = "listgroup";//listgroup
+    public final static int GS_LISTGROUP_USER_TOKEN = 0; //UserToken Token
+    public final static int GS_LISTGROUP_GROUP_NAME = 1; //String    Group
+    
+    public final static String GS_VIEW = "view";        //view
+    public final static int GS_VIEW_USER_TOKEN = 0;     //UserToken Token
+    public final static int GS_VIEW_GROUP_NAME = 1;     //String    Group
+    public final static int GS_VIEW_USER_LIST = 2;      //String[]  List
+    
+    public final static String GS_SUCCESS = "success";  //success
+    public final static int GS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
+    public final static int GS_SUCCESS_GROUP_NAME = 1;  //String    Group
+    public final static int GS_SUCCESS_USER_NAME = 1;   //String    User
+    
+    public final static String GS_ERROR = "error";      //error
+    public final static int GS_ERROR_USER_TOKEN = 0;    //UserToken Token
+    public final static int GS_ERROR_GROUP_NAME = 1;    //String    Group
+    
+    public final static int FS_GENERAL_USER_TOKEN = 0;  //UserToken Token
+    public final static int FS_GENERAL_GROUP_NAME = 1;  //String    Group
+    
+    public final static String FS_DOWNLOAD = "download";//download
+    public final static int FS_DOWNLOAD_USER_TOKEN = 0; //UserToken Token
+    public final static int FS_DOWNLOAD_GROUP_NAME = 1; //String    Group
+    public final static int FS_DOWNLOAD_FILE_NAME = 2;  //String    FileName
+    
+    public final static String FS_UPLOAD = "upload";    //upload
+    public final static int FS_UPLOAD_USER_TOKEN = 0;   //UserToken Token
+    public final static int FS_UPLOAD_GROUP_NAME = 1;   //String    Group
+    public final static int FS_UPLOAD_FILE_NAME = 2;    //String    FileName
+    public final static int FS_UPLOAD_FILE_CONTENT = 3; //byte[]    Content
+    
+    public final static String FS_LIST = "list";        //list
+    public final static int FS_LIST_USER_TOKEN = 0;     //UserToken Token
+    public final static int FS_LIST_GROUP_NAME = 1;     //String    Group
+    
+    public final static String FS_VIEW = "view";        //view
+    public final static int FS_VIEW_USER_TOKEN = 0;     //UserToken Token
+    public final static int FS_VIEW_GROUP_NAME = 1;     //String    Group
+    public final static int FS_VIEW_FILE_LIST = 2;      //String[]  List
+    
+    public final static String FS_SUCCESS = "success";  //success
+    public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
+    public final static int FS_SUCCESS_GROUP_NAME = 1;  //String    Group
+    
+    public final static String FS_ERROR = "error";      //error
+    public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
+    public final static int FS_ERROR_GROUP_NAME = 1;    //String    Group
+    public final static int FS_ERROR_EXCEPTION = 2;     //Exception e
+    
+    static String GS_ADDRESS = "localhost";
+    static int GS_PORT = 8765;
+    
     static String FS_ADDRESS = "localhost";
     static int FS_PORT = 8766;
     
@@ -118,7 +196,7 @@ public class Client2
     
     static List<String> listFile(UserToken token, String group)
     {
-         Message Upload = new Message("list");
+         Message Upload = new Message(FS_LIST);
         
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -140,14 +218,14 @@ public class Client2
             return null;
         }
         
-        if(!"view".equals(Response.getMessage()))
+        if(!Response.getMessage().equals(FS_VIEW))
         {
             return null;
         }
         else
         {
             ArrayList<Object> Content = Response.getObjCont();
-            return (List<String>)Content.get(2);
+            return (List<String>)Content.get(FS_VIEW_FILE_LIST);
         }
     }
     static ClientFramework ListFile = new ClientFramework("List File")
@@ -179,7 +257,7 @@ public class Client2
     
     static boolean upload(UserToken token, String group, String remoteFile, String localFile)
     {
-        Message Upload = new Message("upload");
+        Message Upload = new Message(FS_UPLOAD);
         
         try
         {
@@ -222,7 +300,7 @@ public class Client2
             return false;
         }
         
-        return ("success".equals(Response.getMessage()));
+        return (Response.getMessage().equals(FS_SUCCESS));
     }
     static ClientFramework Upload = new ClientFramework("Upload")
     {
@@ -254,7 +332,7 @@ public class Client2
 
     static boolean download(UserToken token, String group, String remoteFile, String localFile)
     {
-        Message Download = new Message("download");
+        Message Download = new Message(FS_DOWNLOAD);
         
          // Create Message header
         Download.addObject((UserToken) token);
@@ -278,7 +356,7 @@ public class Client2
         }
         
         // Check response
-        if (!"upload".equals(Response.getMessage()))
+        if (!Response.getMessage().equals(FS_UPLOAD))
         {
             return false;
         }
@@ -287,7 +365,7 @@ public class Client2
         try
         {
             ArrayList<Object> Content = Response.getObjCont();
-            byte[] FileContent = (byte[]) Content.get(3);
+            byte[] FileContent = (byte[]) Content.get(FS_UPLOAD_FILE_CONTENT);
             File FileHandle = new File(localFile);
             FileHandle.getParentFile().mkdirs();
             FileOutputStream FileStream = new FileOutputStream(FileHandle);

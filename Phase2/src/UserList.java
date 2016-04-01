@@ -26,10 +26,10 @@ public class UserList implements java.io.Serializable {
     private Hashtable<String,User> list;
     private String LocalStorage;
     
-    UserList(String File)
+    UserList(String File, String DefaultAdmin)
     {
         LocalStorage = File;
-        Load();
+        Load(DefaultAdmin);
     }
     
     public boolean Save()
@@ -49,7 +49,7 @@ public class UserList implements java.io.Serializable {
         return true;
     }
     
-    public boolean Load()
+    public boolean Load(String DefaultAdmin)
     {
         try
         {
@@ -62,17 +62,17 @@ public class UserList implements java.io.Serializable {
         {
             // No file available
             System.out.println("UserList file does not exist. A default user will be created.");
-            System.out.println("User name: admin");
-            System.out.println("Group name: admin");
+            System.out.println("User name: " + DefaultAdmin);
+            System.out.println("Group name: " + DefaultAdmin);
 
             //Create new user list
             list = new Hashtable<String,User>();
             // Add current user to user list
-            addUser("admin");
+            addUser(DefaultAdmin);
             // Add current user to Admin group
-            addGroup("admin", "admin");
+            addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
-            addOwnerships("admin", "admin");
+            addOwnerships(DefaultAdmin, DefaultAdmin);
         }
         catch(IOException | ClassNotFoundException e)
         {

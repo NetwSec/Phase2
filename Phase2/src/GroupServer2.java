@@ -139,24 +139,33 @@ public class GroupServer2
             String GroupName = (String) Content.get(GS_ADDGROUP_GROUP_NAME);
             User UserInfo = Account.getUser(Token.getSubject());
             
-            // Permission: anyone, against adding into admin
-            if (
-                    (!GroupName.equals(GS_ADMIN_GROUP)) &&
-                    (UserInfo != null) &&
-                    (Account.addOwnerships(Token.getSubject(), GroupName))
-                    )
-            {
-                //  Create Message
-                Token = new UserTokenImp(GS_IDENTITY, Account.getUser(Token.getSubject()));
-                Response.addObject((UserToken) Token);
-                Response.addObject((String) GroupName);
-            }
-            else
+            // Permission: anyone
+            if (UserInfo == null)
             {
                 //  Return error message
                 System.out.println("Failed to add group, continue");
                 Response = GenerateErrorMessage(Content);
+                return Response;
             }
+
+            // Check if group was created before
+            for (Enumeration<String> UserList = Account.getUsernames(); UserList.hasMoreElements();) {
+                //If groupname is taken
+                if (Account.getUserOwnerships(UserList.nextElement()).contains(GroupName))
+                {
+                    //  Return error message
+                    System.out.println("Failed to add group, continue");
+                    Response = GenerateErrorMessage(Content);
+                    return Response;
+                }
+            }
+
+            Account.addOwnerships(Token.getSubject(), GroupName);
+            
+            //  Create Message
+            Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+            Response.addObject((UserToken) Token);
+            Response.addObject((String) GroupName);
             
             return Response;
         }

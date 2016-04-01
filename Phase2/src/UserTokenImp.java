@@ -24,6 +24,12 @@ public class UserTokenImp implements UserToken, java.io.Serializable{
         this.group = group;
     }
     
+    public UserTokenImp(String issuer, User UserInfo){
+        this.issuer = issuer;   
+        this.subject = UserInfo.getName();
+        this.group = UserInfo.getGroups();
+    }
+    
     @Override
     //return issuer of this token
     public String getIssuer(){

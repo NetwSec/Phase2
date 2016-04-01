@@ -89,7 +89,7 @@ public class UserList implements java.io.Serializable {
         
         if (checkUser(username)) return false;
         
-        User newUser = new User();
+        User newUser = new User(username);
         list.put(username, newUser);
         Save();
         return true;
@@ -156,13 +156,19 @@ public class UserList implements java.io.Serializable {
 class User implements java.io.Serializable{
     
     private static final long serialVersionUID = 1L;
+    private String name;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
     
-    public User(){
-        
+    public User(String username)
+    {
+        name = username;
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
+    }
+    
+    public String getName(){
+        return name;
     }
     
     public ArrayList<String> getGroups(){

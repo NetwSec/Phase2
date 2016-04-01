@@ -74,7 +74,7 @@ public class GroupServer{
     private void getUserList()
     {
         String userFile = "UserList.bin";
-        userL = new UserList(userFile);
+        userL = new UserList(userFile, "ADMIN");
     }
     
      // Getter for server port

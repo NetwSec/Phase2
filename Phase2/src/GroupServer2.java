@@ -147,6 +147,7 @@ public class GroupServer2
                     )
             {
                 //  Create Message
+                Token = new UserTokenImp(GS_IDENTITY, Account.getUser(Token.getSubject()));
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) GroupName);
             }
@@ -185,6 +186,10 @@ public class GroupServer2
                     )
             {
                 //  Create Message
+                if (UserName.equals(Token.getSubject()))
+                {
+                    Token = new UserTokenImp(GS_IDENTITY, Account.getUser(Token.getSubject()));
+                }
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) GroupName);
             }

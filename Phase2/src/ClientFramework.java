@@ -1,5 +1,6 @@
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -119,25 +120,41 @@ public class ClientFramework implements Runnable {
         while (true) {
             DisplayMenu();
 
-            String UserInput = Input.nextLine();
+            String UserInput;
+            try
+            {
+                UserInput = Input.nextLine();
+                System.out.println();
+            }
+            catch (NoSuchElementException e)
+            {
+                // Ctrl+C handler
+                break;
+            }
+            catch (Exception e)
+            {
+                // Something is wrong
+                UserInput = "-1";
+            }
 
             int UserChoice;
 
             try {
                 UserChoice = Integer.parseInt(UserInput);
-            } catch (NumberFormatException e) {
+            } catch (Exception e) {
                 UserChoice = -1;
             }
 
             if (UserChoice == 0) {
                 ExitHandler.Exit();
+                break;
             } else if ((UserChoice >= 1) && (UserChoice <= ItemList.size())) {
-                System.out.println();
                 ItemList.get(UserChoice - 1).run();
             } else {
                 System.out.println("Invalid input");
             }
             System.out.println();
+
         }
     }
 

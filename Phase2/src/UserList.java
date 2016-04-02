@@ -26,9 +26,8 @@ public class UserList implements java.io.Serializable {
     private Hashtable<String, User> list;
     private String LocalStorage;
 
-    UserList(String File, String DefaultAdmin) {
+    UserList(String File) {
         LocalStorage = File;
-        Load(DefaultAdmin);
     }
 
     // Save list to LocalStorage
@@ -38,8 +37,6 @@ public class UserList implements java.io.Serializable {
             outStream = new ObjectOutputStream(new FileOutputStream(LocalStorage));
             outStream.writeObject(list);
         } catch (Exception ex) {
-            System.err.println("Error: " + ex.getMessage());
-            ex.printStackTrace(System.err);
             return false;
         }
         return true;
@@ -69,11 +66,8 @@ public class UserList implements java.io.Serializable {
             addOwnerships(DefaultAdmin, DefaultAdmin);
         } catch (IOException | ClassNotFoundException e) {
             // Other error
-            System.out.println("Error reading from UserList file");
             return false;
         }
-        // Success, tell user to run client
-        System.out.println("User list retrieved. Please run the Client.");
         return true;
     }
 

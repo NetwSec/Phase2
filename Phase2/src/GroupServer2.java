@@ -282,7 +282,12 @@ public class GroupServer2 {
         // Initalize account information
         File FileHandle = new File(GS_STORAGE);
         FileHandle.getParentFile().mkdirs();
-        Account = new UserList(GS_STORAGE, GS_ADMIN_GROUP);
+        Account = new UserList(GS_STORAGE);
+        if (!Account.Load(GS_ADMIN_GROUP))
+        {
+            System.out.println("Unable to initalize user account information, halt");
+            return;
+        }
 
         // Start listener
         System.out.println("Start the listener");

@@ -186,14 +186,14 @@ public class Client2 {
 
             // 1. Collect server information
             System.out.println("Please enter the group server address");
-            System.out.print("Default[localhost]:");
+            System.out.print("Default[localhost]: ");
             GS_ADDRESS = Input.nextLine();
             if (GS_ADDRESS.equals("")) {
                 GS_ADDRESS = "localhost";
             }
 
             System.out.println("Please enter the group server port");
-            System.out.print("Default[8765]:");
+            System.out.print("Default[8765]: ");
             String GPort = Input.nextLine();
             try {
                 GS_PORT = Integer.parseInt(GPort);
@@ -202,14 +202,14 @@ public class Client2 {
             }
 
             System.out.println("Please enter the file server address");
-            System.out.print("Default[localhost]:");
+            System.out.print("Default[localhost]: ");
             FS_ADDRESS = Input.nextLine();
             if (FS_ADDRESS.equals("")) {
                 FS_ADDRESS = "localhost";
             }
 
             System.out.println("Please enter the file server port");
-            System.out.print("Default[8766]:");
+            System.out.print("Default[8766]: ");
             String FPort = Input.nextLine();
             try {
                 FS_PORT = Integer.parseInt(FPort);
@@ -222,7 +222,7 @@ public class Client2 {
                 System.out.println("Connection failed");
                 return;
             } else {
-                System.out.println("Connected.");
+                System.out.println("Connected");
             }
 
             // 3. Login
@@ -236,8 +236,8 @@ public class Client2 {
                 }
 
                 System.out.println("Invalid user name. Please retry");
-                System.out.println();
             }
+            System.out.println();
 
             // 4. Start the main menu
             ClientFramework MainMenu = new ClientFramework("Main Menu");
@@ -313,7 +313,7 @@ public class Client2 {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the user name:");
+            System.out.print("Please enter the user name: ");
             String Username = Input.nextLine();
 
             if (!createUser(Token, Username)) {
@@ -360,7 +360,7 @@ public class Client2 {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
             if (!createGroup(Token, Group)) {
@@ -419,7 +419,7 @@ public class Client2 {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
             // Code in listmembers
@@ -436,10 +436,10 @@ public class Client2 {
             }
             // End of copypasta
 
-            System.out.print("Please enter the user name:");
+            System.out.print("Please enter the user name: ");
             String UserName = Input.nextLine();
 
-            System.out.print("Please enter the operation [add|remove]:");
+            System.out.print("Please enter the operation [add|remove]: ");
             String Operation = Input.nextLine();
 
             if (!manageUser(Token, Group, UserName, Operation)) {
@@ -499,7 +499,7 @@ public class Client2 {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
             List<String> UserList = listMembers(Token, Group);
@@ -510,7 +510,6 @@ public class Client2 {
                 for (int i = 0; i < UserList.toArray().length; i++) {
                     System.out.println(UserList.toArray()[i]);
                 }
-                System.out.println();
             }
         }
     };
@@ -551,18 +550,17 @@ public class Client2 {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
             List<String> FileList = listFiles(Token, Group);
             if (FileList == null) {
                 System.out.println("Operation failed");
             } else {
-                System.out.println("In group " + Group + "the following files are available to you:");
+                System.out.println("In group " + Group + "the following files are available to you: ");
                 for (int i = 0; i < FileList.toArray().length; i++) {
                     System.out.println(FileList.toArray()[i]);
                 }
-                System.out.println();
             }
         }
     };
@@ -616,11 +614,11 @@ public class Client2 {
             // Create an upload message
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the local file name:");
+            System.out.print("Please enter the local file name: ");
             String Local = Input.nextLine();
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
-            System.out.print("Please enter the remote file name:");
+            System.out.print("Please enter the remote file name: ");
             String Remote = Input.nextLine();
 
             String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
@@ -687,11 +685,11 @@ public class Client2 {
             // Create an download message
             Scanner Input = new Scanner(System.in);
 
-            System.out.print("Please enter the group name:");
+            System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
-            System.out.print("Please enter the remote file name:");
+            System.out.print("Please enter the remote file name: ");
             String Remote = Input.nextLine();
-            System.out.print("Please enter the local file name:");
+            System.out.print("Please enter the local file name: ");
             String Local = Input.nextLine();
 
             if (!download(Token, Group, Remote, LocalFile + Local)) {

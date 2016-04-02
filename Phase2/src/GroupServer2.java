@@ -280,6 +280,8 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
 
         // Initalize account information
+        File FileHandle = new File(GS_STORAGE);
+        FileHandle.getParentFile().mkdirs();
         Account = new UserList(GS_STORAGE, GS_ADMIN_GROUP);
 
         // Start listener

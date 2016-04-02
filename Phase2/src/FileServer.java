@@ -208,6 +208,8 @@ public class FileServer {
     public static void run() {
         // Create instances
         System.out.println("Initalize file server");
+        File FileHandle = new File(FS_STORAGE);
+        FileHandle.mkdirs();
         ServerFramework Server = new ServerFramework(FS_PORT);
         
         downloadCallback download = new downloadCallback();

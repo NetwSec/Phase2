@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 /**
  * The entrypoint of the package
+ * Accept command line argument
+ * See main()
  */
 public class Entry {
 

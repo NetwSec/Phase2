@@ -621,9 +621,7 @@ public class Client2 {
             System.out.print("Please enter the remote file name: ");
             String Remote = Input.nextLine();
 
-            String localFile = System.getProperty("user.dir") + File.separator + "FileClient" + File.separator;
-
-            if (!upload(Token, Group, Remote, localFile + Local)) {
+            if (!upload(Token, Group, Remote, LocalFile + Local)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation Succeed");

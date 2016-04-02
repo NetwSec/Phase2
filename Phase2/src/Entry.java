@@ -3,8 +3,6 @@ import java.util.Scanner;
 
 /**
  * The entrypoint of the package
- *
- * @author Yuntian Zhang
  */
 public class Entry {
 

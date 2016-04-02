@@ -55,8 +55,6 @@ import java.util.Scanner;
  * user input.
  * 
  * The default file saving location is ./Client/. This is defined by LocalFile.
- *
- * @author Yuntian Zhang
  */
 public class Client2 {
 

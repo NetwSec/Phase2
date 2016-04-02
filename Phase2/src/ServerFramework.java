@@ -32,7 +32,6 @@ import java.util.Hashtable;
  * socket programming and can focus on the specific task. However if non-Message
  * packet or very large stream is required, ServerCallback can use the client socket
  * that is passing in the parameter to make the direct communication.
- * @author Yuntian Zhang
  */
 public class ServerFramework implements Runnable {
 

@@ -20,8 +20,6 @@ import java.util.Scanner;
  * 
  * You can also override Exit() method to provide a custom action upon exiting
  * menu, such as free resources.
- * 
- * @author Yuntian Zhang
  */
 public class ClientFramework implements Runnable {
 

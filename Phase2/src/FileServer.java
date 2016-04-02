@@ -23,7 +23,6 @@ import java.util.ArrayList;
  * defined by FS_STORAGE.
  * 
  * The default port is 8766. This is defined by FS_PORT.
- * @author Yuntian Zhang
  */
 public class FileServer {
 

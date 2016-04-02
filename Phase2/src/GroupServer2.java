@@ -26,7 +26,6 @@ import java.util.Enumeration;
  * GS_STORAGE.
  * 
  * The default port is 8765. This is defined by GS_PORT.
- * @author Yuntian Zhang
  */
 public class GroupServer2 {
 

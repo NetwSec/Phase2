@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
@@ -54,12 +56,13 @@ public class UserList implements java.io.Serializable {
             // No file available
             System.out.println("UserList file does not exist. A default user will be created.");
             System.out.println("User name: " + DefaultAdmin);
+            System.out.println("Password: " + DefaultAdmin);
             System.out.println("Group name: " + DefaultAdmin);
-
+            
             //Create new user list
             list = new Hashtable<String, User>();
-            // Add current user to user list
-            addUser(DefaultAdmin);
+            // Add current user to user list (username and password both admin)
+            addUser(DefaultAdmin, DefaultAdmin);
             // Add current user to Admin group
             addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
@@ -71,15 +74,44 @@ public class UserList implements java.io.Serializable {
         return true;
     }
 
-    public synchronized boolean addUser(String username) {
+    public synchronized boolean addUser(String username, String password) {
         if (checkUser(username)) {
             return false;
         }
 
-        User newUser = new User(username);
+        User newUser = new User(username, password);
         list.put(username, newUser);
         Save();
         return true;
+    }
+    
+    public synchronized boolean changePassword(String username, String oldPassword, String newPassword)
+    {
+        // Compare old to stored; if equal, set new
+        if(comparePasswords(oldPassword, list.get(username)))
+        {
+            list.get(username).setPassword(newPassword);
+            Save();
+            return true;
+        }
+        else
+            return false;
+    }
+    
+    static byte[] getHash(String input)
+    {
+        byte[] toHash = input.getBytes();
+        // TODO: other algorithm?
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA1", "BC");
+            digest.update(toHash);
+            return digest.digest();
+        }
+        catch(Exception e) { e.printStackTrace(System.err); return null; }
+    }
+    static boolean comparePasswords(String password, User UserInfo)
+    {
+            return Arrays.equals(getHash(password), UserInfo.getPasswordHash());
     }
 
     public synchronized boolean deleteUser(String username) {
@@ -138,17 +170,28 @@ public class UserList implements java.io.Serializable {
 class User implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
+    private byte[] passHash;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
 
-    public User(String username) {
+    public User(String username, String password) {
         name = username;
+        passHash = getHash(password);
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
     }
 
     public String getName() {
         return name;
+    }
+    
+    public void setPassword(String password)
+    {
+        passHash = getHash(password);
+    }
+    public byte[] getPasswordHash()
+    {
+        return passHash;
     }
 
     public ArrayList<String> getGroups() {
@@ -197,5 +240,17 @@ class User implements java.io.Serializable {
             }
         }
         return false;
+    }
+    
+     static byte[] getHash(String input)
+    {
+        byte[] toHash = input.getBytes();
+        // TODO: other algorithm?
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA1", "BC");
+            digest.update(toHash);
+            return digest.digest();
+        }
+        catch(Exception e) { e.printStackTrace(System.err); return null; }
     }
 }

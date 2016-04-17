@@ -1,7 +1,9 @@
 
 import java.io.File;
 import java.net.Socket;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Enumeration;
 
 /**
@@ -37,7 +39,14 @@ public class GroupServer2 {
     public final static String GS_LOGIN = "login";      //login
     public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_LOGIN_USER_NAME = 1;     //String    User
+    public final static int GS_LOGIN_USER_PW = 2;     //String    User
 
+    public final static String GS_CHANGEPASS = "changepass"; //changepass
+    public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
+//    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
+    public final static int GS_CHANGEPASS_OLD_PW = 1;        //String old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 2;        //String new pass
+    
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
@@ -82,15 +91,28 @@ public class GroupServer2 {
 
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
+            String PassWord = (String) Content.get(GS_LOGIN_USER_PW);
+//            byte[] PasswordHash = (byte[]) Content.get(GS_LOGIN_USER_PW);
             User UserInfo = Account.getUser(UserName);
-
+                        
             // Permission: only register user can login
             if (UserInfo != null) {
-                UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+                
+                // Compare the password hashes
+                if(Account.comparePasswords(PassWord, UserInfo))
+                {
+                    // Passwords match, return the token
+                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
 
-                //  Create Message
-                Response.addObject((UserToken) Token);
-                Response.addObject((String) UserName);
+                    //  Create Message
+                    Response.addObject((UserToken) Token);
+                    Response.addObject((String) UserName);
+                }
+                else
+                {
+                    System.out.println("Incorrect password, please try again");
+                    Response = GenerateErrorMessage(Content);
+                }
             } else {
                 //  Return error message
                 System.out.println("Failed to find the user token, continue");
@@ -100,7 +122,37 @@ public class GroupServer2 {
             return Response;
         }
     }
+    
+    static class changepassCallback implements ServerFramework.ServerCallback {
 
+        @Override
+        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+            System.out.println("Received a change password message");
+
+            Message Response = new Message(GS_SUCCESS);
+
+            UserToken Token = (UserToken) Content.get(GS_CHANGEPASS_USER_TOKEN);
+//            String Username = (String) Content.get(GS_CHANGEPASS_USER_NAME);
+            String OldPassword = (String) Content.get(GS_CHANGEPASS_OLD_PW);
+            String NewPassword = (String) Content.get(GS_CHANGEPASS_NEW_PW);
+            User UserInfo = Account.getUser(Token.getSubject());
+
+            // Permission: registered user and OldPassword hash matches stored hash
+            if ((UserInfo != null) && Account.changePassword(Token.getSubject(), OldPassword, NewPassword)){
+                //  Create Message
+                Response.addObject((UserToken) Token);                
+            } else {
+                //  Return error message
+                System.out.println("Failed to change password, continue");
+                Response = GenerateErrorMessage(Content);
+            }
+
+            return Response;
+        }
+    }
+    
+    private static String DEFAULT_USER_PASSWORD = "cs3326";
+    
     static class adduserCallback implements ServerFramework.ServerCallback {
 
         @Override
@@ -116,7 +168,7 @@ public class GroupServer2 {
             // Permission: admin
             if ((UserInfo != null)
                     && (UserInfo.getGroups().contains(GS_ADMIN_GROUP))
-                    && (Account.addUser(UserName))) {
+                    && (Account.addUser(UserName, DEFAULT_USER_PASSWORD))) {
                 //  Create Message
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) UserName);
@@ -250,7 +302,7 @@ public class GroupServer2 {
         Response.addObject((String) Content.get(GS_GENERAL_GROUP_NAME));
         return Response;
     }
-
+    
     public static int GS_PORT = 8765;
     public static String GS_STORAGE = System.getProperty("user.dir") + File.separator + "GroupServer" + File.separator + "UserList.bin";
     public static String GS_IDENTITY = "test_server";
@@ -266,6 +318,7 @@ public class GroupServer2 {
         System.out.println("Initalize group server");
         ServerFramework Server = new ServerFramework(GS_PORT);
         loginCallback login = new loginCallback();
+        changepassCallback changepass = new changepassCallback();
         adduserCallback adduser = new adduserCallback();
         addgroupCallback addgroup = new addgroupCallback();
         mgntCallback mgnt = new mgntCallback();
@@ -274,6 +327,7 @@ public class GroupServer2 {
         // Register callbacks
         System.out.println("Register messages");
         Server.RegisterMessage(GS_LOGIN, login);
+        Server.RegisterMessage(GS_CHANGEPASS, changepass);
         Server.RegisterMessage(GS_ADDUSER, adduser);
         Server.RegisterMessage(GS_ADDGROUP, addgroup);
         Server.RegisterMessage(GS_MGNT, mgnt);

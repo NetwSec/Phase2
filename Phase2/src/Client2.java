@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.security.*;
 
 /**
  * General client for both servers
@@ -66,6 +67,12 @@ public class Client2 {
     public final static String GS_LOGIN = "login";      //login
     public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_LOGIN_USER_NAME = 1;     //String    User
+
+    public final static String GS_CHANGEPASS = "changepass"; //changepass
+    public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
+//    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
+    public final static int GS_CHANGEPASS_OLD_PW = 1;        //String old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 2;        //String new pass
 
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
@@ -149,11 +156,13 @@ public class Client2 {
         }
     }
 
-    static boolean getToken(String UserName) {
+    static boolean getToken(String UserName, String PassWord) {
         Message Login = new Message(GS_LOGIN);
         // Create Message header
         Login.addObject((UserToken) null);
         Login.addObject((String) UserName);
+        Login.addObject((String) PassWord);
+//        Login.addObject((byte[]) getHash(PassWord));
 
         //  Send message
         try {
@@ -178,7 +187,7 @@ public class Client2 {
         }
         return false;
     }
-
+    
     static ClientFramework Login = new ClientFramework("Log in") {
         @Override
         public void run() {
@@ -230,12 +239,16 @@ public class Client2 {
             while (true) {
                 System.out.print("Please enter your user name: ");
                 String UserName = Input.nextLine();
-
-                if (getToken(UserName)) {
+                // Get password
+                System.out.print("Please enter your password: ");
+                String PassWord = Input.nextLine();
+                
+                // See if we can get the token
+                if (getToken(UserName, PassWord)) { 
                     break;
                 }
 
-                System.out.println("Invalid user name. Please retry");
+                System.out.println("Invalid user name or password. Please retry");
             }
             System.out.println();
 
@@ -247,6 +260,7 @@ public class Client2 {
             MainMenu.RegisterItem(AddGroup);
             MainMenu.RegisterItem(Management);
             MainMenu.RegisterItem(ListMembers);
+            MainMenu.RegisterItem(ChangePassword);
 
             // File server specific
             MainMenu.RegisterItem(ListFiles);
@@ -279,6 +293,59 @@ public class Client2 {
     };
 
     // Group server services
+    static boolean changePassword(UserToken token, String oldPassword, String newPassword)
+    {
+         Message Upload = new Message(GS_CHANGEPASS);
+
+        // Create Message header
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) oldPassword);
+        Upload.addObject((String) newPassword);
+
+        //  Send message
+        try {
+            GOutput.writeObject(Upload);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        if (!Response.getMessage().equals(GS_SUCCESS)) {
+            return false;
+        } else {
+            return true;
+        }
+        
+    }
+    static ClientFramework ChangePassword = new ClientFramework("Change password") {
+        @Override
+        public void run() {
+            
+            Scanner Input = new Scanner(System.in);
+
+            System.out.print("Please enter the current password: ");
+            String currentPass = Input.nextLine();
+            System.out.println("Please enter the new password: ");
+            String newPass = Input.nextLine();
+
+            if (!changePassword(Token, currentPass, newPass)) {
+                System.out.println("Operation failed");
+            } else {
+                System.out.println("Operation succeed");
+            }
+        }
+    };
+    
+    
+    
     static boolean createUser(UserToken token, String Username) {
         Message Upload = new Message(GS_ADDUSER);
 
@@ -311,10 +378,12 @@ public class Client2 {
     static ClientFramework AddUser = new ClientFramework("Create new user") {
         @Override
         public void run() {
+            
             Scanner Input = new Scanner(System.in);
 
             System.out.print("Please enter the user name: ");
             String Username = Input.nextLine();
+            System.out.println("A default password will be set.");
 
             if (!createUser(Token, Username)) {
                 System.out.println("Operation failed");

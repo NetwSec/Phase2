@@ -1,6 +1,8 @@
 
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Scanner;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * The entrypoint of the package
@@ -12,6 +14,8 @@ public class Entry {
     static ClientFramework GroupServer = new ClientFramework("Start group server") {
         @Override
         public void run() {
+            
+            Security.addProvider(new BouncyCastleProvider());
             Scanner Input = new Scanner(System.in);
 
             System.out.println("Please enter the group server port");

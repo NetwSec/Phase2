@@ -112,10 +112,10 @@ public class GroupServer2 {
                 if(Account.comparePasswords(PassWord, UserInfo))
                 {
                     // Passwords match, return the token
-                    UserTokenImp Token = new UserTokenImp(GS_IDENTITY, UserInfo);   
+                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);   
 
                     //  Create Message
-                    Response.addObject((UserTokenImp)getSignedToken(Token));
+                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
                     Response.addObject((String) UserName);
                 }
                 else

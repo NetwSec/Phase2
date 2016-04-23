@@ -246,6 +246,9 @@ public class GroupServer2 {
                 Account.addOwnerships(Token.getSubject(), GroupName);
 
                 //  Create Message
+                // Get new UserInfo with updated ownership
+                UserInfo = Account.getUser(Token.getSubject());
+                // Get new token with updated ownership
                 Token = new UserTokenImp(GS_IDENTITY, UserInfo);
                 // Send back signed token so future actions on this group will be authorized
                 Response.addObject((UserToken)getSignedToken((UserTokenImp)Token)); 

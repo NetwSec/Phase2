@@ -333,7 +333,7 @@ public class Client2 {
 
             System.out.print("Please enter the current password: ");
             String currentPass = Input.nextLine();
-            System.out.println("Please enter the new password: ");
+            System.out.print("Please enter the new password: ");
             String newPass = Input.nextLine();
 
             if (!changePassword(Token, currentPass, newPass)) {

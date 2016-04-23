@@ -38,7 +38,7 @@ public class Entry {
         public void run() {
             Scanner Input = new Scanner(System.in);
 
-            System.out.println("Please enter the group server port");
+            System.out.println("Please enter the file server port");
             System.out.print("Default[8766]:");
             int Port = 8766;
             try {

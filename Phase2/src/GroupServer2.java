@@ -103,7 +103,6 @@ public class GroupServer2 {
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
             String PassWord = (String) Content.get(GS_LOGIN_USER_PW);
-//            byte[] PasswordHash = (byte[]) Content.get(GS_LOGIN_USER_PW);
             User UserInfo = Account.getUser(UserName);
                         
             // Permission: only register user can login

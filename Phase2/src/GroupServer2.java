@@ -247,7 +247,8 @@ public class GroupServer2 {
 
                 //  Create Message
                 Token = new UserTokenImp(GS_IDENTITY, UserInfo);
-                Response.addObject((UserToken) Token);
+                // Send back signed token so future actions on this group will be authorized
+                Response.addObject((UserToken)getSignedToken((UserTokenImp)Token)); 
                 Response.addObject((String) GroupName);
             }
             else{
@@ -282,10 +283,13 @@ public class GroupServer2 {
                     && (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))) {
 
                     //  Create Message
+                    // If managing user added/removed themselves, get their new token
                     if (UserName.equals(Token.getSubject())) {
                         Token = new UserTokenImp(GS_IDENTITY, Account.getUser(UserName));
                     }
-                    Response.addObject((UserToken) Token);
+
+                    // Send back new signed token so future actions are properly authorized
+                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token)); 
                     Response.addObject((String) GroupName);
                 } 
                 else {

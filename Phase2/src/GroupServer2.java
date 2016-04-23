@@ -274,30 +274,30 @@ public class GroupServer2 {
             boolean Option = (boolean) Content.get(GS_MGNT_OPTION);
             User UserInfo = Account.getUser(Token.getSubject());
 
-            // Permission: owner
-            if ((UserInfo != null)
+            //Checks the legitimacy of the token
+            if (authToken((UserTokenImp)Token)){
+                // Permission: owner
+                if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))
                     && (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))) {
-                
-                //Checks the legitimacy of the token
-                if (authToken((UserTokenImp)Token)){
+
                     //  Create Message
                     if (UserName.equals(Token.getSubject())) {
                         Token = new UserTokenImp(GS_IDENTITY, Account.getUser(UserName));
                     }
                     Response.addObject((UserToken) Token);
                     Response.addObject((String) GroupName);
+                } 
+                else {
+                //  Return error message
+                System.out.println("Failed to manage group member, continue");
+                Response = GenerateErrorMessage(Content);
                 }
-                else{
-                    //Return error message
-                    System.out.println("Failed to authenticate token, continue");
-                    Response = GenerateErrorMessage(Content);
-                }
-            } 
-            else {
-            //  Return error message
-            System.out.println("Failed to manage group member, continue");
-            Response = GenerateErrorMessage(Content);
+            }
+            else{
+                //Return error message
+                System.out.println("Failed to authenticate token, continue");
+                Response = GenerateErrorMessage(Content);
             }
 
             return Response;

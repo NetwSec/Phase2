@@ -137,6 +137,7 @@ public class ServerFramework implements Runnable {
                     Message Response = Callback.CallbackProc(Client, Content);
 
                     // Send response
+                    Output.reset();
                     Output.writeObject(Response);
                 } catch (Exception e) {
                     try {

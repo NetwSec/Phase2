@@ -233,6 +233,8 @@ class User implements java.io.Serializable {
             return false;
         }
         groups.add(group);
+        // Update the signature
+        signature = makeSignature();
         return true;
     }
 

@@ -5,7 +5,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.KeyPair;
 import java.security.MessageDigest;
+import java.security.Signature;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -183,6 +185,7 @@ class User implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private byte[] passHash;
+    private byte[] signature;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
 
@@ -205,7 +208,17 @@ class User implements java.io.Serializable {
     {
         return passHash;
     }
+    
+    public void setSignature(byte[] signature)
+    {
+        this.signature = signature;
+    }
 
+    public byte[] getSignature()
+    {
+        return signature;
+    }
+    
     public ArrayList<String> getGroups() {
         return groups;
     }
@@ -265,4 +278,31 @@ class User implements java.io.Serializable {
         }
         catch(Exception e) { e.printStackTrace(System.err); return null; }
     }
+     
+    private String getContents()
+    {
+        StringBuilder contents = new StringBuilder(GroupServer2.GS_IDENTITY);
+        contents.append(name);
+        for (int i = 0; i < groups.size(); i++) {
+                contents.append(groups.get(i));
+        }
+        return contents.toString();
+    }
+     private byte[] makeSignature()
+     {
+         try {
+            Signature sig = Signature.getInstance("SHA1WithRSA", "BC");
+            sig.initSign(GroupServer2.KEY.getPrivate());
+            sig.update(this.getContents().getBytes());
+//             System.out.println("Signed on contents: ");
+//             System.out.println(this.getContents());
+//             System.out.println("Bytes: " + this.getContents().getBytes());
+            return sig.sign();
+        }
+        catch (Exception e) {
+            System.err.println("Signing Error: " + e.getMessage());
+            e.printStackTrace(System.err);
+            return null;
+        }
+     }
 }

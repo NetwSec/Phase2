@@ -111,12 +111,21 @@ public class GroupServer2 {
                 // Compare the password hashes
                 if(Account.comparePasswords(PassWord, UserInfo))
                 {
-                    // Passwords match, return the token
-                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);   
-
-                    //  Create Message
-                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
-                    Response.addObject((String) UserName);
+                    // Passwords match
+                    
+                    // Make a token from stored info                    
+                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+                    // Authenticate the token against stored signature
+                    if(authToken((UserTokenImp)Token, UserInfo)) {
+                        //  Create Message
+                        Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
+                        Response.addObject((String) UserName);
+                    }
+                    else
+                    {
+                        System.out.println("Failed to authenticate user info.");
+                        Response = GenerateErrorMessage(Content);
+                    }
                 }
                 else
                 {

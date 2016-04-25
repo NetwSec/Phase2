@@ -251,10 +251,7 @@ public class GroupServer2 {
                 // Get new token with updated ownership
                 Token = new UserTokenImp(GS_IDENTITY, UserInfo);
                 // Send back signed token so future actions on this group will be authorized
-                UserTokenImp signedToken = (UserTokenImp)getSignedToken((UserTokenImp)Token);
-                System.out.println("GS addgroupCallback is sending token to client with contents: ");
-                System.out.println(signedToken.getContents());
-                Response.addObject((UserToken) signedToken); 
+                Response.addObject((UserToken) getSignedToken((UserTokenImp)Token)); 
                 Response.addObject((String) GroupName);
             }
             else{
@@ -481,15 +478,11 @@ public class GroupServer2 {
     
     static UserToken getSignedToken(UserTokenImp token) {
         try {
-            System.out.println("Signing the token, contents are: ");
-            System.out.println(token.getContents());
             // Create the token's signature
             Signature tokenSign = Signature.getInstance("SHA1WithRSA", "BC");
             tokenSign.initSign(KEY.getPrivate());
             tokenSign.update(token.getContents().getBytes());
             token.setSignature(tokenSign.sign());
-            
-            //System.out.println("Token Signed");
             
             return token;
         }

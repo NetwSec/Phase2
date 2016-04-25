@@ -419,11 +419,8 @@ public class Client2 {
         if (!Response.getMessage().equals(GS_SUCCESS)) {
             return false;
         } else {
-            UserTokenImp received = (UserTokenImp) Response.getObjCont().get(GS_SUCCESS_USER_TOKEN);
-            System.out.println("Added a group, contents of received token are: ");
-            System.out.println(received.getContents());
             // Update token
-            UpdateToken(received);
+            UpdateToken((UserToken)Response.getObjCont().get(GS_SUCCESS_USER_TOKEN));
             return true;
         }
     }
@@ -540,9 +537,6 @@ public class Client2 {
     static List<String> listMembers(UserToken token, String group) {
         Message Upload = new Message(GS_LISTGROUP);
         
-        UserTokenImp token2 = (UserTokenImp) token;
-        System.out.println("Want to list members, contents of token are: ");
-        System.out.println(token2.getContents());
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) group);

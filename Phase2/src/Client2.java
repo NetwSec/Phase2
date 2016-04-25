@@ -248,7 +248,7 @@ public class Client2 {
                     break;
                 }
 
-                System.out.println("Invalid user name or password. Please retry");
+                System.out.println("Invalid user name/password or authentication failure. Please retry");
             }
             System.out.println();
 

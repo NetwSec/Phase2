@@ -401,6 +401,9 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_MGNT, mgnt);
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
 
+        // Initialize keys
+        getKeyList();
+        
         // Initalize account information
         File FileHandle = new File(GS_STORAGE);
         FileHandle.getParentFile().mkdirs();
@@ -410,9 +413,15 @@ public class GroupServer2 {
             System.out.println("Unable to initalize user account information, halt");
             return;
         }
-
-        
-        //**************************************************************************************
+       
+        // Start listener
+        System.out.println("Start the listener");
+        Server.run();
+    }
+    
+    static void getKeyList()
+    {
+         //**************************************************************************************
         //**************************************************************************************
         //GSKey List
         ObjectInputStream userStream;
@@ -468,11 +477,6 @@ public class GroupServer2 {
         }
         //*******************************************************************************
         //*******************************************************************************
-        
-        
-        // Start listener
-        System.out.println("Start the listener");
-        Server.run();
     }
     
     static UserToken getSignedToken(UserTokenImp token) {

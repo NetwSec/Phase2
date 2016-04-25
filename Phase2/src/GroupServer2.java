@@ -148,7 +148,7 @@ public class GroupServer2 {
             User UserInfo = Account.getUser(Token.getSubject());
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token)){
+            if (authToken((UserTokenImp)Token, null)){
                 // Permission: registered user and OldPassword hash matches stored hash
                 if ((UserInfo != null) && Account.changePassword(Token.getSubject(), OldPassword, NewPassword)){
                     //  Create Message
@@ -188,7 +188,7 @@ public class GroupServer2 {
                     && (Account.addUser(UserName, DEFAULT_USER_PASSWORD))) {
                 
                  //Checks the legitimacy of the token
-                if (authToken((UserTokenImp)Token)){
+                if (authToken((UserTokenImp)Token, null)){
                     //  Create Message
                     Response.addObject((UserTokenImp) Token);
                     Response.addObject((String) UserName);
@@ -230,7 +230,7 @@ public class GroupServer2 {
             }
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token)){
+            if (authToken((UserTokenImp)Token, null)){
                
                 // Check if group was created before
                 for (Enumeration<String> UserList = Account.getUsernames(); UserList.hasMoreElements();) {
@@ -279,7 +279,7 @@ public class GroupServer2 {
             User UserInfo = Account.getUser(Token.getSubject());
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token)){
+            if (authToken((UserTokenImp)Token, null)){
                 // Permission: owner
                 if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))
@@ -327,7 +327,7 @@ public class GroupServer2 {
             if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))) {
                  //Checks the legitimacy of the token
-                if (authToken((UserTokenImp)Token)){
+                if (authToken((UserTokenImp)Token, null)){
                     
                     ArrayList<String> UserList = new ArrayList<String>();
                     

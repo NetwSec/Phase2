@@ -270,10 +270,10 @@ class User implements java.io.Serializable {
         return false;
     }
     
-     static byte[] getHash(String input)
+    private static byte[] getHash(String input)
     {
         byte[] toHash = input.getBytes();
-        // TODO: other algorithm?
+        
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA1", "BC");
             digest.update(toHash);

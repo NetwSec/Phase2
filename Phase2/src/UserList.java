@@ -141,24 +141,36 @@ public class UserList implements java.io.Serializable {
     }
 
     public synchronized boolean addGroup(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).addGroup(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean removeGroup(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).removeGroup(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean addOwnerships(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).addOwnership(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean removeOwnerships(String user, String groupname) {
+       if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).removeOwnership(groupname);
         Save();
         return result;

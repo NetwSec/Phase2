@@ -194,6 +194,7 @@ class User implements java.io.Serializable {
         passHash = getHash(password);
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
+        signature = makeSignature();
     }
 
     public String getName() {

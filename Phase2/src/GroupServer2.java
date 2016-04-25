@@ -500,28 +500,39 @@ public class GroupServer2 {
         }
     }
     
-    static boolean authToken(UserTokenImp aToken) {
+    static boolean authToken(UserTokenImp aToken, User userInfo) {
+        
+        // TODO: can just always check signature from UserList if we make sure to always update it there
+        
+        byte[] sigToVerify;
+        if(userInfo==null) // Called during a session
+            sigToVerify = aToken.getSignature();
+        else // Called at login
+            sigToVerify = userInfo.getSignature();
+        
         try {
-            // Signature verification
-            Signature signed = Signature.getInstance("SHA1WithRSA", "BC");
-            signed.initVerify(KEY.getPublic());
-            signed.update(aToken.getContents().getBytes());
-            
-            
-            if (signed.verify(aToken.getSignature())) {
-                // RSA Signature verified
-                return true;
+                // Signature verification
+                Signature signed = Signature.getInstance("SHA1WithRSA", "BC");
+                signed.initVerify(KEY.getPublic());
+                signed.update(aToken.getContents().getBytes());
+//                System.out.println("Authenticating on contents: ");
+//                System.out.println(aToken.getContents());
+//                System.out.println("Bytes: " + aToken.getContents().getBytes());
+
+                if (signed.verify(sigToVerify)) {
+                    // RSA Signature verified
+                    return true;
+                }
+                else {
+                    // RSA Signature bad
+                    return false;
+                }
             }
-            else {
-                // RSA Signature bad
-                return false;
+            catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(System.err);
             }
-        }
-        catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            e.printStackTrace(System.err);
-        }
-        return false;
+            return false;  
     }
     
     

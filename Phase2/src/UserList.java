@@ -62,7 +62,8 @@ public class UserList implements java.io.Serializable {
             //Create new user list
             list = new Hashtable<String, User>();
             // Add current user to user list (username and password both admin)
-            addUser(DefaultAdmin, DefaultAdmin);
+            Crypto crypto = new Crypto();
+            addUser(DefaultAdmin, crypto.getHash(DefaultAdmin));
             // Add current user to Admin group
             addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
@@ -85,7 +86,7 @@ public class UserList implements java.io.Serializable {
         return true;
     }
     
-    public synchronized boolean changePassword(String username, String oldPassword, String newPassword)
+    public synchronized boolean changePassword(String username, byte[] oldPassword, byte[] newPassword)
     {
         // Compare old to stored; if equal, set new
         if(comparePasswords(oldPassword, list.get(username)))
@@ -98,9 +99,9 @@ public class UserList implements java.io.Serializable {
             return false;
     }
 
-    static boolean comparePasswords(String password, User UserInfo)
+    static boolean comparePasswords(byte[] password, User UserInfo)
     {
-            return Arrays.equals(getHash(password), UserInfo.getPasswordHash());
+        return Arrays.equals(password, UserInfo.getPassword());
     }
 
     public synchronized boolean deleteUser(String username) {

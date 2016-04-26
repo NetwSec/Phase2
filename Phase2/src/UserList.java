@@ -74,7 +74,7 @@ public class UserList implements java.io.Serializable {
         return true;
     }
 
-    public synchronized boolean addUser(String username, String password) {
+    public synchronized boolean addUser(String username, byte[] password) {
         if (checkUser(username)) {
             return false;
         }
@@ -159,13 +159,13 @@ public class UserList implements java.io.Serializable {
 class User implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
-    private byte[] passHash;
+    private byte[] password;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
 
-    public User(String username, String password) {
+    public User(String username, byte[] passwd) {
         name = username;
-        passHash = getHash(password);
+        password = passwd;
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
     }
@@ -174,13 +174,13 @@ class User implements java.io.Serializable {
         return name;
     }
     
-    public void setPassword(String password)
+    public void setPassword(byte[] passwd)
     {
-        passHash = getHash(password);
+        password = passwd;
     }
-    public byte[] getPasswordHash()
+    public byte[] getPassword()
     {
-        return passHash;
+        return password;
     }
 
     public ArrayList<String> getGroups() {

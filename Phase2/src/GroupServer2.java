@@ -44,8 +44,8 @@ public class GroupServer2 {
     public final static String GS_CHANGEPASS = "changepass"; //changepass
     public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
-    public final static int GS_CHANGEPASS_OLD_PW = 2;        //String old pass
-    public final static int GS_CHANGEPASS_NEW_PW = 3;        //String new pass
+    public final static int GS_CHANGEPASS_OLD_PW = 2;        //byte[] old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 3;        //byte[] new pass
     
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
@@ -135,8 +135,8 @@ public class GroupServer2 {
 
             UserToken Token = (UserToken) Content.get(GS_CHANGEPASS_USER_TOKEN);
             String Username = (String) Content.get(GS_CHANGEPASS_USER_NAME);
-            String OldPassword = (String) Content.get(GS_CHANGEPASS_OLD_PW);
-            String NewPassword = (String) Content.get(GS_CHANGEPASS_NEW_PW);
+            byte[] OldPassword = (byte[]) Content.get(GS_CHANGEPASS_OLD_PW);
+            byte[] NewPassword = (byte[]) Content.get(GS_CHANGEPASS_NEW_PW);
             User UserInfo = Account.getUser(Token.getSubject());
 
             // Permission: registered user and OldPassword hash matches stored hash

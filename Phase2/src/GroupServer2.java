@@ -341,35 +341,24 @@ public class GroupServer2 {
         {
             public Message Decode(Object o)
             {
-                if(o == null)
-                    return null;
-                
                 Message Request = (Message) o;
-                String Command = Request.getMessage();
-                ArrayList<Object> Content = Request.getObjCont();
-                
-                if(Command.equals(GS_LOGIN))
+                if(Request != null)
                 {
-                    // login option: no token, get userinfo to send to authToken
-                    User UserInfo = Account.getUser((String)Content.get(GS_LOGIN_USER_NAME));
-                    // Make a token from stored info                    
-                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
-                    // Authenticate
-                    if(authToken((UserTokenImp)Token, UserInfo))
-                        return Request;
-                    else
-                        return null;
+                    String Command = Request.getMessage();
+                    ArrayList<Object> Content = Request.getObjCont();
+
+                    if(!Command.equals(GS_LOGIN))
+                    {
+                        // Get the token
+                        UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
+                        // Authenticate
+                        if(authToken((UserTokenImp)Token, null))
+                        {
+                            Request = null;
+                        }
+                    }
                 }
-                else
-                {
-                    // Get the token
-                    UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
-                    // Authenticate
-                    if(authToken((UserTokenImp)Token, null))
-                        return Request;
-                    else
-                        return null;
-                }
+                return Request;
             }
             
             public Object Encode(Message o)

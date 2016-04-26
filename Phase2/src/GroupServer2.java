@@ -39,7 +39,7 @@ public class GroupServer2 {
     public final static String GS_LOGIN = "login";      //login
     public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_LOGIN_USER_NAME = 1;     //String    User
-    public final static int GS_LOGIN_USER_PW = 2;     //String    User
+    public final static int GS_LOGIN_USER_PW = 2;       //byte[]    User
 
     public final static String GS_CHANGEPASS = "changepass"; //changepass
     public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
@@ -93,7 +93,7 @@ public class GroupServer2 {
 
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
-            String PassWord = (String) Content.get(GS_LOGIN_USER_PW);
+            byte[] Password = (byte[]) Content.get(GS_LOGIN_USER_PW);
 //            byte[] PasswordHash = (byte[]) Content.get(GS_LOGIN_USER_PW);
             User UserInfo = Account.getUser(UserName);
                         
@@ -101,7 +101,7 @@ public class GroupServer2 {
             if (UserInfo != null) {
                 
                 // Compare the password hashes
-                if(Account.comparePasswords(PassWord, UserInfo))
+                if(Account.comparePasswords(Password, UserInfo))
                 {
                     // Passwords match, return the token
                     UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);

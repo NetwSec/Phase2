@@ -101,13 +101,23 @@ public class ServerFramework implements Runnable {
             Input = new ObjectInputStream(Client.getInputStream());
         }
 
+        public Message Decode(Object o)
+        {
+            return (Message) o;
+        }
+        
+        public Object Encode(Message o)
+        {
+            return (Object) o;
+        }
+        
         // The service thread main proc
         @Override
         public void run() {
             while (true) {
                 try {
                     // Process the Message
-                    Message Request = (Message) Input.readObject();
+                    Message Request = Decode(Input.readObject());
                     if (Request == null) {
                         System.out.println("Invalid message, close connection");
                         throw new UnsupportedOperationException("Invalid message.");
@@ -137,7 +147,7 @@ public class ServerFramework implements Runnable {
 
                     // Send response
                     Output.reset();
-                    Output.writeObject(Response);
+                    Output.writeObject(Encode(Response));
                 } catch (Exception e) {
                     try {
                         // Connection ended, clean up resource

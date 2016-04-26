@@ -469,59 +469,5 @@ public class GroupServer2 {
                 System.out.println("Error reading from GSKeyList file");
                 System.exit(-1);
         }
-        //*******************************************************************************
-        //*******************************************************************************
-    }
-    
-    static UserToken getSignedToken(UserTokenImp token) {
-        try {
-            // Create the token's signature
-            Signature tokenSign = Signature.getInstance("SHA1WithRSA", "BC");
-            tokenSign.initSign(KEY.getPrivate());
-            tokenSign.update(token.getContents().getBytes());
-            token.setSignature(tokenSign.sign());
-            
-            return token;
-        }
-        catch (Exception e) {
-            System.err.println("Signing Error: " + e.getMessage());
-            e.printStackTrace(System.err);
-            return null;
-        }
-    }
-    
-    static boolean authToken(UserTokenImp aToken, User userInfo) {
-        
-        // TODO: can just always check signature from UserList if we make sure to always update it there
-        
-        byte[] sigToVerify;
-        if(userInfo==null) // Called during a session
-        {
-            sigToVerify = aToken.getSignature();
-        }
-        else // Called at login
-        {
-            sigToVerify = userInfo.getSignature();
-        }
-        try {
-                // Signature verification
-                Signature signed = Signature.getInstance("SHA1WithRSA", "BC");
-                signed.initVerify(KEY.getPublic());
-                signed.update(aToken.getContents().getBytes());
-
-                if (signed.verify(sigToVerify)) {
-                    // RSA Signature verified
-                    return true;
-                }
-                else {
-                    // RSA Signature bad
-                    return false;
-                }
-            }
-            catch (Exception e) {
-                System.err.println("Error: " + e.getMessage());
-                e.printStackTrace(System.err);
-            }
-            return false;  
     }
 }

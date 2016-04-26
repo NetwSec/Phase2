@@ -1,4 +1,6 @@
 
+import java.security.KeyPair;
+import java.security.Signature;
 import java.util.List;
 
 public class UserTokenImp implements UserToken, java.io.Serializable {
@@ -57,5 +59,44 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
                 contents.append(group.get(i));
         }
         return contents.toString();
+    }
+    
+    public boolean signToken(KeyPair key) {
+        try {
+            // Create the token's signature
+            Signature tokenSign = Signature.getInstance("SHA1WithRSA", "BC");
+            tokenSign.initSign(key.getPrivate());
+            tokenSign.update(this.getContents().getBytes());
+            this.setSignature(tokenSign.sign());
+            
+            return true;
+        }
+        catch (Exception e) {
+            System.err.println("Signing Error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        return false;
+    }
+    
+    public boolean authToken(KeyPair key) {
+        
+        // TODO: can just always check signature from UserList if we make sure to always update it there
+
+        try {
+                // Signature verification
+                Signature signed = Signature.getInstance("SHA1WithRSA", "BC");
+                signed.initVerify(key.getPublic());
+                signed.update(this.getContents().getBytes());
+
+                if (signed.verify(this.getSignature())) {
+                    // RSA Signature verified
+                    return true;
+                }
+            }
+            catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(System.err);
+            }
+            return false;  
     }
 }

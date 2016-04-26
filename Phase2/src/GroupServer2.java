@@ -352,7 +352,7 @@ public class GroupServer2 {
                         // Get the token
                         UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
                         // Authenticate
-                        if(authToken((UserTokenImp)Token, null))
+                        if(!((UserTokenImp)Token).authToken(KEY))
                         {
                             Request = null;
                         }
@@ -373,7 +373,8 @@ public class GroupServer2 {
                     // Get the token
                     UserToken Token = (UserToken) Content.get(GS_SUCCESS_USER_TOKEN);
                     // Attach the signed token
-                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
+                    ((UserTokenImp)Token).signToken(KEY);
+                    Response.addObject((UserToken) Token);
                     // Attach rest of object array
                     for(int i = GS_SUCCESS_USER_TOKEN; i<Content.size(); i++)
                         Response.addObject(Content.get(i));

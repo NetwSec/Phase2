@@ -243,6 +243,8 @@ class User implements java.io.Serializable {
         if (!groups.isEmpty()) {
             if (groups.contains(group)) {
                 groups.remove(group.indexOf(group));
+                // Update the signature
+                signature = makeSignature();
                 return true;
             }
         }

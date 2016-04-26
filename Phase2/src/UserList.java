@@ -50,7 +50,7 @@ public class UserList implements java.io.Serializable {
 
     // Load list from LocalStorage
     // If the file doesn't exist, create it with an admin account
-    public boolean Load(String DefaultAdmin) {
+    public boolean Load(String DefaultAdmin, String DefaultFileServer) {
         try {
             // Try reading the file containing the user list
             FileInputStream fis = new FileInputStream(LocalStorage);
@@ -59,10 +59,14 @@ public class UserList implements java.io.Serializable {
             Key = (KeyPair) userStream.readObject();
         } catch (FileNotFoundException e) {
             // No file available
-            System.out.println("UserList file does not exist. A default user will be created.");
+            System.out.println("UserList file does not exist. A default admin user will be created.");
             System.out.println("User name: " + DefaultAdmin);
             System.out.println("Password: " + DefaultAdmin);
             System.out.println("Group name: " + DefaultAdmin);
+            System.out.println("A default file server account will be created.");
+            System.out.println("User name: " + DefaultFileServer);
+            System.out.println("Password: " + DefaultFileServer);
+            System.out.println("Group name: " + DefaultFileServer);
             
             //Create new user list
             list = new Hashtable<String, User>();
@@ -73,6 +77,13 @@ public class UserList implements java.io.Serializable {
             addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
             addOwnerships(DefaultAdmin, DefaultAdmin);
+            
+            // Add current user to user list (username and password both file)
+            addUser(DefaultFileServer, crypto.getHash(DefaultFileServer));
+            // Add current user to File group
+            addGroup(DefaultFileServer, DefaultFileServer);
+            // Give ownership of File to admin
+            addOwnerships(DefaultAdmin, DefaultFileServer);
             
             Key = crypto.createKeyPair();
         } catch (IOException | ClassNotFoundException e) {

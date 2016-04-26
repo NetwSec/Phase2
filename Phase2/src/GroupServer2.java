@@ -346,6 +346,7 @@ public class GroupServer2 {
     public static String GS_KEYS = System.getProperty("user.dir") + File.separator + "GroupServer" + File.separator + "GSKeyList.bin";
     public static String GS_IDENTITY = "test_server";
     public static String GS_ADMIN_GROUP = "admin";
+    public static String GS_FILE_SERVER_GROUP = "file";
     public static UserList Account;
 
     GroupServer2(int Port) {
@@ -424,7 +425,7 @@ public class GroupServer2 {
         File FileHandle = new File(GS_STORAGE);
         FileHandle.getParentFile().mkdirs();
         Account = new UserList(GS_STORAGE);
-        if (!Account.Load(GS_ADMIN_GROUP))
+        if (!Account.Load(GS_ADMIN_GROUP, GS_FILE_SERVER_GROUP))
         {
             System.out.println("Unable to initalize user account information, halt");
             return;

@@ -70,9 +70,9 @@ public class Client2 {
 
     public final static String GS_CHANGEPASS = "changepass"; //changepass
     public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
-//    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
-    public final static int GS_CHANGEPASS_OLD_PW = 1;        //String old pass
-    public final static int GS_CHANGEPASS_NEW_PW = 2;        //String new pass
+    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
+    public final static int GS_CHANGEPASS_OLD_PW = 2;        //String old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 3;        //String new pass
 
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
@@ -299,6 +299,7 @@ public class Client2 {
 
         // Create Message header
         Upload.addObject((UserToken) token);
+        Upload.addObject((String) token.getSubject());
         Upload.addObject((String) oldPassword);
         Upload.addObject((String) newPassword);
 

@@ -316,7 +316,18 @@ public class GroupServer2 {
     public static void run() {
         // Create instances
         System.out.println("Initalize group server");
-        ServerFramework Server = new ServerFramework(GS_PORT);
+        ServerFramework Server = new ServerFramework(GS_PORT)
+        {
+            public Message Decode(Object o)
+            {
+                return (Message) o;
+            }
+            
+            public Object Encode(Message o)
+            {
+                return (Object) o;
+            }
+        };
         loginCallback login = new loginCallback();
         changepassCallback changepass = new changepassCallback();
         adduserCallback adduser = new adduserCallback();

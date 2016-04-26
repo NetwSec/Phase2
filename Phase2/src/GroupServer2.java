@@ -50,6 +50,8 @@ public class GroupServer2 {
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
+    public final static int GS_ADDUSER_USER_PASSWD = 2; //byte[]    Password
+
 
     public final static String GS_ADDGROUP = "addgroup";//addgroup
     public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
@@ -151,8 +153,6 @@ public class GroupServer2 {
         }
     }
     
-    private static String DEFAULT_USER_PASSWORD = "cs3326";
-    
     static class adduserCallback implements ServerFramework.ServerCallback {
 
         @Override
@@ -163,12 +163,13 @@ public class GroupServer2 {
 
             UserToken Token = (UserToken) Content.get(GS_ADDUSER_USER_TOKEN);
             String UserName = (String) Content.get(GS_ADDUSER_USER_NAME);
+            byte[] Password = (byte[]) Content.get(GS_ADDUSER_USER_PASSWD);
             User UserInfo = Account.getUser(Token.getSubject());
 
             // Permission: admin
             if ((UserInfo != null)
                     && (UserInfo.getGroups().contains(GS_ADMIN_GROUP))
-                    && (Account.addUser(UserName, DEFAULT_USER_PASSWORD))) {
+                    && (Account.addUser(UserName, Password))) {
                 //  Create Message
                 Response.addObject((UserToken) Token);
                 Response.addObject((String) UserName);

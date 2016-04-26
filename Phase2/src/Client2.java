@@ -346,14 +346,14 @@ public class Client2 {
         }
     };
     
-    
-    
-    static boolean createUser(UserToken token, String Username) {
+    static boolean createUser(UserToken token, String Username, String Password) {
         Message Upload = new Message(GS_ADDUSER);
 
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) Username);
+        Crypto crypto = new Crypto();
+        Upload.addObject((byte[]) crypto.getHash(Password));
 
         //  Send message
         try {
@@ -385,9 +385,10 @@ public class Client2 {
 
             System.out.print("Please enter the user name: ");
             String Username = Input.nextLine();
-            System.out.println("A default password will be set.");
+            System.out.print("Please enter the password: ");
+            String Password = Input.nextLine();
 
-            if (!createUser(Token, Username)) {
+            if (!createUser(Token, Username, Password)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");

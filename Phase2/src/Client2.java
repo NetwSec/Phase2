@@ -295,18 +295,18 @@ public class Client2 {
     // Group server services
     static boolean changePassword(UserToken token, String oldPassword, String newPassword)
     {
-         Message change_pw = new Message(GS_CHANGEPASS);
+         Message Upload = new Message(GS_CHANGEPASS);
 
         // Create Message header
-        change_pw.addObject((UserToken) token);
-        change_pw.addObject((String) token.getSubject());
+        Upload.addObject((UserToken) token);
+        Upload.addObject((String) token.getSubject());
         Crypto crypto = new Crypto();
-        change_pw.addObject((byte[]) crypto.getHash(oldPassword));
-        change_pw.addObject((byte[]) crypto.getHash(newPassword));
+        Upload.addObject((byte[]) crypto.getHash(oldPassword));
+        Upload.addObject((byte[]) crypto.getHash(newPassword));
 
         //  Send message
         try {
-            GOutput.writeObject(change_pw);
+            GOutput.writeObject(Upload);
             GOutput.flush();
         } catch (Exception ex) {
             return false;

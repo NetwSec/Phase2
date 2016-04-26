@@ -156,13 +156,13 @@ public class Client2 {
         }
     }
 
-    static boolean getToken(String UserName, String PassWord) {
+    static boolean getToken(String UserName, String Password) {
         Message Login = new Message(GS_LOGIN);
         // Create Message header
         Login.addObject((UserToken) null);
         Login.addObject((String) UserName);
-        Login.addObject((String) PassWord);
-//        Login.addObject((byte[]) getHash(PassWord));
+        Crypto crypto = new Crypto();
+        Login.addObject((byte[]) crypto.getHash(Password));
 
         //  Send message
         try {
@@ -295,17 +295,18 @@ public class Client2 {
     // Group server services
     static boolean changePassword(UserToken token, String oldPassword, String newPassword)
     {
-         Message Upload = new Message(GS_CHANGEPASS);
+         Message change_pw = new Message(GS_CHANGEPASS);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) token.getSubject());
-        Upload.addObject((String) oldPassword);
-        Upload.addObject((String) newPassword);
+        change_pw.addObject((UserToken) token);
+        change_pw.addObject((String) token.getSubject());
+        Crypto crypto = new Crypto();
+        change_pw.addObject((byte[]) crypto.getHash(oldPassword));
+        change_pw.addObject((byte[]) crypto.getHash(newPassword));
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
+            GOutput.writeObject(change_pw);
             GOutput.flush();
         } catch (Exception ex) {
             return false;

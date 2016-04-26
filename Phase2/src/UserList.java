@@ -175,7 +175,6 @@ class User implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     private String name;
     private byte[] password;
-    private byte[] signature;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
 
@@ -184,7 +183,6 @@ class User implements java.io.Serializable {
         password = passwd;
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
-        signature = makeSignature();
     }
 
     public String getName() {
@@ -200,16 +198,6 @@ class User implements java.io.Serializable {
         return password;
     }
     
-    public void setSignature(byte[] signature)
-    {
-        this.signature = signature;
-    }
-
-    public byte[] getSignature()
-    {
-        return signature;
-    }
-    
     public ArrayList<String> getGroups() {
         return groups;
     }
@@ -223,8 +211,6 @@ class User implements java.io.Serializable {
             return false;
         }
         groups.add(group);
-        // Update the signature
-        signature = makeSignature();
         return true;
     }
 
@@ -233,8 +219,6 @@ class User implements java.io.Serializable {
         if (!groups.isEmpty()) {
             if (groups.contains(group)) {
                 groups.remove(group.indexOf(group));
-                // Update the signature
-                signature = makeSignature();
                 return true;
             }
         }
@@ -271,21 +255,4 @@ class User implements java.io.Serializable {
         }
         return contents.toString();
     }
-     private byte[] makeSignature()
-     {
-         try {
-            Signature sig = Signature.getInstance("SHA1WithRSA", "BC");
-            sig.initSign(GroupServer2.KEY.getPrivate());
-            sig.update(this.getContents().getBytes());
-//             System.out.println("Signed on contents: ");
-//             System.out.println(this.getContents());
-//             System.out.println("Bytes: " + this.getContents().getBytes());
-            return sig.sign();
-        }
-        catch (Exception e) {
-            System.err.println("Signing Error: " + e.getMessage());
-            e.printStackTrace(System.err);
-            return null;
-        }
-     }
 }

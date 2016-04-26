@@ -17,14 +17,6 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
         this.subject = UserInfo.getName();
         this.group = UserInfo.getGroups();
     }
-    
-    //Constructor with 3 parameters
-    public UserTokenImp(String issuer, User UserInfo, byte[] signature) {
-        this.issuer = issuer;
-        this.subject = UserInfo.getName();
-        this.group = UserInfo.getGroups();
-        this.signature = signature;
-    }
 
     @Override
     //return issuer of this token
@@ -40,10 +32,6 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
     
     public byte[] getSignature(){
         return signature;
-    }
-    
-    public void setSignature(byte[] signature){
-        this.signature = signature;
     }
 
     @Override
@@ -67,7 +55,7 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
             Signature tokenSign = Signature.getInstance("SHA1WithRSA", "BC");
             tokenSign.initSign(key.getPrivate());
             tokenSign.update(this.getContents().getBytes());
-            this.setSignature(tokenSign.sign());
+            signature = tokenSign.sign();
             
             return true;
         }

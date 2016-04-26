@@ -118,16 +118,18 @@ public class GroupServer2 {
                     // Make a token from stored info                    
                     UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
                     // Authenticate the token against stored signature
-                    if(authToken((UserTokenImp)Token, UserInfo)) {
-                        //  Create Message
-                        Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
-                        Response.addObject((String) UserName);
-                    }
-                    else
-                    {
-                        System.out.println("Failed to authenticate user info.");
-                        Response = GenerateErrorMessage(Content);
-                    }
+//                    if(authToken((UserTokenImp)Token, UserInfo)) {
+                       
+                    //  Create Message
+//                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
+                    Response.addObject((UserToken) Token);
+                    Response.addObject((String) UserName);
+//                    }
+//                    else
+//                    {
+//                        System.out.println("Failed to authenticate user info.");
+//                        Response = GenerateErrorMessage(Content);
+//                    }
                 }
                 else
                 {
@@ -159,7 +161,7 @@ public class GroupServer2 {
             User UserInfo = Account.getUser(Token.getSubject());
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token, null)){
+//            if (authToken((UserTokenImp)Token, null)){
                 // Permission: registered user and OldPassword hash matches stored hash
                 if ((UserInfo != null) && Account.changePassword(Token.getSubject(), OldPassword, NewPassword)){
                     //  Create Message
@@ -169,12 +171,12 @@ public class GroupServer2 {
                     System.out.println("Failed to change password, continue");
                     Response = GenerateErrorMessage(Content);
                 }
-           }
-           else{
-                //Return error message
-                System.out.println("Failed to authenticate token, continue");
-                Response = GenerateErrorMessage(Content);
-           }
+//           }
+//           else{
+//                //Return error message
+//                System.out.println("Failed to authenticate token, continue");
+//                Response = GenerateErrorMessage(Content);
+//           }
             return Response;
         }
     }
@@ -198,16 +200,16 @@ public class GroupServer2 {
                     && (Account.addUser(UserName, Password))) {
                 
                  //Checks the legitimacy of the token
-                if (authToken((UserTokenImp)Token, null)){
+//                if (authToken((UserTokenImp)Token, null)){
                     //  Create Message
                     Response.addObject((UserTokenImp) Token);
                     Response.addObject((String) UserName);
-                }
-                else{
-                    //Return error message
-                    System.out.println("Failed to authenticate token, continue");
-                    Response = GenerateErrorMessage(Content);
-                }
+//                }
+//                else{
+//                    //Return error message
+//                    System.out.println("Failed to authenticate token, continue");
+//                    Response = GenerateErrorMessage(Content);
+//                }
             } else {
                 //  Return error message
                 System.out.println("Failed to add user, continue");
@@ -239,7 +241,7 @@ public class GroupServer2 {
             }
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token, null)){
+//            if (authToken((UserTokenImp)Token, null)){
                
                 // Check if group was created before
                 for (Enumeration<String> UserList = Account.getUsernames(); UserList.hasMoreElements();) {
@@ -262,12 +264,12 @@ public class GroupServer2 {
                 // Send back signed token so future actions on this group will be authorized
                 Response.addObject((UserToken) getSignedToken((UserTokenImp)Token)); 
                 Response.addObject((String) GroupName);
-            }
-            else{
-                //Return error message
-                System.out.println("Failed to authenticate token, continue");
-                Response = GenerateErrorMessage(Content);
-            }
+//            }
+//            else{
+//                //Return error message
+//                System.out.println("Failed to authenticate token, continue");
+//                Response = GenerateErrorMessage(Content);
+//            }
             return Response;
         }
 
@@ -288,7 +290,7 @@ public class GroupServer2 {
             User UserInfo = Account.getUser(Token.getSubject());
 
             //Checks the legitimacy of the token
-            if (authToken((UserTokenImp)Token, null)){
+//            if (authToken((UserTokenImp)Token, null)){
                 // Permission: owner
                 if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))
@@ -309,12 +311,12 @@ public class GroupServer2 {
                 System.out.println("Failed to manage group member, continue");
                 Response = GenerateErrorMessage(Content);
                 }
-            }
-            else{
-                //Return error message
-                System.out.println("Failed to authenticate token, continue");
-                Response = GenerateErrorMessage(Content);
-            }
+//            }
+//            else{
+//                //Return error message
+//                System.out.println("Failed to authenticate token, continue");
+//                Response = GenerateErrorMessage(Content);
+//            }
 
             return Response;
         }
@@ -336,7 +338,7 @@ public class GroupServer2 {
             if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))) {
                  //Checks the legitimacy of the token
-                if (authToken((UserTokenImp)Token, null)){
+//                if (authToken((UserTokenImp)Token, null)){
                     
                     ArrayList<String> UserList = new ArrayList<String>();
                     
@@ -351,12 +353,12 @@ public class GroupServer2 {
                     Response.addObject((UserToken) Token);
                     Response.addObject((String) GroupName);
                     Response.addObject((ArrayList<String>) UserList);
-                }
-                else{
-                    //  Return error message
-                    System.out.println("Failed to authenticate, continue");
-                    Response = GenerateErrorMessage(Content);
-                }
+//                }
+//                else{
+//                    //  Return error message
+//                    System.out.println("Failed to authenticate, continue");
+//                    Response = GenerateErrorMessage(Content);
+//                }
                 
             } else {
                 //  Return error message

@@ -29,6 +29,7 @@ public class UserList implements java.io.Serializable {
     private static final long SERIAL_VERSION_UID = 1L;
     private Hashtable<String, User> list;
     private String LocalStorage;
+    public KeyPair Key;
 
     UserList(String File) {
         LocalStorage = File;
@@ -40,6 +41,7 @@ public class UserList implements java.io.Serializable {
         try {
             outStream = new ObjectOutputStream(new FileOutputStream(LocalStorage));
             outStream.writeObject(list);
+            outStream.writeObject(Key);
         } catch (Exception ex) {
             return false;
         }
@@ -54,6 +56,7 @@ public class UserList implements java.io.Serializable {
             FileInputStream fis = new FileInputStream(LocalStorage);
             ObjectInputStream userStream = new ObjectInputStream(fis);
             list = (Hashtable<String, User>) userStream.readObject();
+            Key = (KeyPair) userStream.readObject();
         } catch (FileNotFoundException e) {
             // No file available
             System.out.println("UserList file does not exist. A default user will be created.");
@@ -70,6 +73,8 @@ public class UserList implements java.io.Serializable {
             addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
             addOwnerships(DefaultAdmin, DefaultAdmin);
+            
+            Key = crypto.createKeyPair();
         } catch (IOException | ClassNotFoundException e) {
             // Other error
             return false;

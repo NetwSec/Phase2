@@ -1,21 +1,8 @@
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.MessageDigest;
-import java.security.SecureRandom;
-import java.security.Signature;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import static jdk.nashorn.internal.objects.NativeObject.keys;
 
 /**
  * Group server
@@ -328,7 +315,6 @@ public class GroupServer2 {
     public static String GS_IDENTITY = "test_server";
     public static String GS_ADMIN_GROUP = "admin";
     public static UserList Account;
-    public static KeyPair KEY = null;
 
     GroupServer2(int Port) {
         GS_PORT = Port;
@@ -352,7 +338,7 @@ public class GroupServer2 {
                         // Get the token
                         UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
                         // Authenticate
-                        if(!((UserTokenImp)Token).authToken(KEY))
+                        if(!((UserTokenImp)Token).authToken(Account.Key))
                         {
                             Request = null;
                         }
@@ -373,7 +359,7 @@ public class GroupServer2 {
                     // Get the token
                     UserToken Token = (UserToken) Content.get(GS_SUCCESS_USER_TOKEN);
                     // Attach the signed token
-                    ((UserTokenImp)Token).signToken(KEY);
+                    ((UserTokenImp)Token).signToken(Account.Key);
                     Response.addObject((UserToken) Token);
                     // Attach rest of object array
                     for(int i = GS_SUCCESS_USER_TOKEN; i<Content.size(); i++)
@@ -399,9 +385,6 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_ADDGROUP, addgroup);
         Server.RegisterMessage(GS_MGNT, mgnt);
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
-
-        // Initialize keys
-        getKeyList();
         
         // Initalize account information
         File FileHandle = new File(GS_STORAGE);
@@ -416,59 +399,5 @@ public class GroupServer2 {
         // Start listener
         System.out.println("Start the listener");
         Server.run();
-    }
-    
-    static void getKeyList()
-    {
-         //**************************************************************************************
-        //**************************************************************************************
-        //GSKey List
-        ObjectInputStream userStream;
-        ObjectInputStream groupStream;
-        final int RSAKEYSIZE = 2048;
-        
-        try {
-            FileInputStream fis = new FileInputStream(GS_KEYS);
-            userStream = new ObjectInputStream(fis);
-            KEY = (KeyPair)userStream.readObject();
-            userStream.close();
-            fis.close();
-            System.out.println("Loaded keys.");
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("GSKeyList File Does Not Exist. Creating GSKeyList...");
-            // create the keys
-            try {
-                    KeyPairGenerator keyGenRSA = KeyPairGenerator.getInstance("RSA", "BC");
-                    SecureRandom keyGenRandom = new SecureRandom();
-                    byte bytes[] = new byte[20];
-                    keyGenRandom.nextBytes(bytes);
-                    keyGenRSA.initialize(RSAKEYSIZE, keyGenRandom);
-                    KEY = keyGenRSA.generateKeyPair();
-                    System.out.println("Created keys.");
-            }
-            catch (Exception ee) {
-                    System.err.println("Error generating RSA keys.");
-                    ee.printStackTrace(System.err);
-                    System.exit(-1);
-            }
-            // save the keys
-            System.out.println("Saving GSKeyList...");
-            ObjectOutputStream keyOut;
-            try {
-                    keyOut = new ObjectOutputStream(new FileOutputStream(GS_KEYS));
-                    keyOut.writeObject(KEY);
-                    keyOut.close();
-            }
-            catch(Exception ee) {
-                    System.err.println("Error writing to GSKeyList.");
-                    ee.printStackTrace(System.err);
-                    System.exit(-1);
-            }
-        }
-        catch (Exception e) {
-                System.out.println("Error reading from GSKeyList file");
-                System.exit(-1);
-        }
     }
 }

@@ -394,11 +394,56 @@ public class GroupServer2 {
         {
             public Message Decode(Object o)
             {
-                return (Message) o;
+                if(o == null)
+                    return null;
+                
+                Message Request = (Message) o;
+                String Command = Request.getMessage();
+                ArrayList<Object> Content = Request.getObjCont();
+                
+                if(Command == GS_LOGIN)
+                {
+                    // login option: no token, get userinfo to send to authToken
+                    User UserInfo = Account.getUser((String)Content.get(GS_LOGIN_USER_NAME));
+                    // Make a token from stored info                    
+                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+                    // Authenticate
+                    if(authToken((UserTokenImp)Token, UserInfo))
+                        return Request;
+                    else
+                        return null;
+                }
+                else
+                {
+                    // Get the token
+                    UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
+                    // Authenticate
+                    if(authToken((UserTokenImp)Token, null))
+                        return Request;
+                    else
+                        return null;
+                }
             }
             
             public Object Encode(Message o)
             {
+                // Sign the token in the message
+                if(o.getMessage()==GS_SUCCESS)
+                {
+                    // Make a new message
+                    Message Response = new Message(o.getMessage());
+                    // Get object array
+                    ArrayList<Object> Content = o.getObjCont();
+                    // Get the token
+                    UserToken Token = (UserToken) Content.get(GS_SUCCESS_USER_TOKEN);
+                    // Attach the signed token
+                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token));
+                    // Attach rest of object array
+                    for(int i = GS_SUCCESS_USER_TOKEN; i<Content.size(); i++)
+                        Response.addObject(Content.get(i));
+                    
+                    return (Object) Response;
+                }
                 return (Object) o;
             }
         };

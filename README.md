@@ -29,4 +29,4 @@ A simple file sharing service with a file management server, user management ser
 2. On the left side, find Project panel and select Entry.java
 3. Right click Entry.java and click Run File. You can also press Shift+F6 in editor to run Entry.java if you already opened it
 4. You can find the output panel at the bottom of the NetBeans, follow the instruction to start one of the server
-5, Repeat steps 3 and 4 to start the other server and the client
+5. Repeat steps 3 and 4 to start the other server and the client

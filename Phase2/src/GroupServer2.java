@@ -165,7 +165,7 @@ public class GroupServer2 {
                 // Permission: registered user and OldPassword hash matches stored hash
                 if ((UserInfo != null) && Account.changePassword(Token.getSubject(), OldPassword, NewPassword)){
                     //  Create Message
-                    Response.addObject((UserTokenImp) Token);                
+                    Response.addObject((UserToken) Token);                
                 } else {
                     //  Return error message
                     System.out.println("Failed to change password, continue");
@@ -202,7 +202,7 @@ public class GroupServer2 {
                  //Checks the legitimacy of the token
 //                if (authToken((UserTokenImp)Token, null)){
                     //  Create Message
-                    Response.addObject((UserTokenImp) Token);
+                    Response.addObject((UserToken) Token);
                     Response.addObject((String) UserName);
 //                }
 //                else{

@@ -14,8 +14,6 @@ public class Entry {
     static ClientFramework GroupServer = new ClientFramework("Start group server") {
         @Override
         public void run() {
-            
-            Security.addProvider(new BouncyCastleProvider());
             Scanner Input = new Scanner(System.in);
 
             System.out.println("Please enter the group server port");
@@ -69,6 +67,8 @@ public class Entry {
         Subtask.add(FileServer);
         Subtask.add(Client);
 
+        Security.addProvider(new BouncyCastleProvider());
+        
         if (args.length == 0) {
             Launcher.RegisterItem(Subtask);
             Launcher.run();

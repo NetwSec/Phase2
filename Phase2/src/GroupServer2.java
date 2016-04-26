@@ -50,17 +50,19 @@ public class GroupServer2 {
     public final static String GS_LOGIN = "login";      //login
     public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
     public final static int GS_LOGIN_USER_NAME = 1;     //String    User
-    public final static int GS_LOGIN_USER_PW = 2;     //String    User
+    public final static int GS_LOGIN_USER_PW = 2;       //byte[]    User
 
     public final static String GS_CHANGEPASS = "changepass"; //changepass
     public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
-//    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
-    public final static int GS_CHANGEPASS_OLD_PW = 1;        //String old pass
-    public final static int GS_CHANGEPASS_NEW_PW = 2;        //String new pass
+    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
+    public final static int GS_CHANGEPASS_OLD_PW = 2;        //byte[] old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 3;        //byte[] new pass
     
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
+    public final static int GS_ADDUSER_USER_PASSWD = 2; //byte[]    Password
+
 
     public final static String GS_ADDGROUP = "addgroup";//addgroup
     public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
@@ -102,14 +104,14 @@ public class GroupServer2 {
 
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
-            String PassWord = (String) Content.get(GS_LOGIN_USER_PW);
+            byte[] Password = (byte[]) Content.get(GS_LOGIN_USER_PW);
             User UserInfo = Account.getUser(UserName);
                         
             // Permission: only register user can login
             if (UserInfo != null) {
                 
                 // Compare the password hashes
-                if(Account.comparePasswords(PassWord, UserInfo))
+                if(Account.comparePasswords(Password, UserInfo))
                 {
                     // Passwords match
                     
@@ -151,9 +153,9 @@ public class GroupServer2 {
             Message Response = new Message(GS_SUCCESS);
 
             UserToken Token = (UserToken) Content.get(GS_CHANGEPASS_USER_TOKEN);
-//            String Username = (String) Content.get(GS_CHANGEPASS_USER_NAME);
-            String OldPassword = (String) Content.get(GS_CHANGEPASS_OLD_PW);
-            String NewPassword = (String) Content.get(GS_CHANGEPASS_NEW_PW);
+            String Username = (String) Content.get(GS_CHANGEPASS_USER_NAME);
+            byte[] OldPassword = (byte[]) Content.get(GS_CHANGEPASS_OLD_PW);
+            byte[] NewPassword = (byte[]) Content.get(GS_CHANGEPASS_NEW_PW);
             User UserInfo = Account.getUser(Token.getSubject());
 
             //Checks the legitimacy of the token
@@ -177,8 +179,6 @@ public class GroupServer2 {
         }
     }
     
-    private static String DEFAULT_USER_PASSWORD = "cs3326";
-    
     static class adduserCallback implements ServerFramework.ServerCallback {
 
         @Override
@@ -189,12 +189,13 @@ public class GroupServer2 {
 
             UserToken Token = (UserToken) Content.get(GS_ADDUSER_USER_TOKEN);
             String UserName = (String) Content.get(GS_ADDUSER_USER_NAME);
+            byte[] Password = (byte[]) Content.get(GS_ADDUSER_USER_PASSWD);
             User UserInfo = Account.getUser(Token.getSubject());
 
             // Permission: admin
             if ((UserInfo != null)
                     && (UserInfo.getGroups().contains(GS_ADMIN_GROUP))
-                    && (Account.addUser(UserName, DEFAULT_USER_PASSWORD))) {
+                    && (Account.addUser(UserName, Password))) {
                 
                  //Checks the legitimacy of the token
                 if (authToken((UserTokenImp)Token, null)){
@@ -207,7 +208,6 @@ public class GroupServer2 {
                     System.out.println("Failed to authenticate token, continue");
                     Response = GenerateErrorMessage(Content);
                 }
-                
             } else {
                 //  Return error message
                 System.out.println("Failed to add user, continue");

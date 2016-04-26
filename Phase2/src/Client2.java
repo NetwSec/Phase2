@@ -70,13 +70,14 @@ public class Client2 {
 
     public final static String GS_CHANGEPASS = "changepass"; //changepass
     public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
-//    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
-    public final static int GS_CHANGEPASS_OLD_PW = 1;        //String old pass
-    public final static int GS_CHANGEPASS_NEW_PW = 2;        //String new pass
+    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
+    public final static int GS_CHANGEPASS_OLD_PW = 2;        //byte[] old pass
+    public final static int GS_CHANGEPASS_NEW_PW = 3;        //byte[] new pass
 
     public final static String GS_ADDUSER = "adduser";  //adduser
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
+    public final static int GS_ADDUSER_USER_PASSWD = 2; //byte[]    Password
 
     public final static String GS_ADDGROUP = "addgroup";//addgroup
     public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
@@ -156,13 +157,13 @@ public class Client2 {
         }
     }
 
-    static boolean getToken(String UserName, String PassWord) {
+    static boolean getToken(String UserName, String Password) {
         Message Login = new Message(GS_LOGIN);
         // Create Message header
         Login.addObject((UserToken) null);
         Login.addObject((String) UserName);
-        Login.addObject((String) PassWord);
-//        Login.addObject((byte[]) getHash(PassWord));
+        Crypto crypto = new Crypto();
+        Login.addObject((byte[]) crypto.getHash(Password));
 
         //  Send message
         try {
@@ -299,8 +300,10 @@ public class Client2 {
 
         // Create Message header
         Upload.addObject((UserToken) token);
-        Upload.addObject((String) oldPassword);
-        Upload.addObject((String) newPassword);
+        Upload.addObject((String) token.getSubject());
+        Crypto crypto = new Crypto();
+        Upload.addObject((byte[]) crypto.getHash(oldPassword));
+        Upload.addObject((byte[]) crypto.getHash(newPassword));
 
         //  Send message
         try {
@@ -344,14 +347,14 @@ public class Client2 {
         }
     };
     
-    
-    
-    static boolean createUser(UserToken token, String Username) {
+    static boolean createUser(UserToken token, String Username, String Password) {
         Message Upload = new Message(GS_ADDUSER);
 
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) Username);
+        Crypto crypto = new Crypto();
+        Upload.addObject((byte[]) crypto.getHash(Password));
 
         //  Send message
         try {
@@ -383,9 +386,10 @@ public class Client2 {
 
             System.out.print("Please enter the user name: ");
             String Username = Input.nextLine();
-            System.out.println("A default password will be set.");
+            System.out.print("Please enter the password: ");
+            String Password = Input.nextLine();
 
-            if (!createUser(Token, Username)) {
+            if (!createUser(Token, Username, Password)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");

@@ -74,6 +74,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate token.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");
@@ -114,6 +120,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");
@@ -160,6 +172,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate token.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");

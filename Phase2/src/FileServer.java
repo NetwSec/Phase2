@@ -220,10 +220,6 @@ public class FileServer {
         return Response;
     }
     
-    static Socket GServer;
-    static ObjectInputStream GInput;
-    static ObjectOutputStream GOutput;
-
     public static int FS_PORT = 8766;
     public static String FS_STORAGE = System.getProperty("user.dir") + File.separator + "FileServer";
     
@@ -257,7 +253,6 @@ public class FileServer {
     
     public static boolean authenticate(UserToken Token)
     {
-        
         String issuer = Token.getIssuer();
                 
         if(!issuer.equals(GS_IDENTITY))
@@ -265,10 +260,9 @@ public class FileServer {
             return false;
         }
         
+        SecureSocket GServer;
         try {
-            GServer = new Socket(issuer, Client2.GS_PORT);
-            GOutput = new ObjectOutputStream(GServer.getOutputStream());
-            GInput = new ObjectInputStream(GServer.getInputStream());
+            GServer = new SecureSocket(issuer, Client2.GS_PORT);
         } catch (Exception e) {
             return false;
         }
@@ -282,8 +276,7 @@ public class FileServer {
         System.out.println("Token contents: " + test.getContents());
         //  Send message
         try {
-            GOutput.writeObject(Authenticate);
-            GOutput.flush();
+            GServer.send(Authenticate);
         } catch (Exception ex) {
             return false;
         }
@@ -291,7 +284,7 @@ public class FileServer {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -299,13 +292,6 @@ public class FileServer {
         System.out.println("FS: I got a response: " + Response.getMessage());
         
         boolean result = Response.getMessage().equals(GroupServer2.GS_SUCCESS);
-        
-        try {
-            GInput.close();
-            GOutput.close();
-            GServer.close();
-        } catch (Exception ex) {
-        }
         
         return result;
     }

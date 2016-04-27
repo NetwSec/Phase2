@@ -34,7 +34,7 @@ public class SecureSocket {
         Input = new ObjectInputStream(Connection.getInputStream());
     }
     
-    boolean connect()
+    public boolean connect()
     {
         try
         {
@@ -61,12 +61,11 @@ public class SecureSocket {
         return true;
     }
     
-    boolean listen()
+    public boolean listen()
     {
         try
         {
             Crypto crypto = new Crypto();
-            KeyPair Pair = crypto.createKeyPair();
             
             //1a. client send public_c
             PublicKey RemoteKey = (PublicKey) Input.readUnshared();
@@ -98,34 +97,19 @@ public class SecureSocket {
         return true;
     }
 
-    boolean send(Object o)
+    public void send(Object o) throws Exception
     {
-        try
-        {
-            Crypto crypto = new Crypto();
-            byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(o));
-            Output.writeUnshared(EncryptedData);
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+        Crypto crypto = new Crypto();
+        byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(o));
+        Output.writeUnshared(EncryptedData);
     }
     
-    Object receive()
+    public Object receive() throws Exception
     {
         Object Response = null;
-        try
-        {
-            byte[] EncryptedData = (byte[]) Input.readUnshared();
-            Crypto crypto = new Crypto();
-            Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
-        }
-        catch (Exception e)
-        {
-            
-        }
+        byte[] EncryptedData = (byte[]) Input.readUnshared();
+        Crypto crypto = new Crypto();
+        Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
         return Response;
     }
 }

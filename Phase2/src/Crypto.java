@@ -59,4 +59,44 @@ public class Crypto {
             return null;
         }
     }
+    
+    byte[] RSA(int EncryptMode, Key EncryptionKey, byte[] Content)
+    {
+        try { 
+            Cipher cipher = Cipher.getInstance("RSA/CBC/PKCS5Padding", "BC");
+            cipher.init(EncryptMode, EncryptionKey);
+            return cipher.doFinal(Content);
+        } catch (Exception ex) {
+        }
+        return null;
+    }
+    
+    byte[] AES(int EncryptMode, Key EncryptionKey, byte[] Content)
+    {
+        try { 
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
+            cipher.init(EncryptMode, EncryptionKey);
+            return cipher.doFinal(Content);
+        } catch (Exception ex) {
+        }
+        return null;
+    }
+    
+    static KeyPair createKeyPair()
+    {
+        KeyPair Key = null;
+        final int RSAKEYSIZE = 2048;
+        try {
+                KeyPairGenerator keyGenRSA = KeyPairGenerator.getInstance("RSA", "BC");
+                SecureRandom keyGenRandom = new SecureRandom();
+                byte bytes[] = new byte[20];
+                keyGenRandom.nextBytes(bytes);
+                keyGenRSA.initialize(RSAKEYSIZE, keyGenRandom);
+                Key = keyGenRSA.generateKeyPair();
+        }
+        catch (Exception e) {
+                Key = null;
+        }
+        return Key;
+    }
 }

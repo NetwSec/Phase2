@@ -1,6 +1,7 @@
 
 import java.security.KeyPair;
 import java.security.Signature;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserToken implements java.io.Serializable {
@@ -10,12 +11,14 @@ public class UserToken implements java.io.Serializable {
     private String subject; //Holds the subject/user requesting the token
     private List<String> group; //Holds list of memberships of the subject
     private byte[] signature;   //Holds signature of token issued by the server
+    private LocalDateTime timestamp;
 
     //Constructor with 2 parameters
     public UserToken(String issuer, User UserInfo) {
         this.issuer = issuer;
         this.subject = UserInfo.getName();
         this.group = UserInfo.getGroups();
+        this.timestamp = UserInfo.getTimestamp();
     }
 
     //return issuer of this token
@@ -43,6 +46,7 @@ public class UserToken implements java.io.Serializable {
         for (int i = 0; i < group.size(); i++) {
                 contents.append(group.get(i));
         }
+        contents.append(getTimestamp());
         return contents.toString();
     }
     
@@ -83,5 +87,12 @@ public class UserToken implements java.io.Serializable {
                 e.printStackTrace(System.err);
             }
             return false;  
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public LocalDateTime getTimestamp() {
+        return timestamp;
     }
 }

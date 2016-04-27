@@ -8,6 +8,7 @@ import java.io.ObjectOutputStream;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.Signature;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -193,6 +194,7 @@ class User implements java.io.Serializable {
     private byte[] password;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
+    private LocalDateTime timestamp;
 
     public User(String username, byte[] passwd) {
         name = username;
@@ -227,18 +229,20 @@ class User implements java.io.Serializable {
             return false;
         }
         groups.add(group);
+        this.updateTimestamp();
         return true;
     }
 
     // If you are not in the group, you lose your ownership
     public boolean removeGroup(String group) {
+        this.removeOwnership(group);
         if (!groups.isEmpty()) {
             if (groups.contains(group)) {
                 groups.remove(group.indexOf(group));
+                this.updateTimestamp();
                 return true;
             }
         }
-        this.removeOwnership(group);
         return false;
     }
 
@@ -249,6 +253,7 @@ class User implements java.io.Serializable {
         }
         ownerships.add(group);
         this.addGroup(group);
+        this.updateTimestamp();
         return true;
     }
 
@@ -256,6 +261,7 @@ class User implements java.io.Serializable {
         if (!ownerships.isEmpty()) {
             if (ownerships.contains(group)) {
                 ownerships.remove(ownerships.indexOf(group));
+                this.updateTimestamp();
                 return true;
             }
         }
@@ -270,5 +276,24 @@ class User implements java.io.Serializable {
                 contents.append(groups.get(i));
         }
         return contents.toString();
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+    
+    public void updateTimestamp()
+    {
+        timestamp = LocalDateTime.now();
     }
 }

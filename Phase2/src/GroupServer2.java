@@ -318,15 +318,15 @@ public class GroupServer2 {
             UserToken Token = (UserToken) Content.get(GS_AUTH_FS_TOKEN);
             User UserInfo = Account.getUser(Token.getSubject());
             
-            if(!Token.authToken(Account.Key)){
+            if(Token.authToken(Account.Key) && Token.getTimestamp().equals(UserInfo.getTimestamp())){
+                System.out.println("GS authentication successful!");
+                System.out.println("Token contents: " + Token.getContents());
+            }
+            else{
                 Response = GenerateErrorMessage(Content);
                 System.out.println("GS authentication failed");
                 System.out.println("Token contents: " + Token.getContents());
                 System.out.println("Token signature: " + Token.getSignature());
-            }
-            else{
-                System.out.println("GS authentication successful!");
-                System.out.println("Token contents: " + Token.getContents());
             }
             
             return Response;

@@ -3,7 +3,7 @@ import java.security.KeyPair;
 import java.security.Signature;
 import java.util.List;
 
-public class UserTokenImp implements UserToken, java.io.Serializable {
+public class UserToken implements java.io.Serializable {
 
     //Declared Variable
     private String issuer;  //Holds the issuer/server name
@@ -12,19 +12,17 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
     private byte[] signature;   //Holds signature of token issued by the server
 
     //Constructor with 2 parameters
-    public UserTokenImp(String issuer, User UserInfo) {
+    public UserToken(String issuer, User UserInfo) {
         this.issuer = issuer;
         this.subject = UserInfo.getName();
         this.group = UserInfo.getGroups();
     }
 
-    @Override
     //return issuer of this token
     public String getIssuer() {
         return issuer;
     }
 
-    @Override
     //return the subject of this token
     public String getSubject() {
         return subject;
@@ -34,7 +32,6 @@ public class UserTokenImp implements UserToken, java.io.Serializable {
         return signature;
     }
 
-    @Override
     //return the list of group memberships encoded in this token
     public List<String> getGroups() {
         return group;

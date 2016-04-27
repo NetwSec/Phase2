@@ -62,7 +62,7 @@ public class FileServer {
     static class listCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a list message");
 
             Message Response = new Message(FS_VIEW);
@@ -102,7 +102,7 @@ public class FileServer {
     static class downloadCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a download message");
 
             Message Response = new Message(FS_UPLOAD);
@@ -148,7 +148,7 @@ public class FileServer {
     static class uploadCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received an upload message");
 
             Message Response = new Message(FS_SUCCESS);

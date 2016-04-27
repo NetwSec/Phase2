@@ -358,6 +358,7 @@ public class GroupServer2 {
         System.out.println("Initalize group server");
         ServerFramework Server = new ServerFramework(GS_PORT)
         {
+            @Override
             public Message Decode(Object o)
             {
                 Message Request = (Message) o;
@@ -366,7 +367,7 @@ public class GroupServer2 {
                     String Command = Request.getMessage();
                     ArrayList<Object> Content = Request.getObjCont();
 
-                    if(!Command.equals(GS_LOGIN) && !Command.equals(GS_LOGIN))
+                    if(!Command.equals(GS_LOGIN) && !Command.equals(GS_AUTH))
                     {
                         // Get the token
                         UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
@@ -380,6 +381,7 @@ public class GroupServer2 {
                 return Request;
             }
             
+            @Override
             public Object Encode(Message o)
             {
                 // Sign the token in the message

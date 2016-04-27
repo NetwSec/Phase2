@@ -225,10 +225,6 @@ public class FileServer {
     
     public static String GS_IDENTITY = "127.0.0.1";
 
-    FileServer(int Port) {
-        FS_PORT = Port;
-    }
-
     public static void run() {
         // Create instances
         System.out.println("Initalize file server");

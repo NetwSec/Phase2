@@ -348,11 +348,7 @@ public class GroupServer2 {
     public static String GS_ADMIN_GROUP = "admin";
     public static String GS_FILE_SERVER_GROUP = "file";
     public static UserList Account;
-
-    GroupServer2(int Port) {
-        GS_PORT = Port;
-    }
-
+    
     public static void run() {
         // Create instances
         System.out.println("Initalize group server");

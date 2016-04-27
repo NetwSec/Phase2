@@ -199,14 +199,7 @@ public class Client2 {
                 GS_ADDRESS = "localhost";
             }
 
-            System.out.println("Please enter the group server port");
-            System.out.print("Default[8765]: ");
-            String GPort = Input.nextLine();
-            try {
-                GS_PORT = Integer.parseInt(GPort);
-            } catch (Exception e) {
-                GS_PORT = 8765;
-            }
+            GS_PORT = 8765;
 
             System.out.println("Please enter the file server address");
             System.out.print("Default[localhost]: ");
@@ -215,14 +208,7 @@ public class Client2 {
                 FS_ADDRESS = "localhost";
             }
 
-            System.out.println("Please enter the file server port");
-            System.out.print("Default[8766]: ");
-            String FPort = Input.nextLine();
-            try {
-                FS_PORT = Integer.parseInt(FPort);
-            } catch (Exception e) {
-                FS_PORT = 8766;
-            }
+            FS_PORT = 8766;
 
             // 2. Connect to remote servers
             if (!connect()) {

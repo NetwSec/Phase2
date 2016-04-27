@@ -226,6 +226,8 @@ public class FileServer {
 
     public static int FS_PORT = 8766;
     public static String FS_STORAGE = System.getProperty("user.dir") + File.separator + "FileServer";
+    
+    public static String GS_IDENTITY = "127.0.0.1";
 
     FileServer(int Port) {
         FS_PORT = Port;
@@ -255,9 +257,16 @@ public class FileServer {
     
     public static boolean authenticate(UserToken Token)
     {
-        System.out.println("I'm authenticating the token");
+        
+        String issuer = Token.getIssuer();
+                
+        if(!issuer.equals(GS_IDENTITY))
+        {
+            return false;
+        }
+        
         try {
-            GServer = new Socket(Client2.GS_ADDRESS, Client2.GS_PORT);
+            GServer = new Socket(issuer, Client2.GS_PORT);
             GOutput = new ObjectOutputStream(GServer.getOutputStream());
             GInput = new ObjectInputStream(GServer.getInputStream());
         } catch (Exception e) {

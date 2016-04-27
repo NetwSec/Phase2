@@ -201,6 +201,7 @@ class User implements java.io.Serializable {
         password = passwd;
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
+        updateTimestamp();
     }
 
     public String getName() {
@@ -210,6 +211,7 @@ class User implements java.io.Serializable {
     public void setPassword(byte[] passwd)
     {
         password = passwd;
+        this.updateTimestamp();
     }
     public byte[] getPassword()
     {

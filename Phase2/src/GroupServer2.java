@@ -71,6 +71,10 @@ public class GroupServer2 {
     public final static int GS_VIEW_USER_TOKEN = 0;     //UserToken Token
     public final static int GS_VIEW_GROUP_NAME = 1;     //String    Group
     public final static int GS_VIEW_USER_LIST = 2;      //String[]  List
+    
+    public final static String GS_AUTH = "auth";
+    public final static int GS_AUTH_FS_TOKEN = 0;
+    public final static int GS_AUTH_USER_NAME = 1;
 
     public final static String GS_SUCCESS = "success";  //success
     public final static int GS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
@@ -301,6 +305,34 @@ public class GroupServer2 {
             return Response;
         }
     }
+    
+    static class authCallback implements ServerFramework.ServerCallback {
+
+        @Override
+        public Message CallbackProc(Socket FS, ArrayList<Object> Content) {
+            // Received an authentication message
+            
+            System.out.println("I'm in the GS auth");
+            Message Response = new Message(GS_SUCCESS);
+            
+            UserTokenImp Token = (UserTokenImp) Content.get(GS_AUTH_FS_TOKEN);
+            User UserInfo = Account.getUser(Token.getSubject());
+            
+            if(!((UserTokenImp)Token).authToken(Account.Key)){
+                Response = GenerateErrorMessage(Content);
+                System.out.println("GS authentication failed");
+                System.out.println("Token contents: " + Token.getContents());
+                System.out.println("Token signature: " + Token.getSignature());
+            }
+            else{
+                System.out.println("GS authentication successful!");
+                System.out.println("Token contents: " + Token.getContents());
+            }
+            
+            return Response;
+            
+        }
+    }
 
     static public Message GenerateErrorMessage(ArrayList<Object> Content) {
         Message Response = new Message(GS_ERROR);
@@ -376,6 +408,7 @@ public class GroupServer2 {
         addgroupCallback addgroup = new addgroupCallback();
         mgntCallback mgnt = new mgntCallback();
         listgroupCallback listgroup = new listgroupCallback();
+        authCallback auth = new authCallback();
 
         // Register callbacks
         System.out.println("Register messages");
@@ -385,6 +418,7 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_ADDGROUP, addgroup);
         Server.RegisterMessage(GS_MGNT, mgnt);
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
+        Server.RegisterMessage(GS_AUTH, auth);
         
         // Initalize account information
         File FileHandle = new File(GS_STORAGE);

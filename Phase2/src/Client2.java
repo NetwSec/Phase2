@@ -273,12 +273,8 @@ public class Client2 {
 
     static void disconnect() {
         try {
-            GInput.close();
-            GOutput.close();
-            GServer.close();
-            FInput.close();
-            FOutput.close();
-            FServer.close();
+            GServer = null;
+            FServer = null;
         } catch (Exception ex) {
         }
     }

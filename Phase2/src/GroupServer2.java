@@ -366,7 +366,7 @@ public class GroupServer2 {
                     String Command = Request.getMessage();
                     ArrayList<Object> Content = Request.getObjCont();
 
-                    if(!Command.equals(GS_LOGIN))
+                    if(!Command.equals(GS_LOGIN) && !Command.equals(GS_LOGIN))
                     {
                         // Get the token
                         UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);

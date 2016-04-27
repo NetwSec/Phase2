@@ -106,7 +106,7 @@ public class GroupServer2 {
                 {
                     // Passwords match
                     // Make a token from stored info                    
-                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+                    UserToken Token = new UserToken(GS_IDENTITY, UserInfo);
                     Response.addObject((UserToken) Token);
                     Response.addObject((String) UserName);
                 }
@@ -219,7 +219,7 @@ public class GroupServer2 {
             // Get new UserInfo with updated ownership
             UserInfo = Account.getUser(Token.getSubject());
             // Get new token with updated ownership
-            Token = new UserTokenImp(GS_IDENTITY, UserInfo);
+            Token = new UserToken(GS_IDENTITY, UserInfo);
             Response.addObject((UserToken) Token); // Decode will sign it
             Response.addObject((String) GroupName);
 
@@ -250,7 +250,7 @@ public class GroupServer2 {
                 //  Create Message
                 // If managing user added/removed themselves, get their new token
                 if (UserName.equals(Token.getSubject())) {
-                    Token = new UserTokenImp(GS_IDENTITY, Account.getUser(UserName));
+                    Token = new UserToken(GS_IDENTITY, Account.getUser(UserName));
                 }
 
                 // Send back new signed token so future actions are properly authorized
@@ -315,10 +315,10 @@ public class GroupServer2 {
             System.out.println("I'm in the GS auth");
             Message Response = new Message(GS_SUCCESS);
             
-            UserTokenImp Token = (UserTokenImp) Content.get(GS_AUTH_FS_TOKEN);
+            UserToken Token = (UserToken) Content.get(GS_AUTH_FS_TOKEN);
             User UserInfo = Account.getUser(Token.getSubject());
             
-            if(!((UserTokenImp)Token).authToken(Account.Key)){
+            if(!Token.authToken(Account.Key)){
                 Response = GenerateErrorMessage(Content);
                 System.out.println("GS authentication failed");
                 System.out.println("Token contents: " + Token.getContents());
@@ -371,7 +371,7 @@ public class GroupServer2 {
                         // Get the token
                         UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
                         // Authenticate
-                        if(!((UserTokenImp)Token).authToken(Account.Key))
+                        if(!Token.authToken(Account.Key))
                         {
                             Request = null;
                         }
@@ -392,7 +392,7 @@ public class GroupServer2 {
                     // Get the token
                     UserToken Token = (UserToken) Content.get(GS_SUCCESS_USER_TOKEN);
                     // Attach the signed token
-                    ((UserTokenImp)Token).signToken(Account.Key);
+                    Token.signToken(Account.Key);
                     Response.addObject((UserToken) Token);
                     // Attach rest of object array
                     for(int i = GS_SUCCESS_USER_TOKEN; i<Content.size(); i++)

@@ -39,7 +39,7 @@ public class ServerFramework implements Runnable {
     // Since in Java we don't have function pointer, using interface instead
     public abstract interface ServerCallback {
 
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content);
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content);
     }
 
     // Using hashtable to hold callbacks
@@ -98,18 +98,15 @@ public class ServerFramework implements Runnable {
     // Service thread framework
     private class ServerDispatcher implements Runnable {
 
-        Socket Client;
+        SecureSocket Client;
         ServerFramework Server;
-        ObjectInputStream Input;
-        ObjectOutputStream Output;
 
         // Do not catch exception and keep running
         // Instead, let main thread knows we failed
         ServerDispatcher(Socket Connection, ServerFramework Base) throws Exception {
-            Client = Connection;
+            Client = new SecureSocket(Connection);
+            Client.listen();
             Server = Base;
-            Output = new ObjectOutputStream(Client.getOutputStream());
-            Input = new ObjectInputStream(Client.getInputStream());
         }
         
         // The service thread main proc
@@ -118,7 +115,7 @@ public class ServerFramework implements Runnable {
             while (true) {
                 try {
                     // Process the Message
-                    Message Request = Decode(Input.readObject());
+                    Message Request = Decode(Client.receive());
                     if (Request == null) {
                         System.out.println("Invalid message, close connection");
                         throw new UnsupportedOperationException("Invalid message.");
@@ -139,7 +136,7 @@ public class ServerFramework implements Runnable {
                         Response.addObject((UserToken) Token);
                         Response.addObject((String) RequestedGroup);
                         Response.addObject(new Exception("Unknown message"));
-                        Output.writeObject(Response);
+                        Client.send(Response);
                         continue;
                     }
 
@@ -147,15 +144,12 @@ public class ServerFramework implements Runnable {
                     Message Response = Callback.CallbackProc(Client, Content);
 
                     // Send response
-                    Output.reset();
-                    Output.writeObject(Encode(Response));
+                    Client.send(Encode(Response));
                 } catch (Exception e) {
                     try {
                         // Connection ended, clean up resource
                         System.out.println("Client terminated the connection, exit thread");
-                        Input.close();
-                        Output.close();
-                        Client.close();
+                        Client = null;
                         return;
                     } catch (Exception ex) {
                         // If we cannot free resources then just let them leak

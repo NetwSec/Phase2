@@ -42,7 +42,7 @@ import java.security.*;
  *
  * The Client2 consists 10 standard subroutines, 1 run() method to start the main
  * ClientFramework class, and other 10 ClientFramework in following topology:
- * 
+ *
  * [Welcome] - [Log In] - [Main Menu] - [Add User]
  *           L Exit                   L [Add Group]
  *                                    L [User Management]
@@ -144,13 +144,11 @@ public class Client2 {
     // Common services
     static boolean connect() {
         try {
-            GServer = new Socket(GS_ADDRESS, GS_PORT);
-            GOutput = new ObjectOutputStream(GServer.getOutputStream());
-            GInput = new ObjectInputStream(GServer.getInputStream());
+            GServer = new SecureSocket(GS_ADDRESS, GS_PORT);
+            GServer.connect();
 
-            FServer = new Socket(FS_ADDRESS, FS_PORT);
-            FOutput = new ObjectOutputStream(FServer.getOutputStream());
-            FInput = new ObjectInputStream(FServer.getInputStream());
+            FServer = new SecureSocket(FS_ADDRESS, FS_PORT);
+            FServer.connect();
             return true;
         } catch (Exception e) {
             return false;
@@ -167,8 +165,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Login);
-            GOutput.flush();
+            GServer.send(Login);
         } catch (Exception ex) {
             return false;
         }
@@ -176,7 +173,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -188,7 +185,7 @@ public class Client2 {
         }
         return false;
     }
-    
+
     static ClientFramework Login = new ClientFramework("Log in") {
         @Override
         public void run() {
@@ -243,9 +240,9 @@ public class Client2 {
                 // Get password
                 System.out.print("Please enter your password: ");
                 String PassWord = Input.nextLine();
-                
+
                 // See if we can get the token
-                if (getToken(UserName, PassWord)) { 
+                if (getToken(UserName, PassWord)) {
                     break;
                 }
 
@@ -276,12 +273,8 @@ public class Client2 {
 
     static void disconnect() {
         try {
-            GInput.close();
-            GOutput.close();
-            GServer.close();
-            FInput.close();
-            FOutput.close();
-            FServer.close();
+            GServer = null;
+            FServer = null;
         } catch (Exception ex) {
         }
     }
@@ -294,9 +287,8 @@ public class Client2 {
     };
 
     // Group server services
-    static boolean changePassword(UserToken token, String oldPassword, String newPassword)
-    {
-         Message Upload = new Message(GS_CHANGEPASS);
+    static boolean changePassword(UserToken token, String oldPassword, String newPassword) {
+        Message Upload = new Message(GS_CHANGEPASS);
 
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -307,8 +299,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
+            GServer.send(Upload);
         } catch (Exception ex) {
             return false;
         }
@@ -316,7 +307,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -326,12 +317,12 @@ public class Client2 {
         } else {
             return true;
         }
-        
+
     }
     static ClientFramework ChangePassword = new ClientFramework("Change password") {
         @Override
         public void run() {
-            
+
             Scanner Input = new Scanner(System.in);
 
             System.out.print("Please enter the current password: ");
@@ -346,7 +337,7 @@ public class Client2 {
             }
         }
     };
-    
+
     static boolean createUser(UserToken token, String Username, String Password) {
         Message Upload = new Message(GS_ADDUSER);
 
@@ -358,8 +349,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
+            GServer.send(Upload);
         } catch (Exception ex) {
             return false;
         }
@@ -367,7 +357,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -381,7 +371,7 @@ public class Client2 {
     static ClientFramework AddUser = new ClientFramework("Create new user") {
         @Override
         public void run() {
-            
+
             Scanner Input = new Scanner(System.in);
 
             System.out.print("Please enter the user name: ");
@@ -406,8 +396,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
+            GServer.send(Upload);
         } catch (Exception ex) {
             return false;
         }
@@ -415,7 +404,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -463,8 +452,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
+            GServer.send(Upload);
         } catch (Exception ex) {
             return false;
         }
@@ -472,7 +460,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -547,8 +535,7 @@ public class Client2 {
 
         //  Send message
         try {
-            GOutput.writeObject(Upload);
-            GOutput.flush();
+            GServer.send(Upload);
         } catch (Exception ex) {
             return null;
         }
@@ -556,7 +543,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) GInput.readObject();
+            Response = (Message) GServer.receive();
         } catch (Exception ex) {
             return null;
         }
@@ -598,8 +585,7 @@ public class Client2 {
 
         //  Send message
         try {
-            FOutput.writeObject(Upload);
-            FOutput.flush();
+            FServer.send(Upload);
         } catch (Exception ex) {
             return null;
         }
@@ -607,7 +593,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) FInput.readObject();
+            Response = (Message) FServer.receive();
         } catch (Exception ex) {
             return null;
         }
@@ -666,8 +652,7 @@ public class Client2 {
 
         //  Send message
         try {
-            FOutput.writeObject(Upload);
-            FOutput.flush();
+            FServer.send(Upload);
         } catch (Exception ex) {
             return false;
         }
@@ -675,7 +660,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) FInput.readObject();
+            Response = (Message) FServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -713,8 +698,7 @@ public class Client2 {
 
         // Send the message
         try {
-            FOutput.writeObject(Download);
-            FOutput.flush();
+            FServer.send(Download);
         } catch (Exception ex) {
             return false;
         }
@@ -722,7 +706,7 @@ public class Client2 {
         //  Receive response
         Message Response;
         try {
-            Response = (Message) FInput.readObject();
+            Response = (Message) FServer.receive();
         } catch (Exception ex) {
             return false;
         }
@@ -778,13 +762,9 @@ public class Client2 {
     static String FS_ADDRESS = "localhost";
     static int FS_PORT = 8766;
 
-    static Socket GServer;
-    static ObjectInputStream GInput;
-    static ObjectOutputStream GOutput;
+    static SecureSocket GServer;
 
-    static Socket FServer;
-    static ObjectInputStream FInput;
-    static ObjectOutputStream FOutput;
+    static SecureSocket FServer;
 
     static UserToken Token;
 

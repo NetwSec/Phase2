@@ -86,7 +86,7 @@ public class GroupServer2 {
     static class loginCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a login message");
 
             Message Response = new Message(GS_SUCCESS);
@@ -128,7 +128,7 @@ public class GroupServer2 {
     static class changepassCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a change password message");
 
             Message Response = new Message(GS_SUCCESS);
@@ -156,7 +156,7 @@ public class GroupServer2 {
     static class adduserCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received an adduser message");
 
             Message Response = new Message(GS_SUCCESS);
@@ -186,7 +186,7 @@ public class GroupServer2 {
     static class addgroupCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received an addgroup message");
 
             Message Response = new Message(GS_SUCCESS);
@@ -229,7 +229,7 @@ public class GroupServer2 {
     static class mgntCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a mgnt message");
 
             Message Response = new Message(GS_SUCCESS);
@@ -263,7 +263,7 @@ public class GroupServer2 {
     static class listgroupCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket Client, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket Client, ArrayList<Object> Content) {
             System.out.println("Received a listgroup message");
 
             Message Response = new Message(GS_VIEW);

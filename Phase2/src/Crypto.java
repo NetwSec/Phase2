@@ -59,27 +59,12 @@ public class Crypto {
             return null;
         }
     }
-    
-    byte[] RSA(int EncryptMode, Key EncryptionKey, byte[] Content)
+
+    byte[] AES(int EncryptMode, Key EncryptionKey, byte[] Content) throws Exception
     {
-        try { 
-            Cipher cipher = Cipher.getInstance("RSA/CBC/PKCS5Padding", "BC");
-            cipher.init(EncryptMode, EncryptionKey);
-            return cipher.doFinal(Content);
-        } catch (Exception ex) {
-        }
-        return null;
-    }
-    
-    byte[] AES(int EncryptMode, Key EncryptionKey, byte[] Content)
-    {
-        try { 
-            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
-            cipher.init(EncryptMode, EncryptionKey);
-            return cipher.doFinal(Content);
-        } catch (Exception ex) {
-        }
-        return null;
+        Cipher cipher = Cipher.getInstance("AES", "BC");
+        cipher.init(EncryptMode, EncryptionKey);
+        return cipher.doFinal(Content);
     }
     
     static KeyPair createKeyPair()

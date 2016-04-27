@@ -34,7 +34,7 @@ public class SecureSocket {
         Input = new ObjectInputStream(Connection.getInputStream());
     }
     
-    boolean connect()
+    public boolean connect()
     {
         try
         {
@@ -44,27 +44,13 @@ public class SecureSocket {
             //1a. client send public_c
             Output.writeUnshared(Pair.getPublic());
             
-            //1b. server send public_c(public_s)
+            //2b. receive aes key
             byte[] EncryptedData = (byte[]) Input.readUnshared();
-            PublicKey RemoteKey = (PublicKey) crypto.convertFromBytes(crypto.RSA(Cipher.DECRYPT_MODE, Pair.getPrivate(), EncryptedData));
-            
-            //2a. generate aes key
-            KeyGenerator generator = KeyGenerator.getInstance("AES","BC");
-            // Initialize the generator for 128-bit key size
-            generator.init(128);
-            AESKey = generator.generateKey();
-            EncryptedData = crypto.RSA(Cipher.ENCRYPT_MODE, RemoteKey, crypto.convertToBytes(AESKey));
-            Output.writeUnshared(EncryptedData);
+            Cipher cipher = Cipher.getInstance("RSA", "BC");
+            cipher.init(Cipher.UNWRAP_MODE, Pair.getPrivate());
+            AESKey = (SecretKey) cipher.unwrap(EncryptedData, "RSA", Cipher.SECRET_KEY);
             
             //3b. shake hands
-            EncryptedData = (byte[]) Input.readUnshared();
-            PublicKey Hand = (PublicKey) crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
-            if (!Hand.equals(Pair.getPublic()))
-            {
-                throw new Exception("hand shaking failed");
-            }
-            
-            //3c. final
             EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes("success"));
             Output.writeUnshared(EncryptedData);
         }
@@ -75,26 +61,24 @@ public class SecureSocket {
         return true;
     }
     
-    boolean listen()
+    public boolean listen()
     {
         try
         {
             Crypto crypto = new Crypto();
-            KeyPair Pair = crypto.createKeyPair();
             
             //1a. client send public_c
             PublicKey RemoteKey = (PublicKey) Input.readUnshared();
             
-            //1b. server send public_c(public_s)
-            byte[] EncryptedData = crypto.RSA(Cipher.ENCRYPT_MODE, RemoteKey, crypto.convertToBytes(Pair.getPublic()));
-            Output.writeUnshared(EncryptedData);
+            //2a. generate aes key
+            KeyGenerator generator = KeyGenerator.getInstance("AES","BC");
+            // Initialize the generator for 128-bit key size
+            generator.init(128);
+            AESKey = generator.generateKey();
             
-            //2b. receive aes key
-            EncryptedData = (byte[]) Input.readUnshared();
-            AESKey = (SecretKey) crypto.convertFromBytes(crypto.RSA(Cipher.DECRYPT_MODE, Pair.getPrivate(), EncryptedData));
-            
-            //3a. shake hands
-            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(RemoteKey));
+            Cipher cipher = Cipher.getInstance("RSA", "BC");
+            cipher.init(Cipher.WRAP_MODE, RemoteKey);
+            byte[] EncryptedData = cipher.wrap(AESKey);
             Output.writeUnshared(EncryptedData);
             
             //3c. final
@@ -113,34 +97,19 @@ public class SecureSocket {
         return true;
     }
 
-    boolean send(Object o)
+    public void send(Object o) throws Exception
     {
-        try
-        {
-            Crypto crypto = new Crypto();
-            byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(o));
-            Output.writeUnshared(EncryptedData);
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+        Crypto crypto = new Crypto();
+        byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(o));
+        Output.writeUnshared(EncryptedData);
     }
     
-    Object receive()
+    public Object receive() throws Exception
     {
         Object Response = null;
-        try
-        {
-            byte[] EncryptedData = (byte[]) Input.readUnshared();
-            Crypto crypto = new Crypto();
-            Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
-        }
-        catch (Exception e)
-        {
-            
-        }
+        byte[] EncryptedData = (byte[]) Input.readUnshared();
+        Crypto crypto = new Crypto();
+        Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
         return Response;
     }
 }

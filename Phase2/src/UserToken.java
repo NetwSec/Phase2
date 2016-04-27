@@ -1,45 +1,87 @@
 
+import java.security.KeyPair;
+import java.security.Signature;
 import java.util.List;
 
-/**
- * A simple interface to the token data structure that will be returned by a
- * group server.
- *
- * You will need to develop a class that implements this interface so that your
- * code can interface with the tokens created by your group server.
- *
- */
-public interface UserToken {
+public class UserToken implements java.io.Serializable {
 
-    /**
-     * This method should return a string describing the issuer of this token.
-     * This string identifies the group server that created this token. For
-     * instance, if "Alice" requests a token from the group server "Server1",
-     * this method will return the string "Server1".
-     *
-     * @return The issuer of this token
-     *
-     */
-    public String getIssuer();
+    //Declared Variable
+    private String issuer;  //Holds the issuer/server name
+    private String subject; //Holds the subject/user requesting the token
+    private List<String> group; //Holds list of memberships of the subject
+    private byte[] signature;   //Holds signature of token issued by the server
 
-    /**
-     * This method should return a string indicating the name of the subject of
-     * the token. For instance, if "Alice" requests a token from the group
-     * server "Server1", this method will return the string "Alice".
-     *
-     * @return The subject of this token
-     *
-     */
-    public String getSubject();
+    //Constructor with 2 parameters
+    public UserToken(String issuer, User UserInfo) {
+        this.issuer = issuer;
+        this.subject = UserInfo.getName();
+        this.group = UserInfo.getGroups();
+    }
 
-    /**
-     * This method extracts the list of groups that the owner of this token has
-     * access to. If "Alice" is a member of the groups "G1" and "G2" defined at
-     * the group server "Server1", this method will return ["G1", "G2"].
-     *
-     * @return The list of group memberships encoded in this token
-     *
-     */
-    public List<String> getGroups();
+    //return issuer of this token
+    public String getIssuer() {
+        return issuer;
+    }
 
-}   //-- end interface UserToken
+    //return the subject of this token
+    public String getSubject() {
+        return subject;
+    }
+    
+    public byte[] getSignature(){
+        return signature;
+    }
+
+    //return the list of group memberships encoded in this token
+    public List<String> getGroups() {
+        return group;
+    }
+    
+    public String getContents() {
+        StringBuilder contents = new StringBuilder(issuer);
+        contents.append(subject);
+        for (int i = 0; i < group.size(); i++) {
+                contents.append(group.get(i));
+        }
+        return contents.toString();
+    }
+    
+    public boolean signToken(KeyPair key) {
+        try {
+            // Create the token's signature
+            Signature tokenSign = Signature.getInstance("SHA1WithRSA", "BC");
+            tokenSign.initSign(key.getPrivate());
+            tokenSign.update(this.getContents().getBytes());
+            signature = tokenSign.sign();
+            
+            return true;
+        }
+        catch (Exception e) {
+            System.err.println("Signing Error: " + e.getMessage());
+            e.printStackTrace(System.err);
+        }
+        return false;
+    }
+    
+    public boolean authToken(KeyPair key) {
+        
+        // TODO: can just always check signature from UserList if we make sure to always update it there
+
+        try {
+                // Signature verification
+                Signature signed = Signature.getInstance("SHA1WithRSA", "BC");
+                signed.initVerify(key.getPublic());
+                signed.update(this.getContents().getBytes());
+
+                if (signed.verify(this.getSignature())) {
+                    // RSA Signature verified
+                    return true;
+                }
+            }
+            catch (Exception e) {
+                System.err.println("Error: " + e.getMessage());
+                e.printStackTrace(System.err);
+            }
+            return false;  
+    }
+}

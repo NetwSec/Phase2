@@ -85,6 +85,16 @@ public class ServerFramework implements Runnable {
         }
     }
 
+    public Message Decode(Object o)
+    {
+        return (Message) o;
+    }
+
+    public Object Encode(Message o)
+    {
+        return (Object) o;
+    }
+    
     // Service thread framework
     private class ServerDispatcher implements Runnable {
 
@@ -100,16 +110,6 @@ public class ServerFramework implements Runnable {
             Server = Base;
             Output = new ObjectOutputStream(Client.getOutputStream());
             Input = new ObjectInputStream(Client.getInputStream());
-        }
-
-        public Message Decode(Object o)
-        {
-            return (Message) o;
-        }
-        
-        public Object Encode(Message o)
-        {
-            return (Object) o;
         }
         
         // The service thread main proc

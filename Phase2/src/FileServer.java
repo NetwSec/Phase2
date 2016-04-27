@@ -268,7 +268,7 @@ public class FileServer {
         Authenticate.addObject((UserToken) Token);
         Authenticate.addObject((String) Token.getSubject());
         
-        UserTokenImp test = (UserTokenImp) Token;
+        UserToken test = Token;
         System.out.println("FS: I'm about to send the message");
         System.out.println("Token contents: " + test.getContents());
         //  Send message

@@ -4,7 +4,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.PublicKey;
+import java.security.Signature;
 import java.util.ArrayList;
 
 /**
@@ -70,6 +74,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate token.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");
@@ -110,6 +120,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");
@@ -156,6 +172,12 @@ public class FileServer {
             try {
                 // Check permission
                 UserToken Token = (UserToken) Content.get(FS_DOWNLOAD_USER_TOKEN);
+                
+                // Authenticate token
+                if(!authenticate(Token)) {
+                    throw new Exception("Failed to authenticate token.");
+                }
+                
                 String Group = (String) Content.get(FS_DOWNLOAD_GROUP_NAME);
                 if (!Token.getGroups().contains(Group)) {
                     throw new Exception("Access denied.");
@@ -197,9 +219,15 @@ public class FileServer {
         Response.addObject(e);
         return Response;
     }
+    
+    static Socket GServer;
+    static ObjectInputStream GInput;
+    static ObjectOutputStream GOutput;
 
     public static int FS_PORT = 8766;
     public static String FS_STORAGE = System.getProperty("user.dir") + File.separator + "FileServer";
+    
+    public static String GS_IDENTITY = "127.0.0.1";
 
     FileServer(int Port) {
         FS_PORT = Port;
@@ -225,5 +253,60 @@ public class FileServer {
         // Start listener
         System.out.println("Start the listener");
         Server.run();
+    }
+    
+    public static boolean authenticate(UserToken Token)
+    {
+        
+        String issuer = Token.getIssuer();
+                
+        if(!issuer.equals(GS_IDENTITY))
+        {
+            return false;
+        }
+        
+        try {
+            GServer = new Socket(issuer, Client2.GS_PORT);
+            GOutput = new ObjectOutputStream(GServer.getOutputStream());
+            GInput = new ObjectInputStream(GServer.getInputStream());
+        } catch (Exception e) {
+            return false;
+        }
+        
+        Message Authenticate = new Message(GroupServer2.GS_AUTH);
+        Authenticate.addObject((UserToken) Token);
+        Authenticate.addObject((String) Token.getSubject());
+        
+        UserToken test = Token;
+        System.out.println("FS: I'm about to send the message");
+        System.out.println("Token contents: " + test.getContents());
+        //  Send message
+        try {
+            GOutput.writeObject(Authenticate);
+            GOutput.flush();
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GInput.readObject();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        System.out.println("FS: I got a response: " + Response.getMessage());
+        
+        boolean result = Response.getMessage().equals(GroupServer2.GS_SUCCESS);
+        
+        try {
+            GInput.close();
+            GOutput.close();
+            GServer.close();
+        } catch (Exception ex) {
+        }
+        
+        return result;
     }
 }

@@ -5,7 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.KeyPair;
 import java.security.MessageDigest;
+import java.security.Signature;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -27,6 +30,7 @@ public class UserList implements java.io.Serializable {
     private static final long SERIAL_VERSION_UID = 1L;
     private Hashtable<String, User> list;
     private String LocalStorage;
+    public KeyPair Key;
 
     UserList(String File) {
         LocalStorage = File;
@@ -38,6 +42,7 @@ public class UserList implements java.io.Serializable {
         try {
             outStream = new ObjectOutputStream(new FileOutputStream(LocalStorage));
             outStream.writeObject(list);
+            outStream.writeObject(Key);
         } catch (Exception ex) {
             return false;
         }
@@ -46,18 +51,23 @@ public class UserList implements java.io.Serializable {
 
     // Load list from LocalStorage
     // If the file doesn't exist, create it with an admin account
-    public boolean Load(String DefaultAdmin) {
+    public boolean Load(String DefaultAdmin, String DefaultFileServer) {
         try {
             // Try reading the file containing the user list
             FileInputStream fis = new FileInputStream(LocalStorage);
             ObjectInputStream userStream = new ObjectInputStream(fis);
             list = (Hashtable<String, User>) userStream.readObject();
+            Key = (KeyPair) userStream.readObject();
         } catch (FileNotFoundException e) {
             // No file available
-            System.out.println("UserList file does not exist. A default user will be created.");
+            System.out.println("UserList file does not exist. A default admin user will be created.");
             System.out.println("User name: " + DefaultAdmin);
             System.out.println("Password: " + DefaultAdmin);
             System.out.println("Group name: " + DefaultAdmin);
+            System.out.println("A default file server account will be created.");
+            System.out.println("User name: " + DefaultFileServer);
+            System.out.println("Password: " + DefaultFileServer);
+            System.out.println("Group name: " + DefaultFileServer);
             
             //Create new user list
             list = new Hashtable<String, User>();
@@ -68,6 +78,15 @@ public class UserList implements java.io.Serializable {
             addGroup(DefaultAdmin, DefaultAdmin);
             // Give ownership of Admin to current user
             addOwnerships(DefaultAdmin, DefaultAdmin);
+            
+            // Add current user to user list (username and password both file)
+            addUser(DefaultFileServer, crypto.getHash(DefaultFileServer));
+            // Add current user to File group
+            addGroup(DefaultFileServer, DefaultFileServer);
+            // Give ownership of File to admin
+            addOwnerships(DefaultAdmin, DefaultFileServer);
+            
+            Key = crypto.createKeyPair();
         } catch (IOException | ClassNotFoundException e) {
             // Other error
             return false;
@@ -131,24 +150,36 @@ public class UserList implements java.io.Serializable {
     }
 
     public synchronized boolean addGroup(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).addGroup(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean removeGroup(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).removeGroup(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean addOwnerships(String user, String groupname) {
+        if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).addOwnership(groupname);
         Save();
         return result;
     }
 
     public synchronized boolean removeOwnerships(String user, String groupname) {
+       if(list.get(user)==null)
+            return false;
+        
         boolean result = list.get(user).removeOwnership(groupname);
         Save();
         return result;
@@ -163,12 +194,14 @@ class User implements java.io.Serializable {
     private byte[] password;
     private ArrayList<String> groups;
     private ArrayList<String> ownerships;
+    private LocalDateTime timestamp;
 
     public User(String username, byte[] passwd) {
         name = username;
         password = passwd;
         groups = new ArrayList<String>();
         ownerships = new ArrayList<String>();
+        updateTimestamp();
     }
 
     public String getName() {
@@ -178,12 +211,13 @@ class User implements java.io.Serializable {
     public void setPassword(byte[] passwd)
     {
         password = passwd;
+        this.updateTimestamp();
     }
     public byte[] getPassword()
     {
         return password;
     }
-
+    
     public ArrayList<String> getGroups() {
         return groups;
     }
@@ -197,18 +231,20 @@ class User implements java.io.Serializable {
             return false;
         }
         groups.add(group);
+        this.updateTimestamp();
         return true;
     }
 
     // If you are not in the group, you lose your ownership
     public boolean removeGroup(String group) {
+        this.removeOwnership(group);
         if (!groups.isEmpty()) {
             if (groups.contains(group)) {
                 groups.remove(group.indexOf(group));
+                this.updateTimestamp();
                 return true;
             }
         }
-        this.removeOwnership(group);
         return false;
     }
 
@@ -219,6 +255,7 @@ class User implements java.io.Serializable {
         }
         ownerships.add(group);
         this.addGroup(group);
+        this.updateTimestamp();
         return true;
     }
 
@@ -226,9 +263,39 @@ class User implements java.io.Serializable {
         if (!ownerships.isEmpty()) {
             if (ownerships.contains(group)) {
                 ownerships.remove(ownerships.indexOf(group));
+                this.updateTimestamp();
                 return true;
             }
         }
         return false;
+    }
+     
+    private String getContents()
+    {
+        StringBuilder contents = new StringBuilder(GroupServer2.GS_IDENTITY);
+        contents.append(name);
+        for (int i = 0; i < groups.size(); i++) {
+                contents.append(groups.get(i));
+        }
+        return contents.toString();
+    }
+
+    /**
+     * @return the timestamp
+     */
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * @param timestamp the timestamp to set
+     */
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+    
+    public void updateTimestamp()
+    {
+        timestamp = LocalDateTime.now();
     }
 }

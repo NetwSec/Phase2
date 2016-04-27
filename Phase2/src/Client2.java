@@ -246,7 +246,7 @@ public class Client2 {
                     break;
                 }
 
-                System.out.println("Invalid user name or password. Please retry");
+                System.out.println("Invalid user name/password or authentication failure. Please retry");
             }
             System.out.println();
 
@@ -327,7 +327,7 @@ public class Client2 {
 
             System.out.print("Please enter the current password: ");
             String currentPass = Input.nextLine();
-            System.out.println("Please enter the new password: ");
+            System.out.print("Please enter the new password: ");
             String newPass = Input.nextLine();
 
             if (!changePassword(Token, currentPass, newPass)) {
@@ -413,7 +413,7 @@ public class Client2 {
             return false;
         } else {
             // Update token
-            UpdateToken((UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN));
+            UpdateToken((UserToken)Response.getObjCont().get(GS_SUCCESS_USER_TOKEN));
             return true;
         }
     }
@@ -470,6 +470,7 @@ public class Client2 {
         } else {
             // Update token
             if (token.getSubject().equals(UserName)) {
+                
                 UpdateToken((UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN));
             }
             return true;
@@ -527,7 +528,7 @@ public class Client2 {
 
     static List<String> listMembers(UserToken token, String group) {
         Message Upload = new Message(GS_LISTGROUP);
-
+        
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) group);

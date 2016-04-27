@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+//TESTING
 /**
  * A general message driven server class
  *
@@ -84,6 +85,16 @@ public class ServerFramework implements Runnable {
         }
     }
 
+    public Message Decode(Object o)
+    {
+        return (Message) o;
+    }
+
+    public Object Encode(Message o)
+    {
+        return (Object) o;
+    }
+    
     // Service thread framework
     private class ServerDispatcher implements Runnable {
 
@@ -96,16 +107,6 @@ public class ServerFramework implements Runnable {
             Client = new SecureSocket(Connection);
             Client.listen();
             Server = Base;
-        }
-
-        public Message Decode(Object o)
-        {
-            return (Message) o;
-        }
-        
-        public Object Encode(Message o)
-        {
-            return (Object) o;
         }
         
         // The service thread main proc

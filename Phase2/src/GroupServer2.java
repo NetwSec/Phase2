@@ -1,9 +1,7 @@
 
 import java.io.File;
 import java.net.Socket;
-import java.security.MessageDigest;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 
 /**
@@ -73,6 +71,10 @@ public class GroupServer2 {
     public final static int GS_VIEW_USER_TOKEN = 0;     //UserToken Token
     public final static int GS_VIEW_GROUP_NAME = 1;     //String    Group
     public final static int GS_VIEW_USER_LIST = 2;      //String[]  List
+    
+    public final static String GS_AUTH = "auth";
+    public final static int GS_AUTH_FS_TOKEN = 0;
+    public final static int GS_AUTH_USER_NAME = 1;
 
     public final static String GS_SUCCESS = "success";  //success
     public final static int GS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
@@ -94,7 +96,6 @@ public class GroupServer2 {
             // Get the user info
             String UserName = (String) Content.get(GS_LOGIN_USER_NAME);
             byte[] Password = (byte[]) Content.get(GS_LOGIN_USER_PW);
-//            byte[] PasswordHash = (byte[]) Content.get(GS_LOGIN_USER_PW);
             User UserInfo = Account.getUser(UserName);
                         
             // Permission: only register user can login
@@ -103,10 +104,9 @@ public class GroupServer2 {
                 // Compare the password hashes
                 if(Account.comparePasswords(Password, UserInfo))
                 {
-                    // Passwords match, return the token
-                    UserToken Token = new UserTokenImp(GS_IDENTITY, UserInfo);
-
-                    //  Create Message
+                    // Passwords match
+                    // Make a token from stored info                    
+                    UserToken Token = new UserToken(GS_IDENTITY, UserInfo);
                     Response.addObject((UserToken) Token);
                     Response.addObject((String) UserName);
                 }
@@ -148,7 +148,6 @@ public class GroupServer2 {
                 System.out.println("Failed to change password, continue");
                 Response = GenerateErrorMessage(Content);
             }
-
             return Response;
         }
     }
@@ -170,9 +169,9 @@ public class GroupServer2 {
             if ((UserInfo != null)
                     && (UserInfo.getGroups().contains(GS_ADMIN_GROUP))
                     && (Account.addUser(UserName, Password))) {
-                //  Create Message
-                Response.addObject((UserToken) Token);
-                Response.addObject((String) UserName);
+                    //  Create Message
+                    Response.addObject((UserToken) Token);
+                    Response.addObject((String) UserName);
             } else {
                 //  Return error message
                 System.out.println("Failed to add user, continue");
@@ -217,8 +216,11 @@ public class GroupServer2 {
             Account.addOwnerships(Token.getSubject(), GroupName);
 
             //  Create Message
-            Token = new UserTokenImp(GS_IDENTITY, UserInfo);
-            Response.addObject((UserToken) Token);
+            // Get new UserInfo with updated ownership
+            UserInfo = Account.getUser(Token.getSubject());
+            // Get new token with updated ownership
+            Token = new UserToken(GS_IDENTITY, UserInfo);
+            Response.addObject((UserToken) Token); // Decode will sign it
             Response.addObject((String) GroupName);
 
             return Response;
@@ -242,20 +244,25 @@ public class GroupServer2 {
 
             // Permission: owner
             if ((UserInfo != null)
-                    && (UserInfo.getOwnerships().contains(GroupName))
-                    && (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))) {
-                //  Create Message
-                if (UserName.equals(Token.getSubject())) {
-                    Token = new UserTokenImp(GS_IDENTITY, Account.getUser(UserName));
-                }
-                Response.addObject((UserToken) Token);
-                Response.addObject((String) GroupName);
-            } else {
-                //  Return error message
-                System.out.println("Failed to manage group member, continue");
-                Response = GenerateErrorMessage(Content);
-            }
+                && (UserInfo.getOwnerships().contains(GroupName))
+                && (Option == GS_MGNT_OPTION_ADD ? Account.addGroup(UserName, GroupName) : Account.removeGroup(UserName, GroupName))) {
 
+                //  Create Message
+                // If managing user added/removed themselves, get their new token
+                if (UserName.equals(Token.getSubject())) {
+                    Token = new UserToken(GS_IDENTITY, Account.getUser(UserName));
+                }
+
+                // Send back new signed token so future actions are properly authorized
+//                    Response.addObject((UserToken)getSignedToken((UserTokenImp)Token)); 
+                Response.addObject((UserToken) Token); // Decode will sign it 
+                Response.addObject((String) GroupName);
+            } 
+            else {
+            //  Return error message
+            System.out.println("Failed to manage group member, continue");
+            Response = GenerateErrorMessage(Content);
+            }
             return Response;
         }
     }
@@ -267,7 +274,7 @@ public class GroupServer2 {
             System.out.println("Received a listgroup message");
 
             Message Response = new Message(GS_VIEW);
-
+            
             UserToken Token = (UserToken) Content.get(GS_LISTGROUP_USER_TOKEN);
             String GroupName = (String) Content.get(GS_LISTGROUP_GROUP_NAME);
             User UserInfo = Account.getUser(Token.getSubject());
@@ -275,12 +282,14 @@ public class GroupServer2 {
             // Permission: owner
             if ((UserInfo != null)
                     && (UserInfo.getOwnerships().contains(GroupName))) {
+
                 ArrayList<String> UserList = new ArrayList<String>();
+
                 for (Enumeration<String> unList = Account.getUsernames(); unList.hasMoreElements();) {
                     String tUser = unList.nextElement();
                     if (Account.getUserGroups(tUser).contains(GroupName)) {
                         UserList.add(tUser);
-                    }
+                    }    
                 }
 
                 //  Create Message
@@ -296,6 +305,34 @@ public class GroupServer2 {
             return Response;
         }
     }
+    
+    static class authCallback implements ServerFramework.ServerCallback {
+
+        @Override
+        public Message CallbackProc(Socket FS, ArrayList<Object> Content) {
+            // Received an authentication message
+            
+            System.out.println("I'm in the GS auth");
+            Message Response = new Message(GS_SUCCESS);
+            
+            UserToken Token = (UserToken) Content.get(GS_AUTH_FS_TOKEN);
+            User UserInfo = Account.getUser(Token.getSubject());
+            
+            if(Token.authToken(Account.Key) && Token.getTimestamp().equals(UserInfo.getTimestamp())){
+                System.out.println("GS authentication successful!");
+                System.out.println("Token contents: " + Token.getContents());
+            }
+            else{
+                Response = GenerateErrorMessage(Content);
+                System.out.println("GS authentication failed");
+                System.out.println("Token contents: " + Token.getContents());
+                System.out.println("Token signature: " + Token.getSignature());
+            }
+            
+            return Response;
+            
+        }
+    }
 
     static public Message GenerateErrorMessage(ArrayList<Object> Content) {
         Message Response = new Message(GS_ERROR);
@@ -306,8 +343,10 @@ public class GroupServer2 {
     
     public static int GS_PORT = 8765;
     public static String GS_STORAGE = System.getProperty("user.dir") + File.separator + "GroupServer" + File.separator + "UserList.bin";
-    public static String GS_IDENTITY = "test_server";
+    public static String GS_KEYS = System.getProperty("user.dir") + File.separator + "GroupServer" + File.separator + "GSKeyList.bin";
+    public static String GS_IDENTITY = "127.0.0.1";
     public static String GS_ADMIN_GROUP = "admin";
+    public static String GS_FILE_SERVER_GROUP = "file";
     public static UserList Account;
 
     GroupServer2(int Port) {
@@ -319,13 +358,50 @@ public class GroupServer2 {
         System.out.println("Initalize group server");
         ServerFramework Server = new ServerFramework(GS_PORT)
         {
+            @Override
             public Message Decode(Object o)
             {
-                return (Message) o;
+                Message Request = (Message) o;
+                if(Request != null)
+                {
+                    String Command = Request.getMessage();
+                    ArrayList<Object> Content = Request.getObjCont();
+
+                    if(!Command.equals(GS_LOGIN) && !Command.equals(GS_AUTH))
+                    {
+                        // Get the token
+                        UserToken Token = (UserToken) Content.get(GS_GENERAL_USER_TOKEN);
+                        // Authenticate
+                        if(!Token.authToken(Account.Key))
+                        {
+                            Request = null;
+                        }
+                    }
+                }
+                return Request;
             }
             
+            @Override
             public Object Encode(Message o)
             {
+                // Sign the token in the message
+                if(o.getMessage().equals(GS_SUCCESS))
+                {
+                    // Make a new message
+                    Message Response = new Message(o.getMessage());
+                    // Get object array
+                    ArrayList<Object> Content = o.getObjCont();
+                    // Get the token
+                    UserToken Token = (UserToken) Content.get(GS_SUCCESS_USER_TOKEN);
+                    // Attach the signed token
+                    Token.signToken(Account.Key);
+                    Response.addObject((UserToken) Token);
+                    // Attach rest of object array
+                    for(int i = GS_SUCCESS_USER_TOKEN; i<Content.size(); i++)
+                        Response.addObject(Content.get(i));
+                    
+                    return (Object) Response;
+                }
                 return (Object) o;
             }
         };
@@ -335,6 +411,7 @@ public class GroupServer2 {
         addgroupCallback addgroup = new addgroupCallback();
         mgntCallback mgnt = new mgntCallback();
         listgroupCallback listgroup = new listgroupCallback();
+        authCallback auth = new authCallback();
 
         // Register callbacks
         System.out.println("Register messages");
@@ -344,17 +421,18 @@ public class GroupServer2 {
         Server.RegisterMessage(GS_ADDGROUP, addgroup);
         Server.RegisterMessage(GS_MGNT, mgnt);
         Server.RegisterMessage(GS_LISTGROUP, listgroup);
-
+        Server.RegisterMessage(GS_AUTH, auth);
+        
         // Initalize account information
         File FileHandle = new File(GS_STORAGE);
         FileHandle.getParentFile().mkdirs();
         Account = new UserList(GS_STORAGE);
-        if (!Account.Load(GS_ADMIN_GROUP))
+        if (!Account.Load(GS_ADMIN_GROUP, GS_FILE_SERVER_GROUP))
         {
             System.out.println("Unable to initalize user account information, halt");
             return;
         }
-
+       
         // Start listener
         System.out.println("Start the listener");
         Server.run();

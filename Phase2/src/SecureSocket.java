@@ -39,7 +39,7 @@ public class SecureSocket {
         try
         {
             Crypto crypto = new Crypto();
-            KeyPair Pair = crypto.createKeyPair();
+            KeyPair Pair = Crypto.createKeyPair();
             
             //1a. client send public_c
             Output.writeUnshared(Pair.getPublic());

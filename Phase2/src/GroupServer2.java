@@ -309,7 +309,7 @@ public class GroupServer2 {
     static class authCallback implements ServerFramework.ServerCallback {
 
         @Override
-        public Message CallbackProc(Socket FS, ArrayList<Object> Content) {
+        public Message CallbackProc(SecureSocket FS, ArrayList<Object> Content) {
             // Received an authentication message
             
             System.out.println("I'm in the GS auth");

@@ -199,12 +199,12 @@ public class Client2 {
     };
 
     // Group server services
-    static boolean changePassword(UserToken token, String oldPassword, String newPassword) {
+    static boolean changePassword(String oldPassword, String newPassword) {
         Message Upload = new Message(GroupServer2.GS_CHANGEPASS);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
-        Upload.addObject((String) token.getSubject());
+        Upload.addObject((UserToken) Token);
+        Upload.addObject((String) Token.getSubject());
         Crypto crypto = new Crypto();
         Upload.addObject((byte[]) Crypto.getHash(oldPassword));
         Upload.addObject((byte[]) Crypto.getHash(newPassword));
@@ -242,7 +242,7 @@ public class Client2 {
             System.out.print("Please enter the new password: ");
             String newPass = Input.nextLine();
 
-            if (!changePassword(Token, currentPass, newPass)) {
+            if (!changePassword(currentPass, newPass)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");
@@ -250,11 +250,11 @@ public class Client2 {
         }
     };
 
-    static boolean createUser(UserToken token, String Username, String Password) {
+    static boolean createUser(String Username, String Password) {
         Message Upload = new Message(GroupServer2.GS_ADDUSER);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
+        Upload.addObject((UserToken) Token);
         Upload.addObject((String) Username);
         Crypto crypto = new Crypto();
         Upload.addObject((byte[]) Crypto.getHash(Password));
@@ -291,7 +291,7 @@ public class Client2 {
             System.out.print("Please enter the password: ");
             String Password = Input.nextLine();
 
-            if (!createUser(Token, Username, Password)) {
+            if (!createUser(Username, Password)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");
@@ -299,11 +299,11 @@ public class Client2 {
         }
     };
 
-    static boolean createGroup(UserToken token, String Group) {
+    static boolean createGroup(String Group) {
         Message Upload = new Message(GroupServer2.GS_ADDGROUP);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
+        Upload.addObject((UserToken) Token);
         Upload.addObject((String) Group);
 
         //  Send message
@@ -337,7 +337,7 @@ public class Client2 {
             System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
-            if (!createGroup(Token, Group)) {
+            if (!createGroup(Group)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");
@@ -345,11 +345,11 @@ public class Client2 {
         }
     };
 
-    static boolean manageUser(UserToken token, String Group, String UserName, String Operation) {
+    static boolean manageUser(String Group, String UserName, String Operation) {
         Message Upload = new Message(GroupServer2.GS_MGNT);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
+        Upload.addObject((UserToken) Token);
         Upload.addObject((String) Group);
         Upload.addObject((String) UserName);
         boolean Option;
@@ -381,7 +381,7 @@ public class Client2 {
             return false;
         } else {
             // Update token
-            if (token.getSubject().equals(UserName)) {
+            if (Token.getSubject().equals(UserName)) {
                 UpdateToken((UserToken) Response.getObjCont().get(GroupServer2.GS_SUCCESS_USER_TOKEN));
             }
             return true;
@@ -396,7 +396,7 @@ public class Client2 {
             String Group = Input.nextLine();
 
             // Code in listmembers
-            List<String> UserList = listMembers(Token, Group);
+            List<String> UserList = listMembers(Group);
             if (UserList == null) {
                 System.out.println("Operation failed");
                 return;
@@ -415,14 +415,14 @@ public class Client2 {
             System.out.print("Please enter the operation [add|remove]: ");
             String Operation = Input.nextLine();
 
-            if (!manageUser(Token, Group, UserName, Operation)) {
+            if (!manageUser(Group, UserName, Operation)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation succeed");
             }
 
             // Code in listmembers
-            UserList = listMembers(Token, Group);
+            UserList = listMembers(Group);
             if (UserList == null) {
                 System.out.println("Operation failed");
                 return;
@@ -437,11 +437,11 @@ public class Client2 {
         }
     };
 
-    static List<String> listMembers(UserToken token, String group) {
+    static List<String> listMembers(String group) {
         Message Upload = new Message(GroupServer2.GS_LISTGROUP);
         
         // Create Message header
-        Upload.addObject((UserToken) token);
+        Upload.addObject((UserToken) Token);
         Upload.addObject((String) group);
 
         //  Send message
@@ -474,7 +474,7 @@ public class Client2 {
             System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
-            List<String> UserList = listMembers(Token, Group);
+            List<String> UserList = listMembers(Group);
             if (UserList == null) {
                 System.out.println("Operation failed");
             } else {
@@ -487,11 +487,11 @@ public class Client2 {
     };
 
     // File server services
-    static List<String> listFiles(UserToken token, String group) {
+    static List<String> listFiles(String group) {
         Message Upload = new Message(FileServer.FS_LIST);
 
         // Create Message header
-        Upload.addObject((UserToken) token);
+        Upload.addObject((UserToken) Token);
         Upload.addObject((String) group);
 
         //  Send message
@@ -524,7 +524,7 @@ public class Client2 {
             System.out.print("Please enter the group name: ");
             String Group = Input.nextLine();
 
-            List<String> FileList = listFiles(Token, Group);
+            List<String> FileList = listFiles(Group);
             if (FileList == null) {
                 System.out.println("Operation failed");
             } else {
@@ -536,12 +536,12 @@ public class Client2 {
         }
     };
 
-    static boolean upload(UserToken token, String group, String remoteFile, String localFile) {
+    static boolean upload(String group, String remoteFile, String localFile) {
         Message Upload = new Message(FileServer.FS_UPLOAD);
 
         try {
             // Create Message header
-            Upload.addObject((UserToken) token);
+            Upload.addObject((UserToken) Token);
             Upload.addObject((String) group);
             Upload.addObject((String) remoteFile);
 
@@ -591,7 +591,7 @@ public class Client2 {
             System.out.print("Please enter the remote file name: ");
             String Remote = Input.nextLine();
 
-            if (!upload(Token, Group, Remote, LocalFile + Local)) {
+            if (!upload(Group, Remote, LocalFile + Local)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation Succeed");
@@ -599,11 +599,11 @@ public class Client2 {
         }
     };
 
-    static boolean download(UserToken token, String group, String remoteFile, String localFile) {
+    static boolean download(String group, String remoteFile, String localFile) {
         Message Download = new Message(FileServer.FS_DOWNLOAD);
 
         // Create Message header
-        Download.addObject((UserToken) token);
+        Download.addObject((UserToken) Token);
         Download.addObject((String) group);
         Download.addObject((String) remoteFile);
 
@@ -659,7 +659,7 @@ public class Client2 {
             System.out.print("Please enter the local file name: ");
             String Local = Input.nextLine();
 
-            if (!download(Token, Group, Remote, LocalFile + Local)) {
+            if (!download(Group, Remote, LocalFile + Local)) {
                 System.out.println("Operation failed");
             } else {
                 System.out.println("Operation Succeed");

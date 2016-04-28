@@ -59,87 +59,6 @@ import java.security.*;
  */
 public class Client2 {
 
-    // Can't get import working, just copy the definition
-    public final static int GS_GENERAL_USER_TOKEN = 0;  //UserToken Token
-    public final static int GS_GENERAL_GROUP_NAME = 1;  //String    Group
-    public final static int GS_GENERAL_USER_NAME = 1;   //String    User
-
-    public final static String GS_LOGIN = "login";      //login
-    public final static int GS_LOGIN_USER_TOKEN = 0;    //UserToken Token
-    public final static int GS_LOGIN_USER_NAME = 1;     //String    User
-
-    public final static String GS_CHANGEPASS = "changepass"; //changepass
-    public final static int GS_CHANGEPASS_USER_TOKEN = 0;    //UserToken Token
-    public final static int GS_CHANGEPASS_USER_NAME = 1;     //String User
-    public final static int GS_CHANGEPASS_OLD_PW = 2;        //byte[] old pass
-    public final static int GS_CHANGEPASS_NEW_PW = 3;        //byte[] new pass
-
-    public final static String GS_ADDUSER = "adduser";  //adduser
-    public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
-    public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
-    public final static int GS_ADDUSER_USER_PASSWD = 2; //byte[]    Password
-
-    public final static String GS_ADDGROUP = "addgroup";//addgroup
-    public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
-    public final static int GS_ADDGROUP_GROUP_NAME = 1; //String    Group
-
-    public final static String GS_MGNT = "mgnt";        //mgnt
-    public final static int GS_MGNT_USER_TOKEN = 0;     //UserToken Token
-    public final static int GS_MGNT_GROUP_NAME = 1;     //String    Group
-    public final static int GS_MGNT_USER_NAME = 2;      //String    User
-    public final static int GS_MGNT_OPTION = 3;         //boolean   Option
-    public final static boolean GS_MGNT_OPTION_ADD = true;      //boolean   Option
-    public final static boolean GS_MGNT_OPTION_REMOVE = false;  //boolean   Option
-
-    public final static String GS_LISTGROUP = "listgroup";//listgroup
-    public final static int GS_LISTGROUP_USER_TOKEN = 0; //UserToken Token
-    public final static int GS_LISTGROUP_GROUP_NAME = 1; //String    Group
-
-    public final static String GS_VIEW = "view";        //view
-    public final static int GS_VIEW_USER_TOKEN = 0;     //UserToken Token
-    public final static int GS_VIEW_GROUP_NAME = 1;     //String    Group
-    public final static int GS_VIEW_USER_LIST = 2;      //String[]  List
-
-    public final static String GS_SUCCESS = "success";  //success
-    public final static int GS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
-    public final static int GS_SUCCESS_GROUP_NAME = 1;  //String    Group
-    public final static int GS_SUCCESS_USER_NAME = 1;   //String    User
-
-    public final static String GS_ERROR = "error";      //error
-    public final static int GS_ERROR_USER_TOKEN = 0;    //UserToken Token
-    public final static int GS_ERROR_GROUP_NAME = 1;    //String    Group
-
-    public final static int FS_GENERAL_USER_TOKEN = 0;  //UserToken Token
-    public final static int FS_GENERAL_GROUP_NAME = 1;  //String    Group
-
-    public final static String FS_DOWNLOAD = "download";//download
-    public final static int FS_DOWNLOAD_USER_TOKEN = 0; //UserToken Token
-    public final static int FS_DOWNLOAD_GROUP_NAME = 1; //String    Group
-    public final static int FS_DOWNLOAD_FILE_NAME = 2;  //String    FileName
-
-    public final static String FS_UPLOAD = "upload";    //upload
-    public final static int FS_UPLOAD_USER_TOKEN = 0;   //UserToken Token
-    public final static int FS_UPLOAD_GROUP_NAME = 1;   //String    Group
-    public final static int FS_UPLOAD_FILE_NAME = 2;    //String    FileName
-    public final static int FS_UPLOAD_FILE_CONTENT = 3; //byte[]    Content
-
-    public final static String FS_LIST = "list";        //list
-    public final static int FS_LIST_USER_TOKEN = 0;     //UserToken Token
-    public final static int FS_LIST_GROUP_NAME = 1;     //String    Group
-
-    public final static String FS_VIEW = "view";        //view
-    public final static int FS_VIEW_USER_TOKEN = 0;     //UserToken Token
-    public final static int FS_VIEW_GROUP_NAME = 1;     //String    Group
-    public final static int FS_VIEW_FILE_LIST = 2;      //String[]  List
-
-    public final static String FS_SUCCESS = "success";  //success
-    public final static int FS_SUCCESS_USER_TOKEN = 0;  //UserToken Token
-    public final static int FS_SUCCESS_GROUP_NAME = 1;  //String    Group
-
-    public final static String FS_ERROR = "error";      //error
-    public final static int FS_ERROR_USER_TOKEN = 0;    //UserToken Token
-    public final static int FS_ERROR_GROUP_NAME = 1;    //String    Group
-    public final static int FS_ERROR_EXCEPTION = 2;     //Exception e
 
     // Common services
     static boolean connect() {
@@ -156,7 +75,7 @@ public class Client2 {
     }
 
     static boolean getToken(String UserName, String Password) {
-        Message Login = new Message(GS_LOGIN);
+        Message Login = new Message(GroupServer2.GS_LOGIN);
         // Create Message header
         Login.addObject((UserToken) null);
         Login.addObject((String) UserName);
@@ -180,7 +99,7 @@ public class Client2 {
 
         // Update token
         if (Response.getMessage().equals("success")) {
-            UpdateToken((UserToken) Response.getObjCont().get(GS_SUCCESS_USER_TOKEN));
+            UpdateToken((UserToken) Response.getObjCont().get(GroupServer2.GS_SUCCESS_USER_TOKEN));
             return true;
         }
         return false;
@@ -274,14 +193,14 @@ public class Client2 {
 
     // Group server services
     static boolean changePassword(UserToken token, String oldPassword, String newPassword) {
-        Message Upload = new Message(GS_CHANGEPASS);
+        Message Upload = new Message(GroupServer2.GS_CHANGEPASS);
 
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) token.getSubject());
         Crypto crypto = new Crypto();
-        Upload.addObject((byte[]) crypto.getHash(oldPassword));
-        Upload.addObject((byte[]) crypto.getHash(newPassword));
+        Upload.addObject((byte[]) Crypto.getHash(oldPassword));
+        Upload.addObject((byte[]) Crypto.getHash(newPassword));
 
         //  Send message
         try {
@@ -298,7 +217,7 @@ public class Client2 {
             return false;
         }
 
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
+        if (!Response.getMessage().equals(GroupServer2.GS_SUCCESS)) {
             return false;
         } else {
             return true;
@@ -325,13 +244,13 @@ public class Client2 {
     };
 
     static boolean createUser(UserToken token, String Username, String Password) {
-        Message Upload = new Message(GS_ADDUSER);
+        Message Upload = new Message(GroupServer2.GS_ADDUSER);
 
         // Create Message header
         Upload.addObject((UserToken) token);
         Upload.addObject((String) Username);
         Crypto crypto = new Crypto();
-        Upload.addObject((byte[]) crypto.getHash(Password));
+        Upload.addObject((byte[]) Crypto.getHash(Password));
 
         //  Send message
         try {
@@ -348,7 +267,7 @@ public class Client2 {
             return false;
         }
 
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
+        if (!Response.getMessage().equals(GroupServer2.GS_SUCCESS)) {
             return false;
         } else {
             return true;
@@ -374,7 +293,7 @@ public class Client2 {
     };
 
     static boolean createGroup(UserToken token, String Group) {
-        Message Upload = new Message(GS_ADDGROUP);
+        Message Upload = new Message(GroupServer2.GS_ADDGROUP);
 
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -395,11 +314,11 @@ public class Client2 {
             return false;
         }
 
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
+        if (!Response.getMessage().equals(GroupServer2.GS_SUCCESS)) {
             return false;
         } else {
             // Update token
-            UpdateToken((UserToken)Response.getObjCont().get(GS_SUCCESS_USER_TOKEN));
+            UpdateToken((UserToken)Response.getObjCont().get(GroupServer2.GS_SUCCESS_USER_TOKEN));
             return true;
         }
     }
@@ -420,7 +339,7 @@ public class Client2 {
     };
 
     static boolean manageUser(UserToken token, String Group, String UserName, String Operation) {
-        Message Upload = new Message(GS_MGNT);
+        Message Upload = new Message(GroupServer2.GS_MGNT);
 
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -428,9 +347,9 @@ public class Client2 {
         Upload.addObject((String) UserName);
         boolean Option;
         if (Operation.equals("add")) {
-            Option = GS_MGNT_OPTION_ADD;
+            Option = GroupServer2.GS_MGNT_OPTION_ADD;
         } else if (Operation.equals("remove")) {
-            Option = GS_MGNT_OPTION_REMOVE;
+            Option = GroupServer2.GS_MGNT_OPTION_REMOVE;
         } else {
             return false;
         }
@@ -451,13 +370,12 @@ public class Client2 {
             return false;
         }
 
-        if (!Response.getMessage().equals(GS_SUCCESS)) {
+        if (!Response.getMessage().equals(GroupServer2.GS_SUCCESS)) {
             return false;
         } else {
             // Update token
             if (token.getSubject().equals(UserName)) {
-                
-                UpdateToken((UserToken) Response.getObjCont().get(FS_SUCCESS_USER_TOKEN));
+                UpdateToken((UserToken) Response.getObjCont().get(GroupServer2.GS_SUCCESS_USER_TOKEN));
             }
             return true;
         }
@@ -513,7 +431,7 @@ public class Client2 {
     };
 
     static List<String> listMembers(UserToken token, String group) {
-        Message Upload = new Message(GS_LISTGROUP);
+        Message Upload = new Message(GroupServer2.GS_LISTGROUP);
         
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -534,11 +452,11 @@ public class Client2 {
             return null;
         }
 
-        if (!Response.getMessage().equals(GS_VIEW)) {
+        if (!Response.getMessage().equals(GroupServer2.GS_VIEW)) {
             return null;
         } else {
             ArrayList<Object> Content = Response.getObjCont();
-            return (List<String>) Content.get(GS_VIEW_USER_LIST);
+            return (List<String>) Content.get(GroupServer2.GS_VIEW_USER_LIST);
         }
     }
     static ClientFramework ListMembers = new ClientFramework("List members in your group") {
@@ -563,7 +481,7 @@ public class Client2 {
 
     // File server services
     static List<String> listFiles(UserToken token, String group) {
-        Message Upload = new Message(FS_LIST);
+        Message Upload = new Message(FileServer.FS_LIST);
 
         // Create Message header
         Upload.addObject((UserToken) token);
@@ -584,11 +502,11 @@ public class Client2 {
             return null;
         }
 
-        if (!Response.getMessage().equals(FS_VIEW)) {
+        if (!Response.getMessage().equals(FileServer.FS_VIEW)) {
             return null;
         } else {
             ArrayList<Object> Content = Response.getObjCont();
-            return (List<String>) Content.get(FS_VIEW_FILE_LIST);
+            return (List<String>) Content.get(FileServer.FS_VIEW_FILE_LIST);
         }
     }
     static ClientFramework ListFiles = new ClientFramework("List Files") {
@@ -612,7 +530,7 @@ public class Client2 {
     };
 
     static boolean upload(UserToken token, String group, String remoteFile, String localFile) {
-        Message Upload = new Message(FS_UPLOAD);
+        Message Upload = new Message(FileServer.FS_UPLOAD);
 
         try {
             // Create Message header
@@ -651,7 +569,7 @@ public class Client2 {
             return false;
         }
 
-        return (Response.getMessage().equals(FS_SUCCESS));
+        return (Response.getMessage().equals(FileServer.FS_SUCCESS));
     }
     static ClientFramework Upload = new ClientFramework("Upload") {
         @Override
@@ -675,7 +593,7 @@ public class Client2 {
     };
 
     static boolean download(UserToken token, String group, String remoteFile, String localFile) {
-        Message Download = new Message(FS_DOWNLOAD);
+        Message Download = new Message(FileServer.FS_DOWNLOAD);
 
         // Create Message header
         Download.addObject((UserToken) token);
@@ -698,14 +616,14 @@ public class Client2 {
         }
 
         // Check response
-        if (!Response.getMessage().equals(FS_UPLOAD)) {
+        if (!Response.getMessage().equals(FileServer.FS_UPLOAD)) {
             return false;
         }
 
         // Save file
         try {
             ArrayList<Object> Content = Response.getObjCont();
-            byte[] FileContent = (byte[]) Content.get(FS_UPLOAD_FILE_CONTENT);
+            byte[] FileContent = (byte[]) Content.get(FileServer.FS_UPLOAD_FILE_CONTENT);
             File FileHandle = new File(localFile);
             FileHandle.getParentFile().mkdirs();
             FileOutputStream FileStream = new FileOutputStream(FileHandle);

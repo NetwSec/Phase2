@@ -11,6 +11,7 @@ import java.security.KeyPairGenerator;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
 
 /**
  * A general Crypto class
@@ -60,10 +61,10 @@ public class Crypto {
         }
     }
 
-    byte[] AES(int EncryptMode, Key EncryptionKey, byte[] Content) throws Exception
+    byte[] AES(int EncryptMode, Key EncryptionKey, IvParameterSpec InitVector, byte[] Content) throws Exception
     {
-        Cipher cipher = Cipher.getInstance("AES", "BC");
-        cipher.init(EncryptMode, EncryptionKey);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
+        cipher.init(EncryptMode, EncryptionKey, InitVector);
         return cipher.doFinal(Content);
     }
     

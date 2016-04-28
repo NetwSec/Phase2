@@ -4,9 +4,11 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.KeyPair;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 
 public class SecureSocket {
     final int SS_METHOD_NONE = 0;
@@ -18,6 +20,7 @@ public class SecureSocket {
     ObjectInputStream Input;
     
     SecretKey AESKey;
+    IvParameterSpec InitVector;
     
 
     SecureSocket(String IP, int Port) throws Exception
@@ -65,7 +68,8 @@ public class SecureSocket {
             AESKey = (SecretKey) cipher.unwrap(EncryptedData, "RSA", Cipher.SECRET_KEY);
             
             //3b. shake hands
-            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes("success"));
+            InitVector = new IvParameterSpec(generateIV(16));
+            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, InitVector, crypto.convertToBytes("success"));
             Output.writeUnshared(EncryptedData);
         }
         catch (Exception e)
@@ -97,7 +101,7 @@ public class SecureSocket {
             
             //3c. final
             EncryptedData = (byte[]) Input.readUnshared();
-            String Hand = (String) crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
+            String Hand = (String) crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, InitVector, EncryptedData));
             
             if (!Hand.equals("success"))
             {
@@ -114,7 +118,7 @@ public class SecureSocket {
     public void send(Object o) throws Exception
     {
         Crypto crypto = new Crypto();
-        byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, crypto.convertToBytes(o));
+        byte[] EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, InitVector, crypto.convertToBytes(o));
         Output.writeUnshared(EncryptedData);
     }
     
@@ -123,7 +127,21 @@ public class SecureSocket {
         Object Response = null;
         byte[] EncryptedData = (byte[]) Input.readUnshared();
         Crypto crypto = new Crypto();
-        Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, EncryptedData));
+        Response = crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, InitVector, EncryptedData));
         return Response;
+    }
+    
+        /**
+     * Generates a random initialization vector of size n
+     * @param n
+     * @return array of n random bytes
+     */
+    private byte[] generateIV(int n)
+    {
+        SecureRandom rand =new SecureRandom();
+        byte [] randBytes = new byte[n];
+        rand.nextBytes(randBytes);
+        
+        return randBytes;
     }
 }

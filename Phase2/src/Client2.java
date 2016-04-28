@@ -61,12 +61,19 @@ public class Client2 {
 
 
     // Common services
-    static boolean connect() {
+    static boolean connectGS(String Address) {
         try {
-            GServer = new SecureSocket(GS_ADDRESS, GS_PORT);
-            GServer.connect();
-
             FServer = new SecureSocket(FS_ADDRESS, FS_PORT);
+            FServer.connect();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    static boolean connectFS(String Address) {
+        try {
+            FServer = new SecureSocket(Address, FS_PORT);
             FServer.connect();
             return true;
         } catch (Exception e) {
@@ -130,7 +137,7 @@ public class Client2 {
             FS_PORT = 8766;
 
             // 2. Connect to remote servers
-            if (!connect()) {
+            if (!connectGS(GS_ADDRESS) || !connectFS(FS_ADDRESS)) {
                 System.out.println("Connection failed");
                 return;
             } else {

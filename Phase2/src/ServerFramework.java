@@ -130,9 +130,9 @@ public class ServerFramework implements Runnable {
                         System.out.println("Unknown message [" + Command + "], continue");
                         
                         // Send an error packet
-                        Message Response = new Message("error");
-                        UserToken Token = (UserToken) Content.get(GroupServer2.GS_GENERAL_USER_TOKEN);
-                        String RequestedGroup = (String) Content.get(GroupServer2.GS_GENERAL_GROUP_NAME);
+                        Message Response = new Message(GroupServer2.GS_ERROR);
+                        UserToken Token = (UserToken) Content.get(GroupServer2.GS_ERROR_USER_TOKEN);
+                        String RequestedGroup = (String) Content.get(GroupServer2.GS_ERROR_GROUP_NAME);
                         Response.addObject((UserToken) Token);
                         Response.addObject((String) RequestedGroup);
                         Response.addObject(new Exception("Unknown message"));

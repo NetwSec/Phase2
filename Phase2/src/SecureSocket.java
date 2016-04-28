@@ -34,6 +34,20 @@ public class SecureSocket {
         Input = new ObjectInputStream(Connection.getInputStream());
     }
     
+    public void close()
+    {
+        try
+        {
+        Input.close();
+        Output.close();
+        Connection.close();
+        }
+        catch (Exception e)
+        {
+            
+        }
+    }
+    
     public boolean connect()
     {
         try

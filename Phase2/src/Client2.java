@@ -181,8 +181,8 @@ public class Client2 {
 
     static void disconnect() {
         try {
-            GServer = null;
-            FServer = null;
+            GServer.close();
+            FServer.close();
         } catch (Exception ex) {
         }
     }

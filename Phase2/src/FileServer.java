@@ -260,6 +260,10 @@ public class FileServer {
         client.connectGS(issuer);
         client.getToken("file", "file");
         
-        return client.authenticate(Token);
+        boolean result = client.authenticate(Token);
+        
+        client.disconnect();
+        
+        return result;
     }
 }

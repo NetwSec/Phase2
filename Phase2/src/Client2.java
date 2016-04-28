@@ -63,7 +63,7 @@ public class Client2 {
     // Common services
     static boolean connectGS(String Address) {
         try {
-            GServer = new SecureSocket(Address, FS_PORT);
+            GServer = new SecureSocket(Address, GroupServer2.GS_PORT);
             GServer.connect();
             return true;
         } catch (Exception e) {
@@ -73,7 +73,7 @@ public class Client2 {
     
     static boolean connectFS(String Address) {
         try {
-            FServer = new SecureSocket(Address, FS_PORT);
+            FServer = new SecureSocket(Address, FileServer.FS_PORT);
             FServer.connect();
             return true;
         } catch (Exception e) {
@@ -125,16 +125,12 @@ public class Client2 {
                 GS_ADDRESS = "localhost";
             }
 
-            GS_PORT = 8765;
-
             System.out.println("Please enter the file server address");
             System.out.print("Default[localhost]: ");
             FS_ADDRESS = Input.nextLine();
             if (FS_ADDRESS.equals("")) {
                 FS_ADDRESS = "localhost";
             }
-
-            FS_PORT = 8766;
 
             // 2. Connect to remote servers
             if (!connectGS(GS_ADDRESS) || !connectFS(FS_ADDRESS)) {
@@ -694,10 +690,8 @@ public class Client2 {
     }
     
     static String GS_ADDRESS = "localhost";
-    static int GS_PORT = 8765;
 
     static String FS_ADDRESS = "localhost";
-    static int FS_PORT = 8766;
 
     static SecureSocket GServer;
 

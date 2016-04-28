@@ -63,8 +63,17 @@ public class Crypto {
 
     byte[] AES(int EncryptMode, Key EncryptionKey, IvParameterSpec InitVector, byte[] Content) throws Exception
     {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
-        cipher.init(EncryptMode, EncryptionKey, InitVector);
+        Cipher cipher;
+        if (InitVector != null)
+        {
+            cipher = Cipher.getInstance("AES/CBC/PKCS5Padding", "BC");
+            cipher.init(EncryptMode, EncryptionKey, InitVector);
+        }
+        else
+        {
+            cipher = Cipher.getInstance("AES", "BC");
+            cipher.init(EncryptMode, EncryptionKey);
+        }
         return cipher.doFinal(Content);
     }
     

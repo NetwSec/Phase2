@@ -67,10 +67,20 @@ public class SecureSocket {
             cipher.init(Cipher.UNWRAP_MODE, Pair.getPrivate());
             AESKey = (SecretKey) cipher.unwrap(EncryptedData, "RSA", Cipher.SECRET_KEY);
             
-            //3b. shake hands
-            InitVector = new IvParameterSpec(generateIV(16));
-            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, InitVector, crypto.convertToBytes("success"));
+            //3b. send iv
+            byte[] iv = generateIV(16);
+            InitVector = new IvParameterSpec(iv);
+            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, null, iv);
             Output.writeUnshared(EncryptedData);
+            
+            // 4. end
+            EncryptedData = (byte[]) Input.readUnshared();
+            String Hand = (String) crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, InitVector, EncryptedData));
+            
+            if (!Hand.equals("success"))
+            {
+                throw new Exception("hand shaking failed");
+            }
         }
         catch (Exception e)
         {
@@ -99,14 +109,14 @@ public class SecureSocket {
             byte[] EncryptedData = cipher.wrap(AESKey);
             Output.writeUnshared(EncryptedData);
             
-            //3c. final
+            //3c. get iv
             EncryptedData = (byte[]) Input.readUnshared();
-            String Hand = (String) crypto.convertFromBytes(crypto.AES(Cipher.DECRYPT_MODE, AESKey, InitVector, EncryptedData));
-            
-            if (!Hand.equals("success"))
-            {
-                throw new Exception("hand shaking failed");
-            }
+            byte[] iv = crypto.AES(Cipher.DECRYPT_MODE, AESKey, null, EncryptedData);
+            InitVector = new IvParameterSpec(iv);
+
+            // 4. send success
+            EncryptedData = crypto.AES(Cipher.ENCRYPT_MODE, AESKey, InitVector, crypto.convertToBytes("success"));
+            Output.writeUnshared(EncryptedData);
         }
         catch (Exception e)
         {

@@ -63,8 +63,8 @@ public class Client2 {
     // Common services
     static boolean connectGS(String Address) {
         try {
-            FServer = new SecureSocket(FS_ADDRESS, FS_PORT);
-            FServer.connect();
+            GServer = new SecureSocket(Address, FS_PORT);
+            GServer.connect();
             return true;
         } catch (Exception e) {
             return false;

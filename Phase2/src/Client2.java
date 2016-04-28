@@ -667,6 +667,32 @@ public class Client2 {
         }
     };
 
+    static boolean authenticate(UserToken token)
+    {
+        Message Authenticate = new Message(GroupServer2.GS_AUTH);
+        
+        Authenticate.addObject((UserToken) Token);
+        Authenticate.addObject((String) Token.getSubject());
+        Authenticate.addObject((UserToken) token);
+
+        //  Send message
+        try {
+            GServer.send(Authenticate);
+        } catch (Exception ex) {
+            return false;
+        }
+
+        //  Receive response
+        Message Response;
+        try {
+            Response = (Message) GServer.receive();
+        } catch (Exception ex) {
+            return false;
+        }
+        
+        return Response.getMessage().equals(GroupServer2.GS_SUCCESS);
+    }
+    
     static String GS_ADDRESS = "localhost";
     static int GS_PORT = 8765;
 

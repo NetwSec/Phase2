@@ -256,39 +256,10 @@ public class FileServer {
             return false;
         }
         
-        SecureSocket GServer;
-        try {
-            GServer = new SecureSocket(issuer, GroupServer2.GS_PORT);
-        } catch (Exception e) {
-            return false;
-        }
+        Client2 client = new Client2();
+        client.connectGS(issuer);
+        client.getToken("file", "file");
         
-        Message Authenticate = new Message(GroupServer2.GS_AUTH);
-        Authenticate.addObject((UserToken) Token);
-        Authenticate.addObject((String) Token.getSubject());
-        
-        UserToken test = Token;
-        System.out.println("FS: I'm about to send the message");
-        System.out.println("Token contents: " + test.getContents());
-        //  Send message
-        try {
-            GServer.send(Authenticate);
-        } catch (Exception ex) {
-            return false;
-        }
-
-        //  Receive response
-        Message Response;
-        try {
-            Response = (Message) GServer.receive();
-        } catch (Exception ex) {
-            return false;
-        }
-        
-        System.out.println("FS: I got a response: " + Response.getMessage());
-        
-        boolean result = Response.getMessage().equals(GroupServer2.GS_SUCCESS);
-        
-        return result;
+        return client.authenticate(Token);
     }
 }

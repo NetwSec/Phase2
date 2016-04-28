@@ -258,7 +258,7 @@ public class FileServer {
         
         SecureSocket GServer;
         try {
-            GServer = new SecureSocket(issuer, Client2.GS_PORT);
+            GServer = new SecureSocket(issuer, GroupServer2.GS_PORT);
         } catch (Exception e) {
             return false;
         }

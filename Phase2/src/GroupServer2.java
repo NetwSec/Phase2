@@ -49,8 +49,7 @@ public class GroupServer2 {
     public final static int GS_ADDUSER_USER_TOKEN = 0;  //UserToken Token
     public final static int GS_ADDUSER_USER_NAME = 1;   //String    User
     public final static int GS_ADDUSER_USER_PASSWD = 2; //byte[]    Password
-
-
+    
     public final static String GS_ADDGROUP = "addgroup";//addgroup
     public final static int GS_ADDGROUP_USER_TOKEN = 0; //UserToken Token
     public final static int GS_ADDGROUP_GROUP_NAME = 1; //String    Group
